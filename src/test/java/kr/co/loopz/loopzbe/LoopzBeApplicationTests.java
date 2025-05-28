@@ -1,13 +1,13 @@
-package kr.co.loopz;
+package kr.co.loopz.loopzbe;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class LoopzApplicationTests {
+class LoopzBeApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }
