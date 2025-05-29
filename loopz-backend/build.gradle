@@ -1,0 +1,16 @@
+
+dependencies {
+
+    implementation project(':loopz-admin-service')
+    implementation project(':loopz-authentication-service')
+    implementation project(':loopz-magazine-service')
+    implementation project(':loopz-order-service')
+    implementation project(':loopz-payment-service')
+    implementation project(':loopz-product-service')
+    implementation project(':loopz-search-service')
+    implementation project(':loopz-snap-service')
+    implementation project(':loopz-user-service')
+
+
+}
+

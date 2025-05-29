@@ -1,0 +1,19 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+
+    // spring web
+    api 'org.springframework.boot:spring-boot-starter-web'
+
+    // validation
+    api 'org.springframework.boot:spring-boot-starter-validation'
+
+    // actuator
+    api 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // feign
+    api 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+}

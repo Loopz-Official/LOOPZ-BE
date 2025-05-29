@@ -1,0 +1,8 @@
+
+dependencies {
+
+    implementation project(':loopz-common')
+    implementation project(':loopz-authorization')
+
+}
+
