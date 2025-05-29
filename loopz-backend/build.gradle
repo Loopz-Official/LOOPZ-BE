@@ -1,16 +1,44 @@
 
 dependencies {
 
-    implementation project(':loopz-admin-service')
-    implementation project(':loopz-authentication-service')
-    implementation project(':loopz-magazine-service')
-    implementation project(':loopz-order-service')
-    implementation project(':loopz-payment-service')
-    implementation project(':loopz-product-service')
-    implementation project(':loopz-search-service')
-    implementation project(':loopz-snap-service')
-    implementation project(':loopz-user-service')
+    /**
+     * 현재 모듈은 진입점 모듈
+     * loopz-backend
+     */
 
+    /**
+     * 공통 모듈 2개
+     * common, authorization
+     * MSA 전환시 authorization -> gateway
+     */
+
+    /**
+     * 사용자 관련 모듈 3개
+     * user, authentication, admin
+     */
+    implementation project(':loopz-user-service')
+    // 인증 모듈 (인가는 모든 서비스 모듈에서 authorization 모듈 사용)
+    implementation project(':loopz-authentication-service')
+    // 어드민
+    implementation project(':loopz-admin-service')
+
+
+    /**
+     * 상품 관련 모듈 6개
+     * product, snap, magazine, order, payment, search
+     */
+    // 상품
+    implementation project(':loopz-product-service')
+    // 상품 스냅(후기)
+    implementation project(':loopz-snap-service')
+    // 상품 소개
+    implementation project(':loopz-magazine-service')
+    // 주문
+    implementation project(':loopz-order-service')
+    // 결제
+    implementation project(':loopz-payment-service')
+    // 검색
+    implementation project(':loopz-search-service')
 
 }
 
