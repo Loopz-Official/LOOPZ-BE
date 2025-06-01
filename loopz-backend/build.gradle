@@ -11,13 +11,15 @@ dependencies {
      * common, authorization
      * MSA 전환시 authorization -> gateway
      */
+    implementation project(':loopz-common')
+    implementation project(':loopz-authorization')
 
     /**
      * 사용자 관련 모듈 3개
      * user, authentication, admin
      */
     implementation project(':loopz-user-service')
-    // 인증 모듈 (인가는 모든 서비스 모듈에서 authorization 모듈 사용)
+    // 인증
     implementation project(':loopz-authentication-service')
     // 어드민
     implementation project(':loopz-admin-service')
