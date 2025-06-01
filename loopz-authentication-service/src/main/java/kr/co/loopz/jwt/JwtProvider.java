@@ -48,7 +48,7 @@ public class JwtProvider {
 
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining());
+                .collect(Collectors.joining(","));
 
         return Jwts.builder()
                 .subject(userId)
