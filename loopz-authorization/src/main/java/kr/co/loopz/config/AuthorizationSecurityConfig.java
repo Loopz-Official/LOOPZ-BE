@@ -31,6 +31,8 @@ public class AuthorizationSecurityConfig {
             "/error",
             "/v3/api-docs/**",
             "/swagger-ui/**",
+            "/auth/v1/login/google",
+            "/auth/v1/login/kakao",
     };
 
 
