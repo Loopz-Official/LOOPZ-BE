@@ -37,8 +37,12 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 800MB
-#logging.level:
-#  org.hibernate.SQL: debug
+
+logging.level:
+  kr.co.loopz: debug
+  feign:
+    client:
+      logger: debug
 
 jwt:
   expiration:
