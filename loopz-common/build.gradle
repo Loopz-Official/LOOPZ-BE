@@ -16,4 +16,7 @@ dependencies {
     // feign
     api 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
+    // swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
+
 }
