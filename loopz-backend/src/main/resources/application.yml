@@ -9,7 +9,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     properties:
       hibernate:
         format_sql: true
@@ -40,13 +40,29 @@ spring:
 #logging.level:
 #  org.hibernate.SQL: debug
 
-etc:
-  base-url: ${BASE_URL}
-  front-url: ${FRONT_URL}
-  front-auth-success: ${FRONT_URL}/auth/success
-
 jwt:
   expiration:
     access: ${ACCESS_EXPIRATION}
     refresh: ${REFRESH_EXPIRATION}
   secret: ${JWT_SECRET}
+
+
+etc:
+  base-url: ${BASE_URL}
+  #  front-url: ${FRONT_URL}
+  google-profile-url: https://www.googleapis.com/userinfo/v2/me
+  apple:
+    client-id: ${APPLE_BUNDLE_ID}
+    client-secret: ${APPLE_CLIENT_SECRET_FILE}
+    key-id: ${APPLE_KEY_ID}
+    team-id: ${APPLE_TEAM_ID}
+    redirect-uri: ${BASE_URL}/login/oauth2/code/apple
+  user-service-url: ${USER_SERVICE_URL}
+  authentication-service-url: ${AUTHENTICATION_SERVICE_URL}
+  admin-service-url: ${ADMIN_SERVICE_URL}
+  product-service-url: ${PRODUCT_SERVICE_URL}
+  snap-service-url: ${SNAP_SERVICE_URL}
+  magazine-service-url: ${MAGAZINE_SERVICE_URL}
+  order-service-url: ${ORDER_SERVICE_URL}
+  payment-service-url: ${PAYMENT_SERVICE_URL}
+  search-service-url: ${SEARCH_SERVICE_URL}

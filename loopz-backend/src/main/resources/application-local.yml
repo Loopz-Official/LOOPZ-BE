@@ -5,9 +5,18 @@ POSTGRESQL_HOST: localhost
 POSTGRESQL_PORT: 5432
 POSTGRESQL_DATABASE: loopz_db
 
-BASE_URL: http://localhost:8080
-FRONT_URL: http://localhost:3000
-
 REDIS_HOST: localhost
 REDIS_PORT: 6379
 
+BASE_URL: http://localhost:8080
+FRONT_URL: http://localhost:3000
+
+USER_SERVICE_URL: http://localhost:8080
+AUTHENTICATION_SERVICE_URL: http://localhost:8080
+ADMIN_SERVICE_URL: http://localhost:8080
+PRODUCT_SERVICE_URL: http://localhost:8080
+SNAP_SERVICE_URL: http://localhost:8080
+MAGAZINE_SERVICE_URL: http://localhost:8080
+ORDER_SERVICE_URL: http://localhost:8080
+PAYMENT_SERVICE_URL: http://localhost:8080
+SEARCH_SERVICE_URL: http://localhost:8080
