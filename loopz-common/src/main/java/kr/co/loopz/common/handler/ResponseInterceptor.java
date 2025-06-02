@@ -1,8 +1,8 @@
-package kr.co.loopz.handler;
+package kr.co.loopz.common.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.loopz.dto.CommonResponse;
+import kr.co.loopz.common.dto.CommonResponse;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.ServerHttpRequest;
@@ -31,6 +31,11 @@ public class ResponseInterceptor implements ResponseBodyAdvice {
         // swagger 제외
         String path = request.getURI().getPath();
         if (path.contains("swagger") || path.contains("api-docs") || path.contains("webjars")) {
+            return body;
+        }
+
+        // 내부 API 제외 internal
+        if (path.startsWith("/internal")) {
             return body;
         }
 
