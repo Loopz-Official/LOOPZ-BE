@@ -3,6 +3,7 @@ package kr.co.loopz.authentication.service;
 import kr.co.loopz.authentication.client.GoogleClient;
 import kr.co.loopz.authentication.client.UserServiceClient;
 import kr.co.loopz.authentication.constants.SecurityConstants;
+import kr.co.loopz.authentication.converter.AuthConverter;
 import kr.co.loopz.authentication.dto.request.InternalRegisterRequest;
 import kr.co.loopz.authentication.dto.request.TokenRequest;
 import kr.co.loopz.authentication.dto.response.InternalRegisterResponse;
@@ -25,6 +26,8 @@ public class AuthService {
     private final GoogleClient googleClient;
     private final UserServiceClient userServiceClient;
 
+    private final AuthConverter authConverter;
+
     private final RefreshTokenRedisService refreshTokenRedisService;
     @Value("${jwt.expiration.refresh}")
     private Long REFRESH_TOKEN_EXPIRE_TIME;
@@ -45,11 +48,11 @@ public class AuthService {
         log.debug("구글 사용자 정보: {}", googleUserInfo);
 
         // user-service에 회원가입/로그인 요청
-        InternalRegisterRequest request = InternalRegisterRequest.from(googleUserInfo);
+        InternalRegisterRequest request = authConverter.toInternalRegisterRequest(googleUserInfo);
         InternalRegisterResponse user = userServiceClient.getOrCreateUser(request);
         log.debug("user-service에서 반환된 사용자 정보: {}", user);
 
-        return SocialLoginResponse.from(user);
+        return authConverter.toSocialLoginResponse(user);
     }
 
 

@@ -1,7 +1,5 @@
 package kr.co.loopz.authentication.dto.request;
 
-import kr.co.loopz.authentication.dto.response.GoogleResourceServerResponse;
-
 public record InternalRegisterRequest(
         String email,
         String name,
@@ -9,15 +7,4 @@ public record InternalRegisterRequest(
         String familyName,
         String picture
 ) {
-
-    public static InternalRegisterRequest from(GoogleResourceServerResponse response) {
-        return new InternalRegisterRequest(
-                response.email(),
-                response.name(),
-                response.givenName(),
-                response.familyName(),
-                response.picture()
-        );
-    }
-
 }
