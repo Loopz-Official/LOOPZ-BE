@@ -1,6 +1,6 @@
 spring:
   profiles:
-    include: local, jwt, oauth
+    include: local, jwt, oauth, aws
 
   datasource:
     url: jdbc:postgresql://${POSTGRESQL_HOST}:${POSTGRESQL_PORT}/${POSTGRESQL_DATABASE}
@@ -50,6 +50,18 @@ jwt:
     refresh: ${REFRESH_EXPIRATION}
   secret: ${JWT_SECRET}
 
+cloud:
+  aws:
+    s3:
+      bucket: loopz-bucket
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    region:
+      static: ${AWS_REGION}
+      auto: false
+    stack:
+      auto: false
 
 etc:
   base-url: ${BASE_URL}
