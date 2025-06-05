@@ -6,7 +6,6 @@ import kr.co.loopz.user.dto.request.UserInternalRegisterRequest;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -46,13 +45,16 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
     @Column(length = 1024)
     private String imageUrl;
 
-    @ColumnDefault("false")
-    private boolean isEnabled;
+    private boolean enabled;
 
     @Enumerated(STRING)
     private Role role;
 
 
+    /**
+     * UserEntity 생성 메서드
+     * 회원 가입시 사용
+     */
     public static UserEntity from(UserInternalRegisterRequest request) {
         return UserEntity.builder()
                 .email(request.email())
@@ -60,12 +62,12 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
                 .imageUrl(request.picture())
 
                 .role(Role.USER)
-                .isEnabled(true)
+                .enabled(true)
                 .build();
     }
 
     @Builder(access = PRIVATE)
-    private UserEntity(String email, String realName, String nickName, boolean isEnabled, Role role, String imageUrl) {
+    private UserEntity(String email, String realName, String nickName, boolean enabled, Role role, String imageUrl) {
 
         this.userId = UUID.randomUUID().toString();
 
@@ -75,6 +77,6 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
         this.imageUrl = imageUrl;
 
         this.role = role;
-        this.isEnabled = isEnabled;
+        this.enabled = enabled;
     }
 }

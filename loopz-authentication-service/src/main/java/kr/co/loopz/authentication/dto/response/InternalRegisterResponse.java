@@ -4,7 +4,7 @@ public record InternalRegisterResponse(
         String email,
         String userId,
         String realName,
-        boolean isEnabled,
+        boolean enabled,
         String nickName
 ) {
 }

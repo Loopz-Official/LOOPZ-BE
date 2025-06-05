@@ -1,5 +1,6 @@
 package kr.co.loopz.user.service;
 
+import kr.co.loopz.user.converter.UserConverter;
 import kr.co.loopz.user.domain.UserEntity;
 import kr.co.loopz.user.dto.request.UserInternalRegisterRequest;
 import kr.co.loopz.user.dto.response.UserInternalRegisterResponse;
@@ -15,11 +16,13 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final UserConverter userConverter;
+
     public UserInternalRegisterResponse getOrCreateUser(UserInternalRegisterRequest registerRequest) {
 
         UserEntity userEntity = getOrSave(registerRequest);
 
-        return UserInternalRegisterResponse.from(userEntity);
+        return userConverter.toUserInternalRegisterResponse(userEntity);
     }
 
     private UserEntity getOrSave(UserInternalRegisterRequest registerRequest) {
