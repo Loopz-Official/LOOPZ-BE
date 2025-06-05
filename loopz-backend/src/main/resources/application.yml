@@ -1,0 +1,72 @@
+spring:
+  profiles:
+    include: local, jwt, oauth
+
+  datasource:
+    url: jdbc:postgresql://${POSTGRESQL_HOST}:${POSTGRESQL_PORT}/${POSTGRESQL_DATABASE}
+    username: ${POSTGRESQL_USERNAME}
+    password: ${POSTGRESQL_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT}
+            client-secret: ${GOOGLE_SECRET}
+            redirect-uri: ${BASE_URL}/login/oauth2/code/google
+            authorization-grant-type: authorization_code
+            scope:
+              - profile
+              - email
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 800MB
+
+logging.level:
+  kr.co.loopz: debug
+  feign:
+    client:
+      logger: debug
+
+jwt:
+  expiration:
+    access: ${ACCESS_EXPIRATION}
+    refresh: ${REFRESH_EXPIRATION}
+  secret: ${JWT_SECRET}
+
+
+etc:
+  base-url: ${BASE_URL}
+  #  front-url: ${FRONT_URL}
+  google-profile-url: https://www.googleapis.com/userinfo/v2/me
+  apple:
+    client-id: ${APPLE_BUNDLE_ID}
+    client-secret: ${APPLE_CLIENT_SECRET_FILE}
+    key-id: ${APPLE_KEY_ID}
+    team-id: ${APPLE_TEAM_ID}
+    redirect-uri: ${BASE_URL}/login/oauth2/code/apple
+  user-service-url: ${USER_SERVICE_URL}
+  authentication-service-url: ${AUTHENTICATION_SERVICE_URL}
+  admin-service-url: ${ADMIN_SERVICE_URL}
+  product-service-url: ${PRODUCT_SERVICE_URL}
+  snap-service-url: ${SNAP_SERVICE_URL}
+  magazine-service-url: ${MAGAZINE_SERVICE_URL}
+  order-service-url: ${ORDER_SERVICE_URL}
+  payment-service-url: ${PAYMENT_SERVICE_URL}
+  search-service-url: ${SEARCH_SERVICE_URL}

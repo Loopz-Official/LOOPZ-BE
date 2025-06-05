@@ -13,7 +13,15 @@ dependencies {
     // actuator
     api 'org.springframework.boot:spring-boot-starter-actuator'
 
-    // feign
+    // feign client
     api 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
+    // swagger
+    api 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
+
+    // jpa
+    api 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }

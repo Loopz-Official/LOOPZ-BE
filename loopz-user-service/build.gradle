@@ -5,5 +5,9 @@ dependencies {
     implementation project(':loopz-authorization')
 
 
+    // db - postgres, p6spy
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.1'
+
 }
 
