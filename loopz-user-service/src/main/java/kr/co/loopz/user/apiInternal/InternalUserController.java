@@ -23,10 +23,7 @@ public class InternalUserController {
             @RequestBody UserInternalRegisterRequest registerRequest) {
 
         log.debug("Received request to get or create user: {}", registerRequest);
-        UserInternalRegisterResponse orCreateUser = userService.getOrCreateUser(registerRequest);
-
-        log.debug("Returning user information: {}", orCreateUser);
-        return orCreateUser;
+        return userService.getOrCreateUser(registerRequest);
     }
 
 }

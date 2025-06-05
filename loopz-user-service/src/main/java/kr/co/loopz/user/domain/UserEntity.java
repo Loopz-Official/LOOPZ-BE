@@ -35,11 +35,15 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
     @Column(length = 30, nullable = false, unique = false)
     private String email;
 
-    // 실명
-    @Column(length = 30)
+    @Column(length =30)
     private String realName;
 
-    @Column(nullable = true, unique = true)
+    // 이메일 이름
+    @Column(length = 30)
+    private String loginName;
+
+    // 닉네임
+    @Column(length = 20, nullable = true, unique = true)
     private String nickName;
 
     @Column(length = 1024)
@@ -58,7 +62,7 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
     public static UserEntity from(UserInternalRegisterRequest request) {
         return UserEntity.builder()
                 .email(request.email())
-                .realName(request.name())
+                .loginName(request.name())
                 .imageUrl(request.picture())
 
                 .role(Role.USER)
@@ -67,12 +71,12 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
     }
 
     @Builder(access = PRIVATE)
-    private UserEntity(String email, String realName, String nickName, boolean enabled, Role role, String imageUrl) {
+    private UserEntity(String email, String loginName, String nickName, boolean enabled, Role role, String imageUrl) {
 
         this.userId = UUID.randomUUID().toString();
 
         this.email = email;
-        this.realName = realName;
+        this.loginName = loginName;
         this.nickName = nickName;
         this.imageUrl = imageUrl;
 
