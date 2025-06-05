@@ -59,14 +59,14 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
      * UserEntity 생성 메서드
      * 회원 가입시 사용
      */
-    public static UserEntity from(UserInternalRegisterRequest request) {
+    public static UserEntity from(UserInternalRegisterRequest registerRequest) {
         return UserEntity.builder()
-                .email(request.email())
-                .loginName(request.name())
-                .imageUrl(request.picture())
+                .email(registerRequest.email())
+                .loginName(registerRequest.name())
+                .imageUrl(registerRequest.picture())
 
                 .role(Role.USER)
-                .enabled(true)
+                .enabled(false)
                 .build();
     }
 
