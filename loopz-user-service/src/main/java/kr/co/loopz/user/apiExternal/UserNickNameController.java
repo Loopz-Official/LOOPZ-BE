@@ -42,7 +42,7 @@ public class UserNickNameController {
             @RequestParam String nickname) {
 
         try {
-            userService.checkExistAndValidate(nickname);
+            userService.nickNameValidation(nickname);
         } catch (UserException e) {
             return ResponseEntity.status(HttpStatus.OK).body(new NickNameAvailableResponse(false));
         }
