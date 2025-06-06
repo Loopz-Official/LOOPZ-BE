@@ -70,6 +70,10 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
                 .build();
     }
 
+    public void updateNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
     @Builder(access = PRIVATE)
     private UserEntity(String email, String loginName, String nickName, boolean enabled, Role role, String imageUrl) {
 
