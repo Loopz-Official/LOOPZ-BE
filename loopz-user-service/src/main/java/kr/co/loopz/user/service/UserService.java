@@ -22,8 +22,8 @@ import static kr.co.loopz.user.exception.UserErrorCode.*;
 public class UserService {
 
     private final UserRepository userRepository;
-
     private final UserConverter userConverter;
+    private final BadWordFiltering badWordFiltering = new BadWordFiltering();
 
     @Transactional
     public UserInternalRegisterResponse getOrCreateUser(UserInternalRegisterRequest registerRequest) {
@@ -85,11 +85,10 @@ public class UserService {
 
 
     private void checkAllowed(String nickname) {
-        BadWordFiltering wordFiltering = new BadWordFiltering();
-        if (wordFiltering.check(nickname)) {
+        if (badWordFiltering.check(nickname)) {
             throw new UserException(NICKNAME_INVALID, "닉네임에 부적절한 단어가 포함되어 있습니다.");
         }
-        if (wordFiltering.blankCheck(nickname)) {
+        if (badWordFiltering.blankCheck(nickname)) {
             throw new UserException(NICKNAME_INVALID, "닉네임에 부적절한 단어가 포함되어 있습니다.");
         }
     }
