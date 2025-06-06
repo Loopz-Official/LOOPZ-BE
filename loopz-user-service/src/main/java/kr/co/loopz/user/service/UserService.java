@@ -1,5 +1,6 @@
 package kr.co.loopz.user.service;
 
+import com.vane.badwordfiltering.BadWordFiltering;
 import kr.co.loopz.user.converter.UserConverter;
 import kr.co.loopz.user.domain.UserEntity;
 import kr.co.loopz.user.dto.request.UserInternalRegisterRequest;
@@ -50,6 +51,12 @@ public class UserService {
         nickNameValidation(nickname);
     }
 
+    private UserEntity getOrSave(UserInternalRegisterRequest registerRequest) {
+        UserEntity userEntity = userRepository.findByEmail(registerRequest.email())
+                .orElseGet(() -> UserEntity.from(registerRequest));
+        return userRepository.save(userEntity);
+    }
+
     /**
      * 닉네임 유효성 검사 및 중복 검사
      * @param nickname 닉네임
@@ -61,13 +68,9 @@ public class UserService {
 
         checkDuplicate(nickname);
         checkLength(nickname);
+//        checkFormat(nickname);
+        checkAllowed(nickname);
 
-    }
-
-    private UserEntity getOrSave(UserInternalRegisterRequest registerRequest) {
-        UserEntity userEntity = userRepository.findByEmail(registerRequest.email())
-                .orElseGet(() -> UserEntity.from(registerRequest));
-        return userRepository.save(userEntity);
     }
 
     private void checkLength(String nickname) {
@@ -79,6 +82,17 @@ public class UserService {
     private void checkDuplicate(String nickname) {
         if (userRepository.existsByNickName(nickname)) {
             throw new UserException(NICKNAME_DUPLICATED);
+        }
+    }
+
+
+    private void checkAllowed(String nickname) {
+        BadWordFiltering wordFiltering = new BadWordFiltering();
+        if (wordFiltering.check(nickname)) {
+            throw new UserException(NICKNAME_INVALID, "닉네임에 부적절한 단어가 포함되어 있습니다.");
+        }
+        if (wordFiltering.blankCheck(nickname)) {
+            throw new UserException(NICKNAME_INVALID, "닉네임에 부적절한 단어가 포함되어 있습니다.");
         }
     }
 
