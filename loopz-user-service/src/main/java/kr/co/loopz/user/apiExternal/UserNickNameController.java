@@ -15,14 +15,14 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/user/v1")
+@RequestMapping("/user/v1/nickname")
 @RequiredArgsConstructor
 @Slf4j
 public class UserNickNameController {
 
     private final UserService userService;
 
-    @PatchMapping("/nickname")
+    @PatchMapping
     public ResponseEntity<NickNameUpdateResponse> updateNickName(
             @AuthenticationPrincipal User currentUser,
             @RequestBody @Valid NickNameUpdateRequest nickNameUpdateRequest) {
@@ -37,7 +37,7 @@ public class UserNickNameController {
     }
 
 
-    @GetMapping
+    @GetMapping("/validate")
     public ResponseEntity<NickNameAvailableResponse> validateNickName(
             @RequestParam String nickname) {
 
