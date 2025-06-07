@@ -1,6 +1,7 @@
 package kr.co.loopz.user.converter;
 
 import kr.co.loopz.user.domain.UserEntity;
+import kr.co.loopz.user.dto.response.NickNameUpdateResponse;
 import kr.co.loopz.user.dto.response.UserInternalRegisterResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -16,5 +17,5 @@ public interface UserConverter {
     UserConverter INSTANCE = Mappers.getMapper(UserConverter.class);
 
     UserInternalRegisterResponse toUserInternalRegisterResponse(UserEntity userEntity);
-
+    NickNameUpdateResponse toNickNameUpdateResponse(UserEntity user);
 }
