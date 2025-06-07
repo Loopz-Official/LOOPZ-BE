@@ -1,7 +1,10 @@
 package kr.co.loopz.user.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.loopz.common.exception.CustomException;
+import kr.co.loopz.user.client.ObjectClient;
 import kr.co.loopz.user.converter.LikeConverter;
+import kr.co.loopz.user.domain.Likes;
 import kr.co.loopz.user.domain.UserEntity;
 import kr.co.loopz.user.dto.response.InternalLikeResponse;
 import kr.co.loopz.user.exception.UserException;
@@ -15,6 +18,9 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import static kr.co.loopz.user.exception.UserErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -23,12 +29,13 @@ public class LikeService {
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
     private final LikeConverter likeConverter;
+    private final ObjectClient objectClient;
 
     public InternalLikeResponse checkUserLikes(String userId, List<String> objectIds) {
 
         // userId 존재여부 확인
         if (!userRepository.existsByUserId(userId)) {
-            throw new UserException(UserErrorCode.USER_ID_NOT_FOUND);
+            throw new UserException(USER_NOT_FOUND, String.format("User with ID %s not found", userId));
         }
 
         List<String> likedObjectIds = likeRepository.findLikedObjectIdsByUserIdAndObjectIds(userId, objectIds);
@@ -40,7 +47,7 @@ public class LikeService {
         }
 
         // objectId 존재여부 확인
-        List<String> existingIds = likeRepository.findExistingObjectIds(objectIds);
+        List<String> existingIds = objectClient.findExistingObjectIds(objectIds);
         if (existingIds.size() != objectIds.size()) {
             throw new UserException(UserErrorCode.OBJECT_ID_NOT_FOUND);
         }
@@ -48,4 +55,31 @@ public class LikeService {
         return likeConverter.toInternalLikeResponse(result);
     }
 
+
+    public void toggleLike(String userId, String objectId) {
+
+        // userId 존재여부 확인
+        if (!userRepository.existsByUserId(userId)) {
+            throw new UserException(USER_NOT_FOUND, String.format("User with ID %s not found", userId));
+        }
+
+        // objectId 존재 여부 확인
+        boolean exists = objectClient.existsByObjectId(objectId);
+        if (!exists) {
+            throw new UserException(UserErrorCode.OBJECT_ID_NOT_FOUND, "Object ID not found: " + objectId);
+        }
+
+        Optional<Likes> like = likeRepository.findByUserIdAndObjectId(userId, objectId);
+
+        // 좋아요 이미 존재 시 삭제
+        if (like.isPresent()) {
+            // 좋아요가 이미 있으면 삭제 (좋아요 취소)
+            likeRepository.delete(like.get());
+        } else {
+            // 좋아요가 없으면 새로 추가
+            Likes newLike = Likes.from(userId, objectId);
+            likeRepository.save(newLike);
+        }
+    }
 }
+

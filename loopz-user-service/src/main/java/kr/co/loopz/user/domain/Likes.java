@@ -2,9 +2,7 @@ package kr.co.loopz.user.domain;
 
 import jakarta.persistence.*;
 import kr.co.loopz.common.domain.BaseTimeEntity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -22,4 +20,18 @@ public class Likes extends BaseTimeEntity {
 
     @Column(nullable = false)
     private String objectId;
+
+
+    @Builder(access = AccessLevel.PRIVATE)
+    public Likes(String userId, String objectId) {
+        this.userId = userId;
+        this.objectId = objectId;
+    }
+
+    public static Likes from(String userId, String objectId) {
+        return Likes.builder()
+                .userId(userId)
+                .objectId(objectId)
+                .build();
+    }
 }
