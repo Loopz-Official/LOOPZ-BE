@@ -13,14 +13,14 @@ import java.util.HashSet;
 import java.util.UUID;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
-import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
 @NoArgsConstructor(access = PROTECTED)
 @Getter
 @AllArgsConstructor
-public class Object extends BaseTimeEntity {
+@Table(name = "`object`")
+public class Product extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -60,7 +60,7 @@ public class Object extends BaseTimeEntity {
 
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Object(String objectName, int objectPrice, String intro, ObjectType objectType, ObjectSize objectSize, Set<Keyword> keywords, ObjectDetail detail) {
+    private Product(String objectName, int objectPrice, String intro, ObjectType objectType, ObjectSize objectSize, Set<Keyword> keywords, ObjectDetail detail) {
         this.objectId = UUID.randomUUID().toString();
         this.objectName = objectName;
         this.objectPrice = objectPrice;
