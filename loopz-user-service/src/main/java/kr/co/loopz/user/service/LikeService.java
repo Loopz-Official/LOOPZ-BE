@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import kr.co.loopz.user.exception.UserErrorCode;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.Optional;
 import static kr.co.loopz.user.exception.UserErrorCode.USER_NOT_FOUND;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class LikeService {
 
@@ -55,7 +57,7 @@ public class LikeService {
         return likeConverter.toInternalLikeResponse(result);
     }
 
-
+    @Transactional
     public void toggleLike(String userId, String objectId) {
 
         // userId 존재여부 확인

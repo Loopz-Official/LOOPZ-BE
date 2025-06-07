@@ -10,11 +10,11 @@ import java.util.List;
         url = "${etc.product-service-url}"
 )
 
-@RequestMapping("/internal/objects")
+
 public interface ObjectClient {
-    @GetMapping("/{objectId}/exists")
+    @GetMapping("/internal/objects/{objectId}/exists")
     boolean existsByObjectId(@PathVariable("objectId") String objectId);
 
-    @PostMapping("/exists")
+    @PostMapping("/internal/objects/exists")
     List<String> findExistingObjectIds(@RequestBody List<String> objectIds);
 }
