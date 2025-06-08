@@ -1,7 +1,6 @@
 package kr.co.loopz.repository;
 
-import kr.co.loopz.dto.response.ObjectResponse;
-import kr.co.loopz.domain.Product;
+import kr.co.loopz.domain.ObjectEntity;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -10,12 +9,12 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface ObjectRepository extends JpaRepository<Product, Long> {
+public interface ObjectRepository extends JpaRepository<ObjectEntity, Long> {
 
     boolean existsByObjectId(String objectId);
 
-    @Query("SELECT o.objectId FROM Product o WHERE o.objectId IN :ids")
+    @Query("SELECT o.objectId FROM ObjectEntity o WHERE o.objectId IN :ids")
     List<String> findExistingObjectIds(List<String> ids);
 
-    Slice<Product> findByOrderByCreatedAtDesc(Pageable pageable);
+    Slice<ObjectEntity> findByOrderByCreatedAtDesc(Pageable pageable);
 }

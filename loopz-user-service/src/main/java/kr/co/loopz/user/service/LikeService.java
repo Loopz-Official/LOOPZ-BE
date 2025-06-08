@@ -49,12 +49,6 @@ public class LikeService {
             result.put(objectId, likedObjectIds.contains(objectId));
         }
 
-        // objectId 존재여부 확인
-        List<String> existingIds = objectClient.findExistingObjectIds(objectIds);
-        if (existingIds.size() != objectIds.size()) {
-            throw new UserException(OBJECT_ID_NOT_FOUND);
-        }
-
         return likeConverter.toInternalLikeResponse(result);
     }
 

@@ -6,7 +6,7 @@ public record ObjectResponse (
         String objectName,
         String intro,
         String imageUrl,
-        int objectPrice,
+        Long objectPrice,
         boolean soldOut,
         Boolean liked
 ){

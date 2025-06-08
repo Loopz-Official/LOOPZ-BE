@@ -14,7 +14,4 @@ import java.util.List;
 public interface ObjectClient {
     @GetMapping("/internal/objects/{objectId}/exists")
     boolean existsByObjectId(@PathVariable("objectId") String objectId);
-
-    @PostMapping("/internal/objects/exists")
-    List<String> findExistingObjectIds(@RequestBody List<String> objectIds);
 }

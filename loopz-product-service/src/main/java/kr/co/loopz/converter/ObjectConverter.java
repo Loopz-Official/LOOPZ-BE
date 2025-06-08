@@ -1,11 +1,9 @@
 package kr.co.loopz.converter;
 
-import kr.co.loopz.domain.Product;
+import kr.co.loopz.domain.ObjectEntity;
 import kr.co.loopz.dto.response.BoardResponse;
 import kr.co.loopz.dto.response.ObjectResponse;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Map;
@@ -15,10 +13,10 @@ import java.util.stream.Collectors;
 public interface ObjectConverter {
 
     //Product 엔티티를 ObjectResponseDTO로
-    ObjectResponse toObjectResponse(Product entity);
+    ObjectResponse toObjectResponse(ObjectEntity entity);
 
     // List<Product> -> List<ObjectResponse>
-    List<ObjectResponse> toObjectResponseList(List<Product> products);
+    List<ObjectResponse> toObjectResponseList(List<ObjectEntity> objectEntities);
 
 
     // 찜 여부 반영해 새로운 DTO 리스트 반환

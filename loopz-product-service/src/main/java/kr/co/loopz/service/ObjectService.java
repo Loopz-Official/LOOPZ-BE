@@ -1,6 +1,6 @@
 package kr.co.loopz.service;
 
-import kr.co.loopz.domain.Product;
+import kr.co.loopz.domain.ObjectEntity;
 import kr.co.loopz.client.UserClient;
 import kr.co.loopz.converter.ObjectConverter;
 import kr.co.loopz.dto.request.LikeCheckRequest;
@@ -32,7 +32,7 @@ public class ObjectService {
     public BoardResponse getBoard(String userId,int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Slice<Product> slice = objectRepository.findByOrderByCreatedAtDesc(pageable);
+        Slice<ObjectEntity> slice = objectRepository.findByOrderByCreatedAtDesc(pageable);
 
         List<ObjectResponse> objects = objectConverter.toObjectResponseList(slice.getContent());
 

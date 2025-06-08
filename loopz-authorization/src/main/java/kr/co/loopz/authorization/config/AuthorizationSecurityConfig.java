@@ -34,7 +34,7 @@ public class AuthorizationSecurityConfig {
             "/auth/v1/login/google",
             "/auth/v1/login/kakao",
             "/internal/**",
-            "/object/**"
+            "/object/v1"
     };
 
 

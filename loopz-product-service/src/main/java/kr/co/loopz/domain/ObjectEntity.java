@@ -20,7 +20,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @AllArgsConstructor
 @Table(name = "`object`")
-public class Product extends BaseTimeEntity {
+public class ObjectEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -33,7 +33,7 @@ public class Product extends BaseTimeEntity {
     private String objectName;
 
     @Column(nullable = false)
-    private int objectPrice;
+    private Long objectPrice;
 
     @Column(nullable = false)
     private boolean soldOut = false;
@@ -60,7 +60,7 @@ public class Product extends BaseTimeEntity {
 
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Product(String objectName, int objectPrice, String intro, ObjectType objectType, ObjectSize objectSize, Set<Keyword> keywords, ObjectDetail detail) {
+    private ObjectEntity(String objectName, Long objectPrice, String intro, ObjectType objectType, ObjectSize objectSize, Set<Keyword> keywords, ObjectDetail detail) {
         this.objectId = UUID.randomUUID().toString();
         this.objectName = objectName;
         this.objectPrice = objectPrice;

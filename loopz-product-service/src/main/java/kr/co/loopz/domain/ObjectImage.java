@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import kr.co.loopz.common.domain.BaseTimeEntity;
+import kr.co.loopz.common.domain.Image;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,20 +18,14 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 @Getter
 @AllArgsConstructor
-public class Image extends BaseTimeEntity {
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    private String imageUrl;
+public class ObjectImage extends Image {
 
     // Object 참조
     @Column(name = "object_id", nullable = false)
-    private Long objectId;
+    private String objectId;
 
     @Builder
-    public Image(String imageUrl, Long objectId) {
+    public ObjectImage(String imageUrl, String objectId) {
         this.imageUrl = imageUrl;
         this.objectId = objectId;
     }

@@ -20,11 +20,5 @@ public class InternalObjectController {
         return ResponseEntity.ok(exists);
     }
 
-    // objectId 여러개 중 존재하는 ObjectId 반환
-    @PostMapping("/exists")
-    public ResponseEntity<List<String>> checkExistingObjectIds(@RequestBody List<String> objectIds) {
-        List<String> existing = objectRepository.findExistingObjectIds(objectIds);
-        return ResponseEntity.ok(existing);
-    }
 
 }

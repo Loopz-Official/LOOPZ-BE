@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ObjectDetail {
 
-    @Column(nullable = false)
-    private int shippingPrice;
     private String shippingInfo;
 
     private String size;
@@ -23,4 +21,7 @@ public class ObjectDetail {
 
     // 구매 전 읽어주세요
     private String notice;
+
+    // 입고 수량
+    private int stock;
 }
