@@ -29,7 +29,7 @@ public class ObjectService {
     private final ObjectConverter objectConverter;
     private final UserClient userClient;
 
-    public BoardResponse getBoard(String userId,int page, int size) {
+    public BoardResponse getBoard(String userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         Slice<ObjectEntity> slice = objectRepository.findByOrderByCreatedAtDesc(pageable);
@@ -41,21 +41,21 @@ public class ObjectService {
                 .map(ObjectResponse::objectId)
                 .collect(Collectors.toList());
 
-        Map<String, Boolean> likeMap;
-
-        if (userId != null) {
-            // 내부 API 호출
-            LikeCheckRequest request = new LikeCheckRequest(objectIds);
-            InternalLikeResponse likeResponse = userClient.checkLikes(userId, request);
-            likeMap = likeResponse.likes();
-        } else {
-            // 비로그인 상태면 like 정보 없음
-            likeMap = Collections.emptyMap();
-        }
+        Map<String, Boolean> likeMap= checkLikedObject(userId, objectIds);
 
         return objectConverter.toBoardResponse(objects, likeMap, slice.hasNext());
 
 
+    }
+
+    private Map<String, Boolean> checkLikedObject(String userId, List<String> objectIds) {
+        if (userId != null) {
+            LikeCheckRequest request = new LikeCheckRequest(objectIds);
+            InternalLikeResponse likeResponse = userClient.checkLikes(userId, request);
+            return likeResponse.likes();
+        } else {
+            return Collections.emptyMap();
+        }
     }
 }
 
