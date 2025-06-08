@@ -1,6 +1,5 @@
 package kr.co.loopz.user.apiExternal;
 
-import kr.co.loopz.user.dto.request.LikeRequest;
 import kr.co.loopz.user.exception.UserErrorCode;
 import kr.co.loopz.user.exception.UserException;
 import kr.co.loopz.user.service.LikeService;

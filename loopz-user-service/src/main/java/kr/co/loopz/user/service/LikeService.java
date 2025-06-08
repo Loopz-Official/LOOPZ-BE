@@ -21,7 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static kr.co.loopz.user.exception.UserErrorCode.USER_NOT_FOUND;
+import static kr.co.loopz.user.exception.UserErrorCode.*;
+
 
 @Service
 @Transactional(readOnly = true)
@@ -51,7 +52,7 @@ public class LikeService {
         // objectId 존재여부 확인
         List<String> existingIds = objectClient.findExistingObjectIds(objectIds);
         if (existingIds.size() != objectIds.size()) {
-            throw new UserException(UserErrorCode.OBJECT_ID_NOT_FOUND);
+            throw new UserException(OBJECT_ID_NOT_FOUND);
         }
 
         return likeConverter.toInternalLikeResponse(result);
@@ -68,7 +69,7 @@ public class LikeService {
         // objectId 존재 여부 확인
         boolean exists = objectClient.existsByObjectId(objectId);
         if (!exists) {
-            throw new UserException(UserErrorCode.OBJECT_ID_NOT_FOUND, "Object ID not found: " + objectId);
+            throw new UserException(OBJECT_ID_NOT_FOUND, "Object ID not found: " + objectId);
         }
 
         Optional<Likes> like = likeRepository.findByUserIdAndObjectId(userId, objectId);
