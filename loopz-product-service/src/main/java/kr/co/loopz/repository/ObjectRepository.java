@@ -1,0 +1,20 @@
+package kr.co.loopz.repository;
+
+import kr.co.loopz.domain.ObjectEntity;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
+
+public interface ObjectRepository extends JpaRepository<ObjectEntity, Long> {
+
+    boolean existsByObjectId(String objectId);
+
+    @Query("SELECT o.objectId FROM ObjectEntity o WHERE o.objectId IN :ids")
+    List<String> findExistingObjectIds(List<String> ids);
+
+    Slice<ObjectEntity> findByOrderByCreatedAtDesc(Pageable pageable);
+}
