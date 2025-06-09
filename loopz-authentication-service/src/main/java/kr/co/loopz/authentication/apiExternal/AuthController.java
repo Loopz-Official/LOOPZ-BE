@@ -52,10 +52,9 @@ public class AuthController {
 
         String userId = currentUser.getUsername();
 
-        authService.logout(userId);
+        LogoutResponse response = authService.logout(userId);
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new LogoutResponse("로그아웃 되었습니다."));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }
