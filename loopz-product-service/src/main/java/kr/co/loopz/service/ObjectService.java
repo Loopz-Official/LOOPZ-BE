@@ -161,7 +161,7 @@ public class ObjectService {
     @Transactional
     public void updateLikeCount(String objectId, boolean increase) {
         ObjectEntity object = objectRepository.findByObjectId(objectId)
-                .orElseThrow(() -> new RuntimeException("Object not found: " + objectId));
+                .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND));
 
         int currentCount = object.getLikeCount();
         if (increase) {

@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ObjectErrorCode implements ErrorCode {
 
-    INVALID_SORT_TYPE(HttpStatus.BAD_REQUEST, "지원하지 않는 정렬 기준입니다.");
+    INVALID_SORT_TYPE(HttpStatus.BAD_REQUEST, "지원하지 않는 정렬 기준입니다."),
+    OBJECT_ID_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 상품이 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
