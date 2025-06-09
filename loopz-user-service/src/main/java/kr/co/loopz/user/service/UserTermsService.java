@@ -25,9 +25,9 @@ public class UserTermsService {
 
         user.updateTerms(
                 request.over14(),
-                request.agreedTerms(),
-                request.agreedPrivacyPolicy(),
-                request.agreedSMSMarketing()
+                request.agreedServiceTerms(),
+                request.agreedMarketing(),
+                request.agreedEventSMS()
         );
 
         return userConverter.toAgreeTermsResponse(user);

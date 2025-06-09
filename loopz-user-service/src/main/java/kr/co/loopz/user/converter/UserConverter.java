@@ -22,9 +22,9 @@ public interface UserConverter {
     NickNameUpdateResponse toNickNameUpdateResponse(UserEntity user);
 
     @Mapping(source = "userTerms.over14", target = "over14")
-    @Mapping(source = "userTerms.agreedTerms", target = "agreedTerms")
-    @Mapping(source = "userTerms.agreedPrivacyPolicy", target = "agreedPrivacyPolicy")
-    @Mapping(source = "userTerms.agreedSMSMarketing", target = "agreedSMSMarketing")
+    @Mapping(source = "userTerms.agreedServiceTerms", target = "agreedServiceTerms")
+    @Mapping(source = "userTerms.agreedMarketing", target = "agreedMarketing")
+    @Mapping(source = "userTerms.agreedEventSMS", target = "agreedEventSMS")
     AgreeTermsResponse toAgreeTermsResponse(UserEntity user);
 
 }

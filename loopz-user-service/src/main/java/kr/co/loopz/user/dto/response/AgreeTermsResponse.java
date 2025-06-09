@@ -8,8 +8,8 @@ public record AgreeTermsResponse(
         String nickName,
         boolean enabled,
         Boolean over14,
-        Boolean agreedTerms,
-        Boolean agreedPrivacyPolicy,
-        Boolean agreedSMSMarketing
+        Boolean agreedServiceTerms,
+        Boolean agreedMarketing,
+        Boolean agreedEventSMS
 ) {
 }

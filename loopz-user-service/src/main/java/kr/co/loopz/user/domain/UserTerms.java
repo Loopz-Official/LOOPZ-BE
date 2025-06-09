@@ -1,5 +1,6 @@
 package kr.co.loopz.user.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -15,35 +16,36 @@ public class UserTerms {
     // 나이
     private boolean over14;
     // 룹즈 이용 약관
-    private boolean agreedTerms;
+    private boolean agreedServiceTerms;
     // 개인정보 마케팅 동의
-    private boolean agreedPrivacyPolicy;
+    private boolean agreedMarketing;
     // SMS 마케팅 동의
-    private boolean agreedSMSMarketing;
+    @Column(name = "agreed_event_sms")
+    private boolean agreedEventSMS;
 
-    private LocalDateTime agreedTermsAt;
-    private LocalDateTime agreedPrivacyPolicyAt;
-    private LocalDateTime agreedSMSMarketingAt;
+    private LocalDateTime agreedServiceTermsAt;
+    private LocalDateTime agreedMarketingAt;
+    private LocalDateTime agreedEventSMSAt;
 
-    public void updateTerms(boolean over14, boolean agreedTerms, boolean agreedPrivacyPolicy, boolean agreedSMSMarketing) {
+    public void updateTerms(boolean over14, boolean agreedServiceTerms, boolean agreedMarketing, boolean agreedEventSMS) {
 
         LocalDateTime now = LocalDateTime.now();
 
         this.over14 = over14;
 
-        if (this.agreedTerms != agreedTerms) {
-            this.agreedTerms = agreedTerms;
-            this.agreedTermsAt = agreedTerms ? now : null;
+        if (this.agreedServiceTerms != agreedServiceTerms) {
+            this.agreedServiceTerms = agreedServiceTerms;
+            this.agreedServiceTermsAt = agreedServiceTerms ? now : null;
         }
 
-        if (this.agreedPrivacyPolicy != agreedPrivacyPolicy) {
-            this.agreedPrivacyPolicy = agreedPrivacyPolicy;
-            this.agreedPrivacyPolicyAt = agreedPrivacyPolicy ? now : null;
+        if (this.agreedMarketing != agreedMarketing) {
+            this.agreedMarketing = agreedMarketing;
+            this.agreedMarketingAt = agreedMarketing ? now : null;
         }
 
-        if (this.agreedSMSMarketing != agreedSMSMarketing) {
-            this.agreedSMSMarketing = agreedSMSMarketing;
-            this.agreedSMSMarketingAt = agreedSMSMarketing ? now : null;
+        if (this.agreedEventSMS != agreedEventSMS) {
+            this.agreedEventSMS = agreedEventSMS;
+            this.agreedEventSMSAt = agreedEventSMS ? now : null;
         }
 
     }

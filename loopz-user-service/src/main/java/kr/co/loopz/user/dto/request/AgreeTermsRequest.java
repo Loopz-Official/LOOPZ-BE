@@ -9,10 +9,10 @@ public record AgreeTermsRequest(
     Boolean over14,
     @NotNull
     @AssertTrue
-    Boolean agreedTerms,
+    Boolean agreedServiceTerms,
     @NotNull
-    Boolean agreedPrivacyPolicy,
+    Boolean agreedMarketing,
     @NotNull
-    Boolean agreedSMSMarketing
+    Boolean agreedEventSMS
 ) {
 }

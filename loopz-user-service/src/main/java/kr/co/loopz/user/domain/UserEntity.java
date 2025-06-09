@@ -80,14 +80,14 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
      * 온보딩 과정에서 사용
      * 14세 이상, 약관 동의시 enabled 상태로 변경
      * @param over14
-     * @param agreedTerms
-     * @param agreedPrivacyPolicy
-     * @param agreedSMSMarketing
+     * @param agreedServiceTerms
+     * @param agreedMarketing
+     * @param agreedEventSMS
      */
-    public void updateTerms(boolean over14, boolean agreedTerms, boolean agreedPrivacyPolicy, boolean agreedSMSMarketing) {
-        this.userTerms.updateTerms(over14, agreedTerms, agreedPrivacyPolicy, agreedSMSMarketing);
+    public void updateTerms(boolean over14, boolean agreedServiceTerms, boolean agreedMarketing, boolean agreedEventSMS) {
+        this.userTerms.updateTerms(over14, agreedServiceTerms, agreedMarketing, agreedEventSMS);
 
-        if (over14 && agreedTerms) {
+        if (over14 && agreedServiceTerms) {
             this.enabled = true;
         }
     }
