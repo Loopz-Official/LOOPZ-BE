@@ -12,6 +12,7 @@ import kr.co.loopz.domain.QObjectEntity;
 import kr.co.loopz.domain.enums.Keyword;
 import kr.co.loopz.domain.enums.ObjectSize;
 import kr.co.loopz.domain.enums.ObjectType;
+import kr.co.loopz.dto.request.FilterRequest;
 import kr.co.loopz.dto.request.LikeCheckRequest;
 import kr.co.loopz.dto.response.BoardResponse;
 import kr.co.loopz.dto.response.InternalLikeResponse;
@@ -45,16 +46,9 @@ public class ObjectService {
     private final ObjectConverter objectConverter;
     private final UserClient userClient;
 
-    public BoardResponse getBoard(String userId,
-                                  Set<ObjectType> objectTypes,
-                                  Set<ObjectSize> objectSizes,
-                                  Integer priceMin,
-                                  Integer priceMax,
-                                  Set<Keyword> keywords,
-                                  Boolean soldOut,
-                                  String sort, int page, int size) {
+    public BoardResponse getBoard(String userId, FilterRequest filter) {
 
-        Slice<ObjectEntity> slice = getFilteredObjects( objectTypes, objectSizes, priceMin, priceMax, keywords, soldOut, sort, page, size);
+        Slice<ObjectEntity> slice = getFilteredObjects( filter);
 
         List<ObjectResponse> objects = objectConverter.toObjectResponseList(slice.getContent());
 
@@ -70,62 +64,57 @@ public class ObjectService {
 
     }
 
-    public Slice<ObjectEntity> getFilteredObjects( Set<ObjectType> objectTypes,
-                                                   Set<ObjectSize> objectSizes,
-                                                   Integer priceMin,
-                                                   Integer priceMax,
-                                                   Set<Keyword> keywords,
-                                                   Boolean soldOut,
-                                                   String sort, int page, int size) {
+    public Slice<ObjectEntity> getFilteredObjects( FilterRequest filter ) {
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(filter.getPage(), filter.getSize());
         QObjectEntity object = QObjectEntity.objectEntity; //QueryDSL
         BooleanBuilder builder = new BooleanBuilder();
 
         // objectType 필터
-        if (objectTypes != null && !objectTypes.isEmpty()) {
-            builder.and(object.objectType.in(objectTypes));
+        if (filter.getObjectTypes() != null && !filter.getObjectTypes().isEmpty()) {
+            builder.and(object.objectType.in(filter.getObjectTypes()));
         }
 
         // objectSize 필터
-        if (objectSizes != null && !objectSizes.isEmpty()) {
-            builder.and(object.objectSize.in(objectSizes));
+        if (filter.getObjectSizes() != null && !filter.getObjectSizes().isEmpty()) {
+            builder.and(object.objectSize.in(filter.getObjectSizes()));
         }
 
         // priceMin 필터
-        if (priceMin != null) {
-            builder.and(object.objectPrice.goe(priceMin));
+        if (filter.getPriceMin() != null) {
+            builder.and(object.objectPrice.goe(filter.getPriceMin()));
         }
 
         // priceMax 필터
-        if (priceMax != null) {
-            builder.and(object.objectPrice.loe(priceMax));
+        if (filter.getPriceMax() != null) {
+            builder.and(object.objectPrice.loe(filter.getPriceMax()));
         }
 
+
         // keywords 필터
-        if (keywords != null && !keywords.isEmpty()) {
-            builder.and(object.keywords.any().in(keywords));
+        if (filter.getKeywords() != null && !filter.getKeywords().isEmpty()) {
+            builder.and(object.keywords.any().in(filter.getKeywords()));
         }
 
         // soleOut true면 모든 상품 조회 (품절 상품 포함)
         // soldOut false면 품절상품 제외
-        if (soldOut != null && !soldOut) {
+        if (filter.getSoldOut() != null && !filter.getSoldOut()) {
             builder.and(object.soldOut.eq(false));
         }
 
         // 정렬 기준 결정
-        OrderSpecifier<?>[] orderSpecifiers = toSort(sort, object);
+        OrderSpecifier<?>[] orderSpecifiers = toSort(filter.getSort(), object);
 
         // 쿼리 실행
         List<ObjectEntity> content = queryFactory
                 .selectFrom(object)
                 .where(builder)
                 .orderBy(orderSpecifiers)
-                .offset((long) page * size)
-                .limit(size + 1)
+                .offset((long) filter.getPage() * filter.getSize())
+                .limit(filter.getSize() + 1)
                 .fetch();
 
-        boolean hasNext = content.size() > size;
+        boolean hasNext = content.size() > filter.getSize();
         if (hasNext) {
             content.remove(content.size() - 1);
         }
