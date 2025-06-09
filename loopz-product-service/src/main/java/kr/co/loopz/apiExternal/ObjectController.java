@@ -1,6 +1,15 @@
 package kr.co.loopz.apiExternal;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.Explode;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.enums.ParameterStyle;
+import jakarta.validation.constraints.Min;
+import kr.co.loopz.domain.enums.Keyword;
+import kr.co.loopz.domain.enums.ObjectSize;
+import kr.co.loopz.domain.enums.ObjectType;
+import kr.co.loopz.dto.request.FilterRequest;
 import kr.co.loopz.dto.response.BoardResponse;
 import kr.co.loopz.service.ObjectService;
 import lombok.RequiredArgsConstructor;
@@ -8,13 +17,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.userdetails.User;
+
+import java.util.Set;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/object/v1")
+@Validated
 public class ObjectController {
 
     private final ObjectService objectService;
@@ -29,8 +42,15 @@ public class ObjectController {
     @GetMapping
     public ResponseEntity<BoardResponse> getMainBoard(
             @AuthenticationPrincipal User currentUser,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(required = false) Set<ObjectType> objectTypes,
+            @RequestParam(required = false) Set<ObjectSize> objectSizes,
+            @RequestParam(required = false) Integer priceMin,
+            @RequestParam(required = false) Integer priceMax,
+            @RequestParam(required = false) Set<Keyword> keywords,
+            @RequestParam(required = false) Boolean soldOut,
+            @RequestParam(required = false) String sort,
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "10") @Min(1) int size
     ) {
         String userId = null;
         if (currentUser != null) {
@@ -40,7 +60,15 @@ public class ObjectController {
             log.debug("비로그인 상태로 접근");
         }
 
-        BoardResponse response = objectService.getBoard(userId, page, size);
+        BoardResponse response = objectService.getBoard(userId, objectTypes,
+                objectSizes,
+                priceMin,
+                priceMax,
+                keywords,
+                soldOut,
+                sort,
+                page,
+                size);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

@@ -14,4 +14,10 @@ import java.util.List;
 public interface ObjectClient {
     @GetMapping("/internal/objects/{objectId}/exists")
     boolean existsByObjectId(@PathVariable("objectId") String objectId);
+
+    @PostMapping("/internal/objects/{objectId}/like/increase")
+    void increaseLikeCount(@PathVariable String objectId);
+
+    @PostMapping("/internal/objects/{objectId}/like/decrease")
+    void decreaseLikeCount(@PathVariable String objectId);
 }
