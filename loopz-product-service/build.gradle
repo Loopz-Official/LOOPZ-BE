@@ -1,11 +1,8 @@
 
 dependencies {
-
     implementation project(':loopz-common')
     implementation project(':loopz-authorization')
 
     implementation "com.amazonaws:aws-java-sdk-s3:1.12.281"
 
-
 }
-

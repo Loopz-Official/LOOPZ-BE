@@ -71,10 +71,14 @@ public class LikeService {
         if (like.isPresent()) {
             // 좋아요가 이미 있으면 삭제 (좋아요 취소)
             likeRepository.delete(like.get());
+            objectClient.decreaseLikeCount(objectId);
+
         } else {
             // 좋아요가 없으면 새로 추가
             Likes newLike = Likes.from(userId, objectId);
             likeRepository.save(newLike);
+            objectClient.increaseLikeCount(objectId);
+
         }
     }
 }

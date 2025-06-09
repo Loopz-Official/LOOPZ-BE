@@ -44,6 +44,17 @@ logging.level:
     client:
       logger: debug
 
+management:
+  server:
+    port: 8080
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+
 jwt:
   expiration:
     access: ${ACCESS_EXPIRATION}

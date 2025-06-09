@@ -8,13 +8,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ObjectRepository extends JpaRepository<ObjectEntity, Long> {
 
     boolean existsByObjectId(String objectId);
 
-    @Query("SELECT o.objectId FROM ObjectEntity o WHERE o.objectId IN :ids")
-    List<String> findExistingObjectIds(List<String> ids);
-
-    Slice<ObjectEntity> findByOrderByCreatedAtDesc(Pageable pageable);
+    Optional<ObjectEntity> findByObjectId(String objectId);
 }

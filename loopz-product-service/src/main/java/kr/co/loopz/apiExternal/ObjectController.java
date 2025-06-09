@@ -1,6 +1,16 @@
 package kr.co.loopz.apiExternal;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.Explode;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.enums.ParameterStyle;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import kr.co.loopz.domain.enums.Keyword;
+import kr.co.loopz.domain.enums.ObjectSize;
+import kr.co.loopz.domain.enums.ObjectType;
+import kr.co.loopz.dto.request.FilterRequest;
 import kr.co.loopz.dto.response.BoardResponse;
 import kr.co.loopz.service.ObjectService;
 import lombok.RequiredArgsConstructor;
@@ -8,8 +18,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.userdetails.User;
+
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -19,18 +32,10 @@ public class ObjectController {
 
     private final ObjectService objectService;
 
-    /**
-     * 메인 화면 상품 목록 조회 (무한스크롤)
-     *
-     * @param page   현재 페이지 번호 (0부터 시작)
-     * @param size   한 페이지에 가져올 개수
-     * @return BoardResponse (상품 목록 + hasNext)
-     */
     @GetMapping
     public ResponseEntity<BoardResponse> getMainBoard(
             @AuthenticationPrincipal User currentUser,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @ModelAttribute @Valid FilterRequest filter
     ) {
         String userId = null;
         if (currentUser != null) {
@@ -40,7 +45,7 @@ public class ObjectController {
             log.debug("비로그인 상태로 접근");
         }
 
-        BoardResponse response = objectService.getBoard(userId, page, size);
+        BoardResponse response = objectService.getBoard(userId, filter);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

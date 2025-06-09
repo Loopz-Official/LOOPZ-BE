@@ -6,6 +6,7 @@ import kr.co.loopz.common.domain.BaseTimeEntity;
 import kr.co.loopz.domain.enums.ObjectSize;
 import kr.co.loopz.domain.enums.ObjectType;
 import kr.co.loopz.domain.enums.Keyword;
+
 import lombok.*;
 
 import java.util.Set;
@@ -50,7 +51,7 @@ public class ObjectEntity extends BaseTimeEntity {
 
     // 키워드 (다중선택 가능)
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "object_keywords", joinColumns = @JoinColumn(name = "object_id"))
+    @CollectionTable(name = "object_keywords", joinColumns = @JoinColumn(name = "object_id", referencedColumnName = "objectId"))
     @Column(name = "keyword")
     @Enumerated(EnumType.STRING)
     private Set<Keyword> keywords = new HashSet<>();
@@ -58,9 +59,11 @@ public class ObjectEntity extends BaseTimeEntity {
     @Embedded
     private ObjectDetail detail;
 
+    private int likeCount=0;
+
 
     @Builder(access = AccessLevel.PRIVATE)
-    private ObjectEntity(String objectName, Long objectPrice, String intro, ObjectType objectType, ObjectSize objectSize, Set<Keyword> keywords, ObjectDetail detail) {
+    private ObjectEntity(String objectName, Long objectPrice, String intro, ObjectType objectType, ObjectSize objectSize, Set<Keyword> keywords, ObjectDetail detail, int likeCount) {
         this.objectId = UUID.randomUUID().toString();
         this.objectName = objectName;
         this.objectPrice = objectPrice;
@@ -69,5 +72,11 @@ public class ObjectEntity extends BaseTimeEntity {
         this.objectSize = objectSize;
         this.keywords = keywords;
         this.detail = detail;
+        this.likeCount = likeCount;
     }
+
+    public void setLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
+
 }
