@@ -12,7 +12,6 @@ import kr.co.loopz.domain.QObjectEntity;
 import kr.co.loopz.domain.enums.Keyword;
 import kr.co.loopz.domain.enums.ObjectSize;
 import kr.co.loopz.domain.enums.ObjectType;
-import kr.co.loopz.dto.request.FilterRequest;
 import kr.co.loopz.dto.request.LikeCheckRequest;
 import kr.co.loopz.dto.response.BoardResponse;
 import kr.co.loopz.dto.response.InternalLikeResponse;

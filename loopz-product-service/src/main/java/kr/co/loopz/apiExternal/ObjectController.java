@@ -9,7 +9,6 @@ import jakarta.validation.constraints.Min;
 import kr.co.loopz.domain.enums.Keyword;
 import kr.co.loopz.domain.enums.ObjectSize;
 import kr.co.loopz.domain.enums.ObjectType;
-import kr.co.loopz.dto.request.FilterRequest;
 import kr.co.loopz.dto.response.BoardResponse;
 import kr.co.loopz.service.ObjectService;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +34,13 @@ public class ObjectController {
     /**
      * 메인 화면 상품 목록 조회 (무한스크롤)
      *
+     * @param objectTypes 상품 타입
+     * @param objectSizes SMALL/MEDIUM/LARGE
+     * @param priceMin 필터 최소 가격
+     * @param priceMax 필터 최대 가격
+     * @param keywords 키워드
+     * @param soldOut 품절여부
+     * @param sort 최신순(latest), 인기순(popular)
      * @param page   현재 페이지 번호 (0부터 시작)
      * @param size   한 페이지에 가져올 개수
      * @return BoardResponse (상품 목록 + hasNext)
@@ -60,15 +66,7 @@ public class ObjectController {
             log.debug("비로그인 상태로 접근");
         }
 
-        BoardResponse response = objectService.getBoard(userId, objectTypes,
-                objectSizes,
-                priceMin,
-                priceMax,
-                keywords,
-                soldOut,
-                sort,
-                page,
-                size);
+        BoardResponse response = objectService.getBoard(userId, objectTypes, objectSizes, priceMin, priceMax, keywords, soldOut, sort, page, size);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
