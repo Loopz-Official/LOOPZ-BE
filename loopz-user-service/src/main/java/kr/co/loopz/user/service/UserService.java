@@ -36,9 +36,7 @@ public class UserService {
     @Transactional
     public NickNameUpdateResponse updateNickName(String userId, String nickname) {
 
-        UserEntity user = userRepository.findByUserId(userId).orElseThrow(
-                () -> new UserException(USER_NOT_FOUND, String.format("User with ID %s not found", userId))
-        );
+        UserEntity user = findByUserId(userId);
 
         nickNameValidation(nickname);
         user.updateNickName(nickname);
@@ -60,6 +58,11 @@ public class UserService {
 //        checkFormat(nickname);
         checkAllowed(nickname);
 
+    }
+
+    public UserEntity findByUserId(String userId) {
+        return userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserException(USER_NOT_FOUND, String.format("User with ID %s not found", userId)));
     }
 
 
