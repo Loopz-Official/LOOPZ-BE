@@ -67,4 +67,9 @@ public class AuthService {
         return SecurityConstants.TOKEN_PREFIX + accessToken;
     }
 
+    public void logout(String userId) {
+        refreshTokenRedisService.deleteRefreshToken(userId);
+    }
+
+
 }
