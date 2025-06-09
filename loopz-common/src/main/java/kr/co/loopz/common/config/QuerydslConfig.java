@@ -1,4 +1,4 @@
-package kr.co.loopz.config;
+package kr.co.loopz.common.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
