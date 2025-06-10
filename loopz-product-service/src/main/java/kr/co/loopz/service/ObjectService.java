@@ -94,9 +94,9 @@ public class ObjectService {
             builder.and(object.keywords.any().in(filter.getKeywords()));
         }
 
-        // soleOut true면 모든 상품 조회 (품절 상품 포함)
-        // soldOut false면 품절상품 제외
-        if (filter.getSoldOut() != null && !filter.getSoldOut()) {
+        // ExcludeSoldOut false면 모든 상품 조회 (품절 상품 포함)
+        // ExcludeSoldOut true면 품절상품 제외
+        if (Boolean.TRUE.equals(filter.getExcludeSoldOut())) {
             builder.and(object.soldOut.eq(false));
         }
 

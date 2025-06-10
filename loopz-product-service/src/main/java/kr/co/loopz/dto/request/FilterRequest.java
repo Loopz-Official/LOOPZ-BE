@@ -17,7 +17,7 @@ public class FilterRequest {
     private Integer priceMin;
     private Integer priceMax;
     private Set<Keyword> keywords = new HashSet<>();
-    private Boolean soldOut = false;
+    private Boolean excludeSoldOut = false;
     private String sort = "latest";
 
     @Min(0)
