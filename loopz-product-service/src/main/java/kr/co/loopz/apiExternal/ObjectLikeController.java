@@ -1,21 +1,23 @@
-package kr.co.loopz.user.apiExternal;
+package kr.co.loopz.apiExternal;
 
-import kr.co.loopz.user.exception.UserErrorCode;
-import kr.co.loopz.user.exception.UserException;
-import kr.co.loopz.user.service.LikeService;
+
+import kr.co.loopz.service.LikeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/user/v1/likes")
+@RequestMapping("/object/v1/likes")
 @RequiredArgsConstructor
 @Slf4j
-public class UserLikeController {
+public class ObjectLikeController {
 
     private final LikeService likeService;
 

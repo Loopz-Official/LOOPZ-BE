@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 )
 public interface UserServiceClient {
 
-    @PostMapping("/internal/user/v1")
+    @PostMapping("/internal/user")
     InternalRegisterResponse getOrCreateUser(
             @RequestBody InternalRegisterRequest registerRequest
     );

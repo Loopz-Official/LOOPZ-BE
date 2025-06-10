@@ -59,8 +59,6 @@ public class ObjectEntity extends BaseTimeEntity {
     @Embedded
     private ObjectDetail detail;
 
-    private int likeCount=0;
-
 
     @Builder(access = AccessLevel.PRIVATE)
     private ObjectEntity(String objectName, Long objectPrice, String intro, ObjectType objectType, ObjectSize objectSize, Set<Keyword> keywords, ObjectDetail detail, int likeCount) {
@@ -72,11 +70,6 @@ public class ObjectEntity extends BaseTimeEntity {
         this.objectSize = objectSize;
         this.keywords = keywords;
         this.detail = detail;
-        this.likeCount = likeCount;
-    }
-
-    public void setLikeCount(int likeCount) {
-        this.likeCount = likeCount;
     }
 
 }

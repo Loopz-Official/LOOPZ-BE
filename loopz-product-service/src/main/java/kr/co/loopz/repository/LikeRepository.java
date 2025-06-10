@@ -1,6 +1,6 @@
-package kr.co.loopz.user.repository;
+package kr.co.loopz.repository;
 
-import kr.co.loopz.user.domain.Likes;
+import kr.co.loopz.domain.Likes;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,5 +14,8 @@ public interface LikeRepository extends JpaRepository<Likes, Long> {
     List<String> findLikedObjectIdsByUserIdAndObjectIds(@Param("userId") String userId, @Param("objectIds") List<String> objectIds);
 
     Optional<Likes> findByUserIdAndObjectId(String userId, String objectId);
+
+    List<Likes> findAllByUserIdAndObjectIdIn(String userId, List<String> objectIds);
+
 
 }

@@ -1,4 +1,4 @@
-package kr.co.loopz.user.domain;
+package kr.co.loopz.domain;
 
 import jakarta.persistence.*;
 import kr.co.loopz.common.domain.BaseTimeEntity;

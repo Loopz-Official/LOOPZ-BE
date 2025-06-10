@@ -1,22 +1,23 @@
 package kr.co.loopz.service;
 
 import com.fasterxml.jackson.databind.util.ArrayBuilders;
-import com.querydsl.core.types.Order;
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.core.types.OrderSpecifier;
 import kr.co.loopz.Exception.ObjectException;
+import kr.co.loopz.domain.Likes;
 import kr.co.loopz.domain.ObjectEntity;
 import kr.co.loopz.client.UserClient;
 import kr.co.loopz.converter.ObjectConverter;
+import kr.co.loopz.domain.QLikes;
 import kr.co.loopz.domain.QObjectEntity;
 import kr.co.loopz.domain.enums.Keyword;
 import kr.co.loopz.domain.enums.ObjectSize;
 import kr.co.loopz.domain.enums.ObjectType;
 import kr.co.loopz.dto.request.FilterRequest;
-import kr.co.loopz.dto.request.LikeCheckRequest;
 import kr.co.loopz.dto.response.BoardResponse;
-import kr.co.loopz.dto.response.InternalLikeResponse;
 import kr.co.loopz.dto.response.ObjectResponse;
+import kr.co.loopz.repository.LikeRepository;
 import kr.co.loopz.repository.ObjectRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,10 +29,8 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static kr.co.loopz.Exception.ObjectErrorCode.*;
@@ -41,14 +40,13 @@ import static kr.co.loopz.Exception.ObjectErrorCode.*;
 @Slf4j
 public class ObjectService {
 
-    private final ObjectRepository objectRepository;
     private final JPAQueryFactory queryFactory;
+    private final LikeRepository likeRepository;
     private final ObjectConverter objectConverter;
-    private final UserClient userClient;
 
     public BoardResponse getBoard(String userId, FilterRequest filter) {
 
-        Slice<ObjectEntity> slice = getFilteredObjects( filter);
+        Slice<ObjectEntity> slice = getFilteredObjects(filter);
 
         List<ObjectResponse> objects = objectConverter.toObjectResponseList(slice.getContent());
 
@@ -57,14 +55,15 @@ public class ObjectService {
                 .map(ObjectResponse::objectId)
                 .collect(Collectors.toList());
 
-        Map<String, Boolean> likeMap= checkLikedObject(userId, objectIds);
+        Map<String, Boolean> likeMap = checkLikedObject(userId, objectIds);
 
         return objectConverter.toBoardResponse(objects, likeMap, slice.hasNext());
 
 
     }
 
-    public Slice<ObjectEntity> getFilteredObjects( FilterRequest filter ) {
+    public Slice<ObjectEntity> getFilteredObjects(FilterRequest filter) {
+
 
         Pageable pageable = PageRequest.of(filter.getPage(), filter.getSize());
         QObjectEntity object = QObjectEntity.objectEntity; //QueryDSL
@@ -90,7 +89,6 @@ public class ObjectService {
             builder.and(object.objectPrice.loe(filter.getPriceMax()));
         }
 
-
         // keywords 필터
         if (filter.getKeywords() != null && !filter.getKeywords().isEmpty()) {
             builder.and(object.keywords.any().in(filter.getKeywords()));
@@ -102,66 +100,91 @@ public class ObjectService {
             builder.and(object.soldOut.eq(false));
         }
 
-        // 정렬 기준 결정
-        OrderSpecifier<?>[] orderSpecifiers = toSort(filter.getSort(), object);
+        if ("popular".equals(filter.getSort())) {
+            QLikes like = QLikes.likes;
 
-        // 쿼리 실행
-        List<ObjectEntity> content = queryFactory
-                .selectFrom(object)
-                .where(builder)
-                .orderBy(orderSpecifiers)
-                .offset((long) filter.getPage() * filter.getSize())
-                .limit(filter.getSize() + 1)
-                .fetch();
+            // objectId별 좋아요 수 집계
+            List<Tuple> likeCountTuples = queryFactory
+                    .select(object.objectId, like.count())
+                    .from(object)
+                    .leftJoin(like).on(like.objectId.eq(object.objectId))
+                    .where(builder)
+                    .groupBy(object.objectId,object.createdAt)
+                    .orderBy(like.count().desc(), object.createdAt.desc())
+                    .offset((long) filter.getPage() * filter.getSize())
+                    .limit(filter.getSize() + 1)
+                    .fetch();
 
-        boolean hasNext = content.size() > filter.getSize();
-        if (hasNext) {
-            content.remove(content.size() - 1);
+            boolean hasNext = likeCountTuples.size() > filter.getSize();
+            if (hasNext) {
+                likeCountTuples.remove(likeCountTuples.size() - 1);
+            }
+
+            List<String> objectIds = likeCountTuples.stream()
+                    .map(t -> t.get(object.objectId))
+                    .collect(Collectors.toList());
+
+            if (objectIds.isEmpty()) {
+                return new SliceImpl<>(Collections.emptyList(), pageable, false);
+            }
+
+            // ObjectEntity 조회
+            List<ObjectEntity> objects = queryFactory
+                    .selectFrom(object)
+                    .where(object.objectId.in(objectIds))
+                    .fetch();
+
+            Map<String, ObjectEntity> objectMap = objects.stream()
+                    .collect(Collectors.toMap(ObjectEntity::getObjectId, Function.identity()));
+
+            List<ObjectEntity> sortedObjects = objectIds.stream()
+                    .map(objectMap::get)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+
+            return new SliceImpl<>(sortedObjects, pageable, hasNext);
+
+        } else if ("latest".equals(filter.getSort())) {
+
+            // 최신순 정렬
+            List<ObjectEntity> content = queryFactory
+                    .selectFrom(object)
+                    .where(builder)
+                    .orderBy(object.createdAt.desc())
+                    .offset((long) filter.getPage() * filter.getSize())
+                    .limit(filter.getSize() + 1)
+                    .fetch();
+
+            boolean hasNext = content.size() > filter.getSize();
+            if (hasNext) {
+                content.remove(content.size() - 1);
+            }
+
+            return new SliceImpl<>(content, pageable, hasNext);
         }
+        else throw new ObjectException(INVALID_SORT_TYPE,"popular 또는 latest를 입력해주세요.");
 
-        return new SliceImpl<>(content, pageable, hasNext);
-    }
-
-
-    private OrderSpecifier<?>[] toSort(String sort, QObjectEntity object) {
-        if (sort == null || sort.equals("latest")) {
-            return new OrderSpecifier<?>[]{object.createdAt.desc()};
-        } else if ("popular".equals(sort)) {
-            // 좋아요 수 같을 시 최신순 정렬
-            return new OrderSpecifier<?>[]{object.likeCount.desc(), object.createdAt.desc()};
-        } else {
-            throw new ObjectException(INVALID_SORT_TYPE,"popular 혹은 latest를 입력해주세요.");
-        }
     }
 
 
     private Map<String, Boolean> checkLikedObject(String userId, List<String> objectIds) {
-        if (userId != null) {
-            LikeCheckRequest request = new LikeCheckRequest(objectIds);
-            InternalLikeResponse likeResponse = userClient.checkLikes(userId, request);
-            return likeResponse.likes();
-        } else {
+        if (userId == null || objectIds == null || objectIds.isEmpty()) {
             return Collections.emptyMap();
         }
-    }
 
-    // internal
+        // 리포지토리에서 직접 좋아요 여부 조회
+        List<Likes> likes = likeRepository.findAllByUserIdAndObjectIdIn(userId, objectIds);
 
-    @Transactional
-    public void updateLikeCount(String objectId, boolean increase) {
-        ObjectEntity object = objectRepository.findByObjectId(objectId)
-                .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND));
-
-        int currentCount = object.getLikeCount();
-        if (increase) {
-            object.setLikeCount(currentCount + 1);
-        } else {
-            if (currentCount > 0) {
-                object.setLikeCount(currentCount - 1);
-            }
+        // 좋아요 누른 objectId만 맵에 true로 표시
+        Map<String, Boolean> likeMap = new HashMap<>();
+        for (String objectId : objectIds) {
+            likeMap.put(objectId, false);
+        }
+        for (Likes like : likes) {
+            likeMap.put(like.getObjectId(), true);
         }
 
-        objectRepository.save(object);
+        return likeMap;
     }
 }
 
