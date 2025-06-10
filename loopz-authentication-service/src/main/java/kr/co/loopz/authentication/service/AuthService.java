@@ -6,17 +6,20 @@ import kr.co.loopz.authentication.constants.SecurityConstants;
 import kr.co.loopz.authentication.converter.AuthConverter;
 import kr.co.loopz.authentication.dto.request.InternalRegisterRequest;
 import kr.co.loopz.authentication.dto.request.TokenRequest;
+import kr.co.loopz.authentication.dto.response.GoogleResourceServerResponse;
 import kr.co.loopz.authentication.dto.response.InternalRegisterResponse;
 import kr.co.loopz.authentication.dto.response.LogoutResponse;
-import kr.co.loopz.authentication.jwt.JwtProvider;
-import kr.co.loopz.authentication.dto.response.GoogleResourceServerResponse;
 import kr.co.loopz.authentication.dto.response.SocialLoginResponse;
+import kr.co.loopz.authentication.exception.AuthenticationException;
+import kr.co.loopz.authentication.jwt.JwtProvider;
 import kr.co.loopz.common.redis.service.RefreshTokenRedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+
+import static kr.co.loopz.authentication.exception.AuthenticationErrorCode.GOOGLE_AUTHENTICATION_FAILED;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +48,7 @@ public class AuthService {
         String bearerHeader = SecurityConstants.TOKEN_PREFIX + tokenRequest.accessToken();
 
         // 구글 리소스 서버에 access token으로 사용자 정보 요청
-        GoogleResourceServerResponse googleUserInfo = googleClient.getUserInfo(bearerHeader);
+        GoogleResourceServerResponse googleUserInfo = requestToGoogle(bearerHeader);
         log.debug("구글 사용자 정보: {}", googleUserInfo);
 
         // user-service에 회원가입/로그인 요청
@@ -72,6 +75,21 @@ public class AuthService {
         boolean isDeleted = refreshTokenRedisService.deleteRefreshToken(userId);
         String message = isDeleted ? "Logout successful" : "Logout failed: User not found";
         return new LogoutResponse(message);
+    }
+
+
+
+    private GoogleResourceServerResponse requestToGoogle(String bearerHeader) {
+
+        GoogleResourceServerResponse googleUserInfo;
+        try {
+            googleUserInfo = googleClient.getUserInfo(bearerHeader);
+        } catch (Exception e) {
+            log.info("구글 리소스 서버 요청 실패: {}", e.getMessage());
+            throw new AuthenticationException(GOOGLE_AUTHENTICATION_FAILED, e.getMessage());
+        }
+        return googleUserInfo;
+
     }
 
 
