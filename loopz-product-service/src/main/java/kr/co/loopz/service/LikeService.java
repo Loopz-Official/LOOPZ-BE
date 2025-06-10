@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.amazonaws.services.kms.model.ConnectionErrorCodeType.USER_NOT_FOUND;
 import static kr.co.loopz.Exception.ObjectErrorCode.*;
 
 @Service
@@ -32,7 +31,7 @@ public class LikeService {
 
         // userId 존재여부 확인
         if (!userClient.existsByUserId(userId)) {
-            throw new ObjectException(USER_ID_NOT_FOUND, "User with ID %s not found"+ userId);
+            throw new ObjectException(USER_ID_NOT_FOUND, "User with ID not found: "+ userId);
         }
 
         // objectId 존재 여부 확인
