@@ -86,7 +86,7 @@ public class AuthService {
             googleUserInfo = googleClient.getUserInfo(bearerHeader);
         } catch (Exception e) {
             log.info("구글 리소스 서버 요청 실패: {}", e.getMessage());
-            throw new AuthenticationException(GOOGLE_AUTHENTICATION_FAILED, "토큰이 유효하지 않거나 만료되었을 수 있습니다.");
+            throw new AuthenticationException(GOOGLE_AUTHENTICATION_FAILED, e.getMessage());
         }
         return googleUserInfo;
 
