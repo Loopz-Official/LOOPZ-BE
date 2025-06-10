@@ -118,14 +118,11 @@ public class ObjectService {
 
             boolean next = hasNext(likeCountTuples, filter.getSize());
 
-            Map<ObjectEntity, Long> objectLikeCountMap = likeCountTuples.stream()
-                    .collect(Collectors.toMap(
-                            tuple -> tuple.get(object),
-                            tuple -> tuple.get(like.count())
-                    ));
+            List<ObjectEntity> orderedObjects = likeCountTuples.stream()
+                    .map(tuple -> tuple.get(object))
+                    .collect(Collectors.toList());
 
-
-            return new SliceImpl<>( new ArrayList<>(objectLikeCountMap.keySet()), pageable, next);
+            return new SliceImpl<>(orderedObjects, pageable, next);
 
         } else if ("latest".equals(filter.getSort())) {
 

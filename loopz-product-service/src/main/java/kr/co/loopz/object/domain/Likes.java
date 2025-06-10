@@ -10,7 +10,7 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 @Getter
 @AllArgsConstructor
-@Table(name = "`like`")
+@Table(name = "object_user_like")
 public class Likes extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
