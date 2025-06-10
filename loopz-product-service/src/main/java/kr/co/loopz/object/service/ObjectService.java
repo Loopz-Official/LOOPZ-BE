@@ -3,12 +3,12 @@ package kr.co.loopz.object.service;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import kr.co.loopz.object.domain.QLikes;
+import kr.co.loopz.object.domain.QObjectEntity;
 import kr.co.loopz.object.Exception.ObjectException;
 import kr.co.loopz.object.converter.ObjectConverter;
 import kr.co.loopz.object.domain.Likes;
 import kr.co.loopz.object.domain.ObjectEntity;
-import kr.co.loopz.object.domain.QLikes;
-import kr.co.loopz.object.domain.QObjectEntity;
 import kr.co.loopz.object.dto.request.FilterRequest;
 import kr.co.loopz.object.dto.response.BoardResponse;
 import kr.co.loopz.object.dto.response.ObjectResponse;
@@ -107,10 +107,7 @@ public class ObjectService {
                     .limit(filter.getSize() + 1)
                     .fetch();
 
-            boolean hasNext = likeCountTuples.size() > filter.getSize();
-            if (hasNext) {
-                likeCountTuples.remove(likeCountTuples.size() - 1);
-            }
+            boolean next = hasNext(likeCountTuples, filter.getSize());
 
             List<String> objectIds = likeCountTuples.stream()
                     .map(t -> t.get(object.objectId))
@@ -134,7 +131,7 @@ public class ObjectService {
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
 
-            return new SliceImpl<>(sortedObjects, pageable, hasNext);
+            return new SliceImpl<>(sortedObjects, pageable, next);
 
         } else if ("latest".equals(filter.getSort())) {
 
@@ -147,15 +144,20 @@ public class ObjectService {
                     .limit(filter.getSize() + 1)
                     .fetch();
 
-            boolean hasNext = content.size() > filter.getSize();
-            if (hasNext) {
-                content.remove(content.size() - 1);
-            }
+            boolean next = hasNext(content, filter.getSize());
 
-            return new SliceImpl<>(content, pageable, hasNext);
+            return new SliceImpl<>(content, pageable, next);
         }
         else throw new ObjectException(INVALID_SORT_TYPE,"popular 또는 latest를 입력해주세요.");
 
+    }
+
+    private <T> boolean hasNext(List<T> list, int pageSize) {
+        boolean hasNext = list.size() > pageSize;
+        if (hasNext) {
+            list.remove(list.size() - 1);
+        }
+        return hasNext;
     }
 
 
