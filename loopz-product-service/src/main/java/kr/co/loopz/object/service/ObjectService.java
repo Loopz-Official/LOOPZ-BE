@@ -97,11 +97,20 @@ public class ObjectService {
 
             // objectId별 좋아요 수 집계
             List<Tuple> likeCountTuples = queryFactory
-                    .select(object.objectId, like.count())
+                    .select(object, like.count())
                     .from(object)
                     .leftJoin(like).on(like.objectId.eq(object.objectId))
                     .where(builder)
-                    .groupBy(object.objectId,object.createdAt)
+                    .groupBy(object.id,
+                            object.createdAt,
+                            object.intro,
+                            object.objectId,
+                            object.objectName,
+                            object.objectPrice,
+                            object.objectSize,
+                            object.objectType,
+                            object.soldOut,
+                            object.updatedAt)
                     .orderBy(like.count().desc(), object.createdAt.desc())
                     .offset((long) filter.getPage() * filter.getSize())
                     .limit(filter.getSize() + 1)
@@ -109,29 +118,14 @@ public class ObjectService {
 
             boolean next = hasNext(likeCountTuples, filter.getSize());
 
-            List<String> objectIds = likeCountTuples.stream()
-                    .map(t -> t.get(object.objectId))
-                    .collect(Collectors.toList());
+            Map<ObjectEntity, Long> objectLikeCountMap = likeCountTuples.stream()
+                    .collect(Collectors.toMap(
+                            tuple -> tuple.get(object),
+                            tuple -> tuple.get(like.count())
+                    ));
 
-            if (objectIds.isEmpty()) {
-                return new SliceImpl<>(Collections.emptyList(), pageable, false);
-            }
 
-            // ObjectEntity 조회
-            List<ObjectEntity> objects = queryFactory
-                    .selectFrom(object)
-                    .where(object.objectId.in(objectIds))
-                    .fetch();
-
-            Map<String, ObjectEntity> objectMap = objects.stream()
-                    .collect(Collectors.toMap(ObjectEntity::getObjectId, Function.identity()));
-
-            List<ObjectEntity> sortedObjects = objectIds.stream()
-                    .map(objectMap::get)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-
-            return new SliceImpl<>(sortedObjects, pageable, next);
+            return new SliceImpl<>( new ArrayList<>(objectLikeCountMap.keySet()), pageable, next);
 
         } else if ("latest".equals(filter.getSort())) {
 
