@@ -7,6 +7,7 @@ import kr.co.loopz.authentication.converter.AuthConverter;
 import kr.co.loopz.authentication.dto.request.InternalRegisterRequest;
 import kr.co.loopz.authentication.dto.request.TokenRequest;
 import kr.co.loopz.authentication.dto.response.InternalRegisterResponse;
+import kr.co.loopz.authentication.dto.response.LogoutResponse;
 import kr.co.loopz.authentication.jwt.JwtProvider;
 import kr.co.loopz.authentication.dto.response.GoogleResourceServerResponse;
 import kr.co.loopz.authentication.dto.response.SocialLoginResponse;
@@ -66,5 +67,12 @@ public class AuthService {
 
         return SecurityConstants.TOKEN_PREFIX + accessToken;
     }
+
+    public LogoutResponse logout(String userId) {
+        boolean isDeleted = refreshTokenRedisService.deleteRefreshToken(userId);
+        String message = isDeleted ? "Logout successful" : "Logout failed: User not found";
+        return new LogoutResponse(message);
+    }
+
 
 }

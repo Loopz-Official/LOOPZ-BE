@@ -2,12 +2,15 @@ package kr.co.loopz.authentication.apiExternal;
 
 import jakarta.validation.Valid;
 import kr.co.loopz.authentication.dto.request.TokenRequest;
+import kr.co.loopz.authentication.dto.response.LogoutResponse;
 import kr.co.loopz.authentication.dto.response.SocialLoginResponse;
 import kr.co.loopz.authentication.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,6 +42,19 @@ public class AuthController {
                 .header(HttpHeaders.AUTHORIZATION, accessWithBearer)
                 .body(socialLoginResponse);
 
+    }
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<LogoutResponse> logout(
+            @AuthenticationPrincipal User currentUser
+            ) {
+
+        String userId = currentUser.getUsername();
+
+        LogoutResponse response = authService.logout(userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }

@@ -28,8 +28,14 @@ public class RefreshTokenRedisService {
         return refreshTokenRepository.findById(userId);
     }
 
-    public void deleteRefreshToken(String userId) {
+    public boolean deleteRefreshToken(String userId) {
+
+        if (!refreshTokenRepository.existsById(userId)) {
+            return false;
+        }
+
         refreshTokenRepository.deleteById(userId);
+        return true;
     }
 
 }
