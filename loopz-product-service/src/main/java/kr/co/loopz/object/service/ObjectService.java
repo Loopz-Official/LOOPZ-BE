@@ -171,6 +171,7 @@ public class ObjectService {
     }
 
 
+    // 좋아요 여부 체크
     private Map<String, Boolean> checkLikedObject(String userId, List<String> objectIds) {
         if (userId == null || objectIds == null || objectIds.isEmpty()) {
             return Collections.emptyMap();
@@ -191,6 +192,7 @@ public class ObjectService {
         return likeMap;
     }
 
+    // 제품 상세보기
     public DetailResponse getObjectDetails(String userId, String objectId) {
         ObjectEntity entity =objectRepository.findByObjectId(objectId)
                 .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND,"Object not found: " + objectId));
