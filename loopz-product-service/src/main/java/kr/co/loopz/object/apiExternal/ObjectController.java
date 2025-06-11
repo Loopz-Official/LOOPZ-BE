@@ -1,5 +1,6 @@
 package kr.co.loopz.object.apiExternal;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import kr.co.loopz.object.domain.ObjectEntity;
 import kr.co.loopz.object.dto.request.FilterRequest;
@@ -23,6 +24,7 @@ public class ObjectController {
     private final ObjectService objectService;
 
     @GetMapping
+    @Operation(summary= "메인보드 조회")
     public ResponseEntity<BoardResponse> getMainBoard(
             @AuthenticationPrincipal User currentUser,
             @ModelAttribute @Valid FilterRequest filter
@@ -41,6 +43,7 @@ public class ObjectController {
     }
 
     @GetMapping("/{objectId}")
+    @Operation(summary= "상품 상세보기")
     public ResponseEntity<DetailResponse> getObjectDetails(
             @AuthenticationPrincipal User currentUser,
             @PathVariable String objectId

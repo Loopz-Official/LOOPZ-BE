@@ -1,6 +1,7 @@
 package kr.co.loopz.object.apiExternal;
 
 
+import io.swagger.v3.oas.annotations.Operation;
 import kr.co.loopz.object.service.LikeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ public class ObjectLikeController {
     private final LikeService likeService;
 
     @PatchMapping("/{objectId}")
+    @Operation(summary="좋아요 추가/삭제")
     public ResponseEntity<Void> toggleLike(
             @AuthenticationPrincipal User currentUser,
             @PathVariable String objectId){
