@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ObjectImageRepository extends JpaRepository<ObjectImage, Long> {
     List<ObjectImage> findByObjectIdIn(List<String> objectIds);
+
+    List<ObjectImage> findByObjectId(String objectId);
 }

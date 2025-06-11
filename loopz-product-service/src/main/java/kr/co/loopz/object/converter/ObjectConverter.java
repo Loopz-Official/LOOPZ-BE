@@ -1,7 +1,9 @@
 package kr.co.loopz.object.converter;
 
+import kr.co.loopz.object.domain.ObjectDetail;
 import kr.co.loopz.object.domain.ObjectEntity;
 import kr.co.loopz.object.dto.response.BoardResponse;
+import kr.co.loopz.object.dto.response.DetailResponse;
 import kr.co.loopz.object.dto.response.ObjectResponse;
 import org.mapstruct.Mapper;
 
@@ -36,5 +38,31 @@ public interface ObjectConverter {
     default BoardResponse toBoardResponse(List<ObjectResponse> dtos, Map<String, String> imageUrlMap, Map<String, Boolean> likeMap, boolean hasNext) {
         List<ObjectResponse> resultObjects = toObjectResponseList(dtos, imageUrlMap,likeMap);
         return new BoardResponse(resultObjects.size(), resultObjects, hasNext);
+    }
+
+    default DetailResponse toDetailResponse(ObjectEntity entity, List<String> imageUrls, Boolean liked) {
+        ObjectResponse objectResponse = new ObjectResponse(
+                entity.getObjectId(),
+                entity.getObjectName(),
+                entity.getIntro(),
+                imageUrls.isEmpty() ? null : imageUrls.get(0),
+                entity.getObjectPrice(),
+                entity.isSoldOut(),
+                liked
+        );
+
+        ObjectDetail detail = entity.getDetail();
+        return new DetailResponse(
+                objectResponse,
+                detail.getShippingInfo(),
+                detail.getShippingFee(),
+                detail.getSize(),
+                detail.getDescriptionUrl(),
+                detail.getProductInfo(),
+                detail.getNotice(),
+                detail.getStock(),
+                imageUrls
+
+        );
     }
 }

@@ -8,9 +8,11 @@ import kr.co.loopz.object.Exception.ObjectException;
 import kr.co.loopz.object.converter.ObjectConverter;
 import kr.co.loopz.object.dto.request.FilterRequest;
 import kr.co.loopz.object.dto.response.BoardResponse;
+import kr.co.loopz.object.dto.response.DetailResponse;
 import kr.co.loopz.object.dto.response.ObjectResponse;
 import kr.co.loopz.object.repository.LikeRepository;
 import kr.co.loopz.object.repository.ObjectImageRepository;
+import kr.co.loopz.object.repository.ObjectRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +26,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static kr.co.loopz.object.Exception.ObjectErrorCode.INVALID_SORT_TYPE;
+import static kr.co.loopz.object.Exception.ObjectErrorCode.OBJECT_ID_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +37,7 @@ public class ObjectService {
     private final JPAQueryFactory queryFactory;
     private final LikeRepository likeRepository;
     private final ObjectConverter objectConverter;
+    private final ObjectRepository objectRepository;
 
     public BoardResponse getBoard(String userId, FilterRequest filter) {
 
@@ -186,6 +190,25 @@ public class ObjectService {
 
         return likeMap;
     }
+
+    public DetailResponse getObjectDetails(String userId, String objectId) {
+        ObjectEntity entity =objectRepository.findByObjectId(objectId)
+                .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND,"Object not found: " + objectId));
+
+        Boolean liked = false;
+        if (userId != null) {
+            liked = likeRepository.existsByUserIdAndObjectId(userId, objectId);
+        }
+
+        List<ObjectImage> images = objectImageRepository.findByObjectId(objectId);
+        List<String> imageUrls = images.stream()
+                .map(ObjectImage::getImageUrl)
+                .collect(Collectors.toList());
+
+        return objectConverter.toDetailResponse(entity, imageUrls, liked);
+    }
+
+
 }
 
 
