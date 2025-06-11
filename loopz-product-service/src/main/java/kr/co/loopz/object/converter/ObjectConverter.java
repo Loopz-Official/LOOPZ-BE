@@ -54,8 +54,6 @@ public interface ObjectConverter {
         ObjectDetail detail = entity.getDetail();
         return new DetailResponse(
                 objectResponse,
-                detail.getShippingInfo(),
-                detail.getShippingFee(),
                 detail.getSize(),
                 detail.getDescriptionUrl(),
                 detail.getProductInfo(),

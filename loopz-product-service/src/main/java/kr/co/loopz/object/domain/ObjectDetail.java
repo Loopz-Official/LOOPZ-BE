@@ -11,10 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ObjectDetail {
 
-    private String shippingInfo;
-
-    private int shippingFee;
-
     private String size;
 
     // HTML로 받을 상세 설명 (버킷주소)
