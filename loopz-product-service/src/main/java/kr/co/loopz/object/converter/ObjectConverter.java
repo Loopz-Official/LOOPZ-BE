@@ -19,25 +19,22 @@ public interface ObjectConverter {
     List<ObjectResponse> toObjectResponseList(List<ObjectEntity> objectEntities);
 
 
-    // 찜 여부 반영해 새로운 DTO 리스트 반환
-    default List<ObjectResponse> toObjectResponseList(List<ObjectResponse> dtos, Map<String, Boolean> likeMap) {
+    // 찜 여부와 image url 반영해 새로운 DTO 리스트 반환
+    default List<ObjectResponse> toObjectResponseList(List<ObjectResponse> dtos, Map<String, String> imageUrlMap,Map<String, Boolean> likeMap) {
         return dtos.stream()
-                .map(dto -> {
-                    Boolean liked = likeMap.getOrDefault(dto.objectId(), false);
-                    return new ObjectResponse(
-                            dto.objectId(),
-                            dto.objectName(),
-                            dto.intro(),
-                            dto.imageUrl(),
-                            dto.objectPrice(),
-                            dto.soldOut(),
-                            liked
-                    );
-                }).collect(Collectors.toList());
+                .map(dto -> new ObjectResponse(
+                        dto.objectId(),
+                        dto.objectName(),
+                        dto.intro(),
+                        imageUrlMap.get(dto.objectId()),
+                        dto.objectPrice(),
+                        dto.soldOut(),
+                        likeMap.getOrDefault(dto.objectId(), false)
+                )).collect(Collectors.toList());
     }
 
-    default BoardResponse toBoardResponse(List<ObjectResponse> dtos, Map<String, Boolean> likeMap, boolean hasNext) {
-        List<ObjectResponse> resultObjects = toObjectResponseList(dtos, likeMap);
+    default BoardResponse toBoardResponse(List<ObjectResponse> dtos, Map<String, String> imageUrlMap, Map<String, Boolean> likeMap, boolean hasNext) {
+        List<ObjectResponse> resultObjects = toObjectResponseList(dtos, imageUrlMap,likeMap);
         return new BoardResponse(resultObjects.size(), resultObjects, hasNext);
     }
 }

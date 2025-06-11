@@ -3,16 +3,14 @@ package kr.co.loopz.object.service;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import kr.co.loopz.object.domain.QLikes;
-import kr.co.loopz.object.domain.QObjectEntity;
+import kr.co.loopz.object.domain.*;
 import kr.co.loopz.object.Exception.ObjectException;
 import kr.co.loopz.object.converter.ObjectConverter;
-import kr.co.loopz.object.domain.Likes;
-import kr.co.loopz.object.domain.ObjectEntity;
 import kr.co.loopz.object.dto.request.FilterRequest;
 import kr.co.loopz.object.dto.response.BoardResponse;
 import kr.co.loopz.object.dto.response.ObjectResponse;
 import kr.co.loopz.object.repository.LikeRepository;
+import kr.co.loopz.object.repository.ObjectImageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +30,7 @@ import static kr.co.loopz.object.Exception.ObjectErrorCode.INVALID_SORT_TYPE;
 @Slf4j
 public class ObjectService {
 
+    private final ObjectImageRepository objectImageRepository;
     private final JPAQueryFactory queryFactory;
     private final LikeRepository likeRepository;
     private final ObjectConverter objectConverter;
@@ -40,17 +39,33 @@ public class ObjectService {
 
         Slice<ObjectEntity> slice = getFilteredObjects(filter);
 
-        List<ObjectResponse> objects = objectConverter.toObjectResponseList(slice.getContent());
+        List<ObjectEntity> entities = slice.getContent();
 
-        // 상품 ID 목록 추출
-        List<String> objectIds = objects.stream()
-                .map(ObjectResponse::objectId)
+        List<String> objectIds = entities.stream()
+                .map(ObjectEntity::getObjectId)
                 .collect(Collectors.toList());
+
+        List<ObjectResponse> objects = objectConverter.toObjectResponseList(entities);
+
+        //image 처리
+        List<ObjectImage> objectImages = objectImageRepository.findByObjectIdIn(objectIds);
+        Map<String, String> imageMap = objectImages.stream()
+                .collect(Collectors.groupingBy(
+                        ObjectImage::getObjectId,
+                        LinkedHashMap::new,
+                        Collectors.mapping(
+                                ObjectImage::getImageUrl,
+                                Collectors.collectingAndThen(
+                                        Collectors.toList(),
+                                        list -> list.get(0)        // 첫 번째 이미지 URL만 선택
+                                )
+                        )
+                ));
+
 
         Map<String, Boolean> likeMap = checkLikedObject(userId, objectIds);
 
-        return objectConverter.toBoardResponse(objects, likeMap, slice.hasNext());
-
+        return objectConverter.toBoardResponse(objects, imageMap, likeMap, slice.hasNext());
 
     }
 
