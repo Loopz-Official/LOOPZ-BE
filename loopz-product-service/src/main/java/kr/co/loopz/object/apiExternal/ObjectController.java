@@ -1,8 +1,11 @@
 package kr.co.loopz.object.apiExternal;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import kr.co.loopz.object.domain.ObjectEntity;
 import kr.co.loopz.object.dto.request.FilterRequest;
 import kr.co.loopz.object.dto.response.BoardResponse;
+import kr.co.loopz.object.dto.response.DetailResponse;
 import kr.co.loopz.object.service.ObjectService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +24,7 @@ public class ObjectController {
     private final ObjectService objectService;
 
     @GetMapping
+    @Operation(summary= "메인보드 조회")
     public ResponseEntity<BoardResponse> getMainBoard(
             @AuthenticationPrincipal User currentUser,
             @ModelAttribute @Valid FilterRequest filter
@@ -34,6 +38,19 @@ public class ObjectController {
         }
 
         BoardResponse response = objectService.getBoard(userId, filter);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/{objectId}")
+    @Operation(summary= "상품 상세보기")
+    public ResponseEntity<DetailResponse> getObjectDetails(
+            @AuthenticationPrincipal User currentUser,
+            @PathVariable String objectId
+    ){
+        String userId = currentUser != null ? currentUser.getUsername() : null;
+
+        DetailResponse response = objectService.getObjectDetails(userId, objectId);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
