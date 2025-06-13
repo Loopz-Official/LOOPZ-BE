@@ -3,13 +3,16 @@ package kr.co.loopz.user.service;
 import kr.co.loopz.user.converter.UserConverter;
 import kr.co.loopz.user.domain.Address;
 import kr.co.loopz.user.dto.request.AddressRegisterRequest;
-import kr.co.loopz.user.dto.response.AddressRegisterResponse;
+import kr.co.loopz.user.dto.response.AddressListResponse;
+import kr.co.loopz.user.dto.response.AddressResponse;
 import kr.co.loopz.user.exception.UserException;
 import kr.co.loopz.user.repository.AddressRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static kr.co.loopz.user.exception.UserErrorCode.*;
 
@@ -23,7 +26,7 @@ public class UserAddressService {
     private final AddressRepository addressRepository;
 
     @Transactional
-    public AddressRegisterResponse registerAddress(String userId, AddressRegisterRequest request) {
+    public AddressResponse registerAddress(String userId, AddressRegisterRequest request) {
 
         // 사용자가 등록한 기존 배송지 개수를 조회
         boolean isFirstAddress = addressRepository.countByUserId(userId) == 0;
@@ -61,7 +64,16 @@ public class UserAddressService {
 
         Address saved = addressRepository.save(address);
 
-        return userConverter.toAddressRegisterResponse(saved);
+        return userConverter.toAddressResponse(saved);
+    }
+
+    public AddressListResponse getAddressList(String userId) {
+        List<Address> addresses = addressRepository.findAllByUserId(userId);
+        List<AddressResponse> addressResponses = addresses.stream()
+                .map(userConverter::toAddressResponse)
+                .toList();
+
+        return new AddressListResponse(addressResponses);
     }
 
 

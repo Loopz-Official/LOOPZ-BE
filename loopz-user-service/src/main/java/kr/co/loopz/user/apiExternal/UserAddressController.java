@@ -4,7 +4,8 @@ import feign.Response;
 import jakarta.validation.Valid;
 import kr.co.loopz.user.dto.request.AddressRegisterRequest;
 import kr.co.loopz.user.dto.request.NickNameUpdateRequest;
-import kr.co.loopz.user.dto.response.AddressRegisterResponse;
+import kr.co.loopz.user.dto.response.AddressListResponse;
+import kr.co.loopz.user.dto.response.AddressResponse;
 import kr.co.loopz.user.dto.response.NickNameUpdateResponse;
 import kr.co.loopz.user.service.UserAddressService;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user/v1/address")
@@ -27,14 +25,22 @@ public class UserAddressController {
     private final UserAddressService userAddressService;
 
     @PostMapping
-    public ResponseEntity<AddressRegisterResponse> RegisterAddress(
+    public ResponseEntity<AddressResponse> RegisterAddress(
             @AuthenticationPrincipal User currentUser,
             @RequestBody @Valid AddressRegisterRequest request){
 
         String userId = currentUser.getUsername();
 
-        AddressRegisterResponse response = userAddressService.registerAddress(userId, request);
+        AddressResponse response = userAddressService.registerAddress(userId, request);
 
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<AddressListResponse> addressList(@AuthenticationPrincipal User currentUser){
+        String userId = currentUser.getUsername();
+
+        AddressListResponse response= userAddressService.getAddressList(userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

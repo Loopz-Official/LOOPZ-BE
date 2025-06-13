@@ -2,7 +2,7 @@ package kr.co.loopz.user.converter;
 
 import kr.co.loopz.user.domain.Address;
 import kr.co.loopz.user.domain.UserEntity;
-import kr.co.loopz.user.dto.response.AddressRegisterResponse;
+import kr.co.loopz.user.dto.response.AddressResponse;
 import kr.co.loopz.user.dto.response.AgreeTermsResponse;
 import kr.co.loopz.user.dto.response.NickNameUpdateResponse;
 import kr.co.loopz.user.dto.response.UserInternalRegisterResponse;
@@ -30,6 +30,6 @@ public interface UserConverter {
     AgreeTermsResponse toAgreeTermsResponse(UserEntity user);
 
     @Mapping(source = "default", target = "isDefault")
-    AddressRegisterResponse toAddressRegisterResponse(Address address);
+    AddressResponse toAddressResponse(Address address);
 
 }

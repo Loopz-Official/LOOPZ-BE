@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import kr.co.loopz.common.domain.BaseTimeEntity;
 import kr.co.loopz.common.domain.BaseTimeEntityWithDeletion;
 import kr.co.loopz.user.dto.request.AddressRegisterRequest;
-import kr.co.loopz.user.dto.response.AddressRegisterResponse;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
