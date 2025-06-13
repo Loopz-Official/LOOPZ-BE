@@ -25,7 +25,7 @@ public class UserAddressController {
     private final UserAddressService userAddressService;
 
     @PostMapping
-    public ResponseEntity<AddressResponse> RegisterAddress(
+    public ResponseEntity<AddressResponse> registerAddress(
             @AuthenticationPrincipal User currentUser,
             @RequestBody @Valid AddressRegisterRequest request){
 

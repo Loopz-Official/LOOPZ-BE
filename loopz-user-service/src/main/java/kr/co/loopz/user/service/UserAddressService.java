@@ -25,6 +25,7 @@ public class UserAddressService {
     private final UserConverter userConverter;
     private final AddressRepository addressRepository;
 
+    //배송지 등록
     @Transactional
     public AddressResponse registerAddress(String userId, AddressRegisterRequest request) {
 
@@ -67,6 +68,7 @@ public class UserAddressService {
         return userConverter.toAddressResponse(saved);
     }
 
+    //배송지 목록 조회
     public AddressListResponse getAddressList(String userId) {
         List<Address> addresses = addressRepository.findAllByUserId(userId);
         List<AddressResponse> addressResponses = addresses.stream()
