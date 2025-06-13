@@ -3,6 +3,9 @@ package kr.co.loopz.user.domain;
 import jakarta.persistence.*;
 import kr.co.loopz.common.domain.BaseTimeEntity;
 import kr.co.loopz.common.domain.BaseTimeEntityWithDeletion;
+import kr.co.loopz.user.dto.request.AddressRegisterRequest;
+import kr.co.loopz.user.dto.response.AddressRegisterResponse;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
@@ -37,5 +40,40 @@ public class Address extends BaseTimeEntity {
     private String addressDetail;
 
     //기본 배송지 여부
-    private boolean isDefault;
+    private boolean isDefault = false;
+
+    @Builder
+    private Address(String userId, String recipientName, String phoneNumber,
+                    String zoneCode, String address, String addressDetail,
+                    boolean isDefault) {
+        this.userId = userId;
+        this.recipientName = recipientName;
+        this.phoneNumber = phoneNumber;
+        this.zoneCode = zoneCode;
+        this.address = address;
+        this.addressDetail = addressDetail;
+        this.isDefault = isDefault;
+    }
+
+    /**
+     * Address 생성 메서드
+     */
+    public static Address from(AddressRegisterRequest request, String userId,boolean isDefault) {
+        return Address.builder()
+                .userId(userId)
+                .recipientName(request.recipientName())
+                .phoneNumber(request.phoneNumber())
+                .zoneCode(request.zoneCode())
+                .address(request.address())
+                .addressDetail(request.addressDetail())
+                .isDefault(isDefault)
+                .build();
+    }
+
+    public boolean isDefault() {
+        return isDefault;
+    }
+
+
 }
+
