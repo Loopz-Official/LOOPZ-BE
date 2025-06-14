@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.util.UUID;
+
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -21,6 +23,9 @@ public class Address extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
+
+    @Column(unique = true, nullable = false)
+    private String addressId;
 
     private String userId;
 
@@ -39,25 +44,26 @@ public class Address extends BaseTimeEntity {
     private String addressDetail;
 
     //기본 배송지 여부
-    private boolean isDefault = false;
+    private boolean defaultAddress = false;
 
     @Builder
     private Address(String userId, String recipientName, String phoneNumber,
                     String zoneCode, String address, String addressDetail,
-                    boolean isDefault) {
+                    boolean defaultAddress) {
+        this.addressId = UUID.randomUUID().toString();
         this.userId = userId;
         this.recipientName = recipientName;
         this.phoneNumber = phoneNumber;
         this.zoneCode = zoneCode;
         this.address = address;
         this.addressDetail = addressDetail;
-        this.isDefault = isDefault;
+        this.defaultAddress = defaultAddress;
     }
 
     /**
      * Address 생성 메서드
      */
-    public static Address from(AddressRegisterRequest request, String userId,boolean isDefault) {
+    public static Address from(AddressRegisterRequest request, String userId,boolean defaultAddress) {
         return Address.builder()
                 .userId(userId)
                 .recipientName(request.recipientName())
@@ -65,12 +71,8 @@ public class Address extends BaseTimeEntity {
                 .zoneCode(request.zoneCode())
                 .address(request.address())
                 .addressDetail(request.addressDetail())
-                .isDefault(isDefault)
+                .defaultAddress(defaultAddress)
                 .build();
-    }
-
-    public boolean isDefault() {
-        return isDefault;
     }
 
 

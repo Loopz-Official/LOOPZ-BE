@@ -13,7 +13,7 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     boolean existsByUserIdAndZoneCodeAndAddressAndAddressDetail(
             String userId, String zoneCode, String address, String addressDetail);
 
-    boolean existsByUserIdAndIsDefaultTrue(String userId);
+    boolean existsByUserIdAndDefaultAddressTrue(String userId);
 
     List<Address> findAllByUserId(String userId);
 }

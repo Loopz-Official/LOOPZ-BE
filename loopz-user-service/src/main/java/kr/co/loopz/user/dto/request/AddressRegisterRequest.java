@@ -6,6 +6,6 @@ public record AddressRegisterRequest (
         String zoneCode,
         String address,
         String addressDetail,
-        boolean isDefault
+        boolean defaultAddress
 ) {
 }

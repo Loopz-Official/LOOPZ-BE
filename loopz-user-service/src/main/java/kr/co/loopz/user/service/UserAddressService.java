@@ -32,8 +32,8 @@ public class UserAddressService {
         // 사용자가 등록한 기존 배송지 개수를 조회
         boolean isFirstAddress = addressRepository.countByUserId(userId) == 0;
 
-        // 첫 배송지인데 request.isDefault()가 false면 예외
-        if (isFirstAddress && !request.isDefault()) {
+        // 첫 배송지인데 request.defaultAddress()가 false면 예외
+        if (isFirstAddress && !request.defaultAddress()) {
             throw new UserException(FIRST_ADDRESS_MUST_BE_DEFAULT);
         }
 
@@ -50,11 +50,11 @@ public class UserAddressService {
         }
 
         // 첫 배송지이거나 요청에서 기본 배송지로 설정했으면 true
-        boolean isDefault = isFirstAddress || request.isDefault();
+        boolean isDefault = isFirstAddress || request.defaultAddress();
 
         // 기본배송지 중복체크
         if (isDefault) {
-            boolean defaultAddressExists = addressRepository.existsByUserIdAndIsDefaultTrue(userId);
+            boolean defaultAddressExists = addressRepository.existsByUserIdAndDefaultAddressTrue(userId);
             if (!isFirstAddress && defaultAddressExists) {
                 throw new UserException(ALREADY_HAS_DEFAULT_ADDRESS);
             }
