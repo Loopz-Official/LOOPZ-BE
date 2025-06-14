@@ -52,12 +52,13 @@ public class UserAddressService {
         // 첫 배송지이거나 요청에서 기본 배송지로 설정했으면 true
         boolean isDefault = isFirstAddress || request.defaultAddress();
 
-        // 기본배송지 중복체크
+        // 기존 기본배송지가 있으면 기본 설정 해제
         if (isDefault) {
-            boolean defaultAddressExists = addressRepository.existsByUserIdAndDefaultAddressTrue(userId);
-            if (!isFirstAddress && defaultAddressExists) {
-                throw new UserException(ALREADY_HAS_DEFAULT_ADDRESS);
-            }
+            addressRepository.findByUserIdAndDefaultAddressTrue(userId)
+                    .ifPresent(existingDefault -> {
+                        existingDefault.setDefaultAddress(false);
+                        addressRepository.save(existingDefault);
+                    });
         }
 
         // Address 엔티티 생성

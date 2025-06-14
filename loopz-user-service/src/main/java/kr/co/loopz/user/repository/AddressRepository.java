@@ -4,6 +4,7 @@ import kr.co.loopz.user.domain.Address;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AddressRepository extends JpaRepository<Address, Long> {
 
@@ -13,7 +14,8 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     boolean existsByUserIdAndZoneCodeAndAddressAndAddressDetail(
             String userId, String zoneCode, String address, String addressDetail);
 
-    boolean existsByUserIdAndDefaultAddressTrue(String userId);
+    Optional<Address> findByUserIdAndDefaultAddressTrue(String userId);
+
 
     List<Address> findAllByUserId(String userId);
 }

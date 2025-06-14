@@ -46,6 +46,10 @@ public class Address extends BaseTimeEntity {
     //기본 배송지 여부
     private boolean defaultAddress = false;
 
+    public void setDefaultAddress(boolean isDefault) {
+        this.defaultAddress = isDefault;
+    }
+
     @Builder
     private Address(String userId, String recipientName, String phoneNumber,
                     String zoneCode, String address, String addressDetail,
