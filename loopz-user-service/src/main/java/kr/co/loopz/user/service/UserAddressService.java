@@ -55,11 +55,7 @@ public class UserAddressService {
 
         // 기존 기본배송지가 있으면 기본 설정 해제
         if (isDefault) {
-            addressRepository.findByUserIdAndDefaultAddressTrue(userId)
-                    .ifPresent(existingDefault -> {
-                        existingDefault.setDefaultAddress(false);
-                        addressRepository.save(existingDefault);
-                    });
+            unsetDefaultAddress(userId);
         }
 
         // Address 엔티티 생성
@@ -103,12 +99,7 @@ public class UserAddressService {
                 if (requestedDefault) {
                     // 기본배송지로 변경 요청 시
                     if (!currentDefault) {
-                        // 기존 기본배송지 해제
-                        addressRepository.findByUserIdAndDefaultAddressTrue(userId)
-                                .ifPresent(existingDefault -> {
-                                    existingDefault.setDefaultAddress(false);
-                                    addressRepository.save(existingDefault);
-                                });
+                       unsetDefaultAddress(userId);
                     }
                     address.setDefaultAddress(true);
                 } else {
@@ -128,6 +119,15 @@ public class UserAddressService {
             }
 
             return userConverter.toAddressResponse(address);
+    }
+
+    // 기존 기본배송지 해제
+    private void unsetDefaultAddress(String userId) {
+        addressRepository.findByUserIdAndDefaultAddressTrue(userId)
+                .ifPresent(existingDefault -> {
+                    existingDefault.setDefaultAddress(false);
+                    addressRepository.save(existingDefault);
+                });
     }
 
 }
