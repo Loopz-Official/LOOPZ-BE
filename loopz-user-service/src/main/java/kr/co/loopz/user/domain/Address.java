@@ -50,6 +50,18 @@ public class Address extends BaseTimeEntity {
         this.defaultAddress = isDefault;
     }
 
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setAddressDetail(String addressDetail) {
+        this.addressDetail = addressDetail;
+    }
+
+    public void setZoneCode(String zoneCode) {
+        this.zoneCode = zoneCode;
+    }
+
     @Builder
     private Address(String userId, String recipientName, String phoneNumber,
                     String zoneCode, String address, String addressDetail,

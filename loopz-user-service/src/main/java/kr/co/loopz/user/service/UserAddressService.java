@@ -3,6 +3,7 @@ package kr.co.loopz.user.service;
 import kr.co.loopz.user.converter.UserConverter;
 import kr.co.loopz.user.domain.Address;
 import kr.co.loopz.user.dto.request.AddressRegisterRequest;
+import kr.co.loopz.user.dto.request.AddressUpdateRequest;
 import kr.co.loopz.user.dto.response.AddressListResponse;
 import kr.co.loopz.user.dto.response.AddressResponse;
 import kr.co.loopz.user.exception.UserException;
@@ -79,5 +80,54 @@ public class UserAddressService {
         return new AddressListResponse(addressResponses);
     }
 
+    //배송지 수정
+    @Transactional
+    public AddressResponse updateAddress(String userId, Long addressId, AddressUpdateRequest request) {
+        Address address = addressRepository.findByIdAndUserId(addressId, userId)
+                .orElseThrow(() -> new UserException(ADDRESS_NOT_FOUND,"Addreess id: "+ addressId));
+
+        if (request.address() != null) {
+            address.setAddress(request.address());
+        }
+        if (request.addressDetail() != null) {
+            address.setAddressDetail(request.addressDetail());
+        }
+        if (request.zoneCode() != null) {
+            address.setZoneCode(request.zoneCode());
+        }
+
+        if (request.defaultAddress() != null) {
+            boolean requestedDefault = request.defaultAddress();
+            boolean currentDefault = address.isDefaultAddress();
+
+                if (requestedDefault) {
+                    // 기본배송지로 변경 요청 시
+                    if (!currentDefault) {
+                        // 기존 기본배송지 해제
+                        addressRepository.findByUserIdAndDefaultAddressTrue(userId)
+                                .ifPresent(existingDefault -> {
+                                    existingDefault.setDefaultAddress(false);
+                                    addressRepository.save(existingDefault);
+                                });
+                    }
+                    address.setDefaultAddress(true);
+                } else {
+                    // 기본배송지 해제 요청 시
+                    if (currentDefault) {
+                        boolean otherDefaultExists = addressRepository.existsByUserIdAndDefaultAddressTrueAndIdNot(userId, address.getId());
+                        // 요청 기본 배송지가 이미 기본 배송지인 경우
+                        if (!otherDefaultExists) {
+                            throw new UserException(NEED_DEFAULT_ADDRESS);
+                        } else {
+                            address.setDefaultAddress(false);
+                        }
+                    }
+                }
+
+                addressRepository.save(address);
+            }
+
+            return userConverter.toAddressResponse(address);
+    }
 
 }
