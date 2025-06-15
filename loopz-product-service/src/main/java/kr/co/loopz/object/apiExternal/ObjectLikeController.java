@@ -31,6 +31,6 @@ public class ObjectLikeController {
         String userId = currentUser.getUsername();
         likeService.toggleLike(userId, objectId);
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
