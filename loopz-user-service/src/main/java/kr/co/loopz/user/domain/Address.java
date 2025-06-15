@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import kr.co.loopz.common.domain.BaseTimeEntity;
 import kr.co.loopz.common.domain.BaseTimeEntityWithDeletion;
 import kr.co.loopz.user.dto.request.AddressRegisterRequest;
+import kr.co.loopz.user.dto.request.AddressUpdateRequest;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,9 +47,6 @@ public class Address extends BaseTimeEntity {
     //기본 배송지 여부
     private boolean defaultAddress = false;
 
-    public void setDefaultAddress(boolean isDefault) {
-        this.defaultAddress = isDefault;
-    }
 
     @Builder
     private Address(String userId, String recipientName, String phoneNumber,
@@ -67,7 +65,7 @@ public class Address extends BaseTimeEntity {
     /**
      * Address 생성 메서드
      */
-    public static Address from(AddressRegisterRequest request, String userId,boolean defaultAddress) {
+    public static Address from(AddressRegisterRequest request, String userId, boolean defaultAddress) {
         return Address.builder()
                 .userId(userId)
                 .recipientName(request.recipientName())
@@ -79,6 +77,36 @@ public class Address extends BaseTimeEntity {
                 .build();
     }
 
+    public void update(AddressUpdateRequest request) {
+        if (request.recipientName() != null) {
+            this.recipientName = request.recipientName();
+        }
+        if (request.phoneNumber() != null) {
+            this.phoneNumber = request.phoneNumber();
+        }
+        if (request.zoneCode() != null) {
+            this.zoneCode = request.zoneCode();
+        }
+        if (request.address() != null) {
+            this.address = request.address();
+        }
+        if (request.addressDetail() != null) {
+            this.addressDetail = request.addressDetail();
+        }
+    }
 
+    public void updateDefaultAddress(Boolean requestedDefault, Runnable unsetDefaultAction) {
+        if (requestedDefault == null) return;
+
+        if (requestedDefault && !this.defaultAddress) {
+            unsetDefaultAction.run();
+            this.defaultAddress = true;
+        } else if (!requestedDefault) {
+            this.defaultAddress = false;
+        }
+    }
+
+    public void clearDefault() {
+        this.defaultAddress = false;
+    }
 }
-

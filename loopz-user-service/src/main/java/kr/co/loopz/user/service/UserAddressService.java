@@ -3,6 +3,7 @@ package kr.co.loopz.user.service;
 import kr.co.loopz.user.converter.UserConverter;
 import kr.co.loopz.user.domain.Address;
 import kr.co.loopz.user.dto.request.AddressRegisterRequest;
+import kr.co.loopz.user.dto.request.AddressUpdateRequest;
 import kr.co.loopz.user.dto.response.AddressListResponse;
 import kr.co.loopz.user.dto.response.AddressResponse;
 import kr.co.loopz.user.exception.UserException;
@@ -32,11 +33,6 @@ public class UserAddressService {
         // 사용자가 등록한 기존 배송지 개수를 조회
         boolean isFirstAddress = addressRepository.countByUserId(userId) == 0;
 
-        // 첫 배송지인데 request.defaultAddress()가 false면 예외
-        if (isFirstAddress && !request.defaultAddress()) {
-            throw new UserException(FIRST_ADDRESS_MUST_BE_DEFAULT);
-        }
-
         // 이미 동일한 주소가 존재하면 예외
         boolean exists = addressRepository.existsByUserIdAndZoneCodeAndAddressAndAddressDetail(
                 userId,
@@ -49,16 +45,12 @@ public class UserAddressService {
             throw new UserException(ADDRESS_EXISTS);
         }
 
-        // 첫 배송지이거나 요청에서 기본 배송지로 설정했으면 true
-        boolean isDefault = isFirstAddress || request.defaultAddress();
+        //요청에서 기본 배송지로 설정했으면 trueg
+        boolean isDefault = request.defaultAddress();
 
         // 기존 기본배송지가 있으면 기본 설정 해제
         if (isDefault) {
-            addressRepository.findByUserIdAndDefaultAddressTrue(userId)
-                    .ifPresent(existingDefault -> {
-                        existingDefault.setDefaultAddress(false);
-                        addressRepository.save(existingDefault);
-                    });
+            unsetDefaultAddress(userId);
         }
 
         // Address 엔티티 생성
@@ -79,5 +71,35 @@ public class UserAddressService {
         return new AddressListResponse(addressResponses);
     }
 
+    //배송지 수정
+    @Transactional
+    public AddressResponse updateAddress(String userId, Long addressId, AddressUpdateRequest request) {
+        Address address = addressRepository.findByIdAndUserId(addressId, userId)
+                .orElseThrow(() -> new UserException(ADDRESS_NOT_FOUND,"Addreess id: "+ addressId));
 
-}
+        address.update(request);
+        address.updateDefaultAddress(request.defaultAddress(), () -> unsetDefaultAddress(userId));
+
+        return userConverter.toAddressResponse(address);
+    }
+
+    // 배송지 삭제
+    @Transactional
+    public void deleteAddress(String userId, Long addressId){
+        Address address = addressRepository.findByIdAndUserId(addressId, userId)
+                .orElseThrow(() -> new UserException(ADDRESS_NOT_FOUND,"Addreess id: "+ addressId));
+
+        addressRepository.delete(address);
+    }
+
+    // 기존 기본배송지 해제
+    private void unsetDefaultAddress(String userId) {
+        addressRepository.findByUserIdAndDefaultAddressTrue(userId)
+                .ifPresent(existingDefault -> {
+                    existingDefault.clearDefault();
+                    addressRepository.save(existingDefault);
+                });
+    }
+
+
+    }
