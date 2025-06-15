@@ -59,4 +59,14 @@ public class UserAddressController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    // 배송지 삭제
+    @DeleteMapping("/{addressId}")
+    public ResponseEntity<Void> deleteAddress(@AuthenticationPrincipal User currentUser, @PathVariable Long addressId){
+        String userId = currentUser.getUsername();
+
+        userAddressService.deleteAddress(userId, addressId);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 }

@@ -121,6 +121,20 @@ public class UserAddressService {
             return userConverter.toAddressResponse(address);
     }
 
+    // 배송지 삭제
+    @Transactional
+    public void deleteAddress(String userId, Long addressId){
+        Address address = addressRepository.findByIdAndUserId(addressId, userId)
+                .orElseThrow(() -> new UserException(ADDRESS_NOT_FOUND,"Addreess id: "+ addressId));
+
+        // 기본배송지인 경우 삭제 불가
+        if (address.isDefaultAddress()) {
+            throw new UserException(CANNOT_DELETE_DEFAULT_ADDRESS);
+        }
+
+        addressRepository.delete(address);
+    }
+
     // 기존 기본배송지 해제
     private void unsetDefaultAddress(String userId) {
         addressRepository.findByUserIdAndDefaultAddressTrue(userId)
