@@ -66,7 +66,7 @@ public class UserAddressController {
 
         userAddressService.deleteAddress(userId, addressId);
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }
