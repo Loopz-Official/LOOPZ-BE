@@ -62,6 +62,17 @@ public class Address extends BaseTimeEntity {
         this.zoneCode = zoneCode;
     }
 
+    public void setRecipientName(String recipientName) {
+        this.recipientName = recipientName;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    ;
+
+
     @Builder
     private Address(String userId, String recipientName, String phoneNumber,
                     String zoneCode, String address, String addressDetail,
@@ -79,7 +90,7 @@ public class Address extends BaseTimeEntity {
     /**
      * Address 생성 메서드
      */
-    public static Address from(AddressRegisterRequest request, String userId,boolean defaultAddress) {
+    public static Address from(AddressRegisterRequest request, String userId, boolean defaultAddress) {
         return Address.builder()
                 .userId(userId)
                 .recipientName(request.recipientName())
@@ -91,6 +102,4 @@ public class Address extends BaseTimeEntity {
                 .build();
     }
 
-
 }
-

@@ -77,6 +77,14 @@ public class UserAddressService {
         Address address = addressRepository.findByIdAndUserId(addressId, userId)
                 .orElseThrow(() -> new UserException(ADDRESS_NOT_FOUND,"Addreess id: "+ addressId));
 
+        if (request.recipientName() != null){
+            address.setRecipientName(request.recipientName());
+        }
+
+        if (request.phoneNumber() != null){
+            address.setPhoneNumber(request.phoneNumber());
+        }
+
         if (request.address() != null) {
             address.setAddress(request.address());
         }
