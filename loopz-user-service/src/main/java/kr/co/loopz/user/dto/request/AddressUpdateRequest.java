@@ -1,5 +1,6 @@
 package kr.co.loopz.user.dto.request;
 
+
 public record AddressUpdateRequest(
         String recipientName,
         String phoneNumber,

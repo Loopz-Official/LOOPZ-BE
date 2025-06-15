@@ -77,43 +77,10 @@ public class UserAddressService {
         Address address = addressRepository.findByIdAndUserId(addressId, userId)
                 .orElseThrow(() -> new UserException(ADDRESS_NOT_FOUND,"Addreess id: "+ addressId));
 
-        if (request.recipientName() != null){
-            address.setRecipientName(request.recipientName());
-        }
+        address.update(request);
+        address.updateDefaultAddress(request.defaultAddress(), () -> unsetDefaultAddress(userId));
 
-        if (request.phoneNumber() != null){
-            address.setPhoneNumber(request.phoneNumber());
-        }
-
-        if (request.address() != null) {
-            address.setAddress(request.address());
-        }
-        if (request.addressDetail() != null) {
-            address.setAddressDetail(request.addressDetail());
-        }
-        if (request.zoneCode() != null) {
-            address.setZoneCode(request.zoneCode());
-        }
-
-        if (request.defaultAddress() != null) {
-            boolean requestedDefault = request.defaultAddress();
-            boolean currentDefault = address.isDefaultAddress();
-
-                if (requestedDefault) {
-                    // 기본배송지로 변경 요청 시
-                    if (!currentDefault) {
-                       unsetDefaultAddress(userId);
-                    }
-                    address.setDefaultAddress(true);
-                } else {
-                            address.setDefaultAddress(false);
-                        }
-                    }
-
-                addressRepository.save(address);
-
-
-            return userConverter.toAddressResponse(address);
+        return userConverter.toAddressResponse(address);
     }
 
     // 배송지 삭제
@@ -129,9 +96,10 @@ public class UserAddressService {
     private void unsetDefaultAddress(String userId) {
         addressRepository.findByUserIdAndDefaultAddressTrue(userId)
                 .ifPresent(existingDefault -> {
-                    existingDefault.setDefaultAddress(false);
+                    existingDefault.clearDefault();
                     addressRepository.save(existingDefault);
                 });
     }
 
-}
+
+    }

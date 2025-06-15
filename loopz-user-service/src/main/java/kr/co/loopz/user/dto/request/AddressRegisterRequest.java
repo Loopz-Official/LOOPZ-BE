@@ -1,11 +1,13 @@
 package kr.co.loopz.user.dto.request;
 
+import jakarta.validation.constraints.NotNull;
+
 public record AddressRegisterRequest (
-        String recipientName,
-        String phoneNumber,
-        String zoneCode,
-        String address,
-        String addressDetail,
+        @NotNull String recipientName,
+        @NotNull String phoneNumber,
+        @NotNull String zoneCode,
+        @NotNull String address,
+        @NotNull String addressDetail,
         boolean defaultAddress
 ) {
 }
