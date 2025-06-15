@@ -33,11 +33,6 @@ public class UserAddressService {
         // 사용자가 등록한 기존 배송지 개수를 조회
         boolean isFirstAddress = addressRepository.countByUserId(userId) == 0;
 
-        // 첫 배송지인데 request.defaultAddress()가 false면 예외
-        if (isFirstAddress && !request.defaultAddress()) {
-            throw new UserException(FIRST_ADDRESS_MUST_BE_DEFAULT);
-        }
-
         // 이미 동일한 주소가 존재하면 예외
         boolean exists = addressRepository.existsByUserIdAndZoneCodeAndAddressAndAddressDetail(
                 userId,
@@ -50,8 +45,8 @@ public class UserAddressService {
             throw new UserException(ADDRESS_EXISTS);
         }
 
-        // 첫 배송지이거나 요청에서 기본 배송지로 설정했으면 true
-        boolean isDefault = isFirstAddress || request.defaultAddress();
+        //요청에서 기본 배송지로 설정했으면 trueg
+        boolean isDefault = request.defaultAddress();
 
         // 기존 기본배송지가 있으면 기본 설정 해제
         if (isDefault) {
@@ -103,20 +98,12 @@ public class UserAddressService {
                     }
                     address.setDefaultAddress(true);
                 } else {
-                    // 기본배송지 해제 요청 시
-                    if (currentDefault) {
-                        boolean otherDefaultExists = addressRepository.existsByUserIdAndDefaultAddressTrueAndIdNot(userId, address.getId());
-                        // 요청 기본 배송지가 이미 기본 배송지인 경우
-                        if (!otherDefaultExists) {
-                            throw new UserException(NEED_DEFAULT_ADDRESS);
-                        } else {
                             address.setDefaultAddress(false);
                         }
                     }
-                }
 
                 addressRepository.save(address);
-            }
+
 
             return userConverter.toAddressResponse(address);
     }
@@ -126,11 +113,6 @@ public class UserAddressService {
     public void deleteAddress(String userId, Long addressId){
         Address address = addressRepository.findByIdAndUserId(addressId, userId)
                 .orElseThrow(() -> new UserException(ADDRESS_NOT_FOUND,"Addreess id: "+ addressId));
-
-        // 기본배송지인 경우 삭제 불가
-        if (address.isDefaultAddress()) {
-            throw new UserException(CANNOT_DELETE_DEFAULT_ADDRESS);
-        }
 
         addressRepository.delete(address);
     }
