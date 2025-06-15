@@ -5,7 +5,7 @@ import kr.co.loopz.user.dto.request.NickNameUpdateRequest;
 import kr.co.loopz.user.dto.response.NickNameAvailableResponse;
 import kr.co.loopz.user.dto.response.NickNameUpdateResponse;
 import kr.co.loopz.user.exception.UserException;
-import kr.co.loopz.user.service.UserService;
+import kr.co.loopz.user.service.UserNickNameService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class UserNickNameController {
 
-    private final UserService userService;
+    private final UserNickNameService userNickNameService;
 
     @PatchMapping
     public ResponseEntity<NickNameUpdateResponse> updateNickName(
@@ -31,7 +31,7 @@ public class UserNickNameController {
         String nickname = nickNameUpdateRequest.nickname();
         log.debug("Received request to update nickname for userId: {}, with request: {}", userId, nickname);
 
-        NickNameUpdateResponse response = userService.updateNickName(userId, nickname);
+        NickNameUpdateResponse response = userNickNameService.updateNickName(userId, nickname);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -42,7 +42,7 @@ public class UserNickNameController {
             @RequestParam String nickname) {
 
         try {
-            userService.nickNameValidation(nickname);
+            userNickNameService.nickNameValidation(nickname);
         } catch (UserException e) {
             return ResponseEntity.status(HttpStatus.OK).body(new NickNameAvailableResponse(false));
         }
