@@ -66,11 +66,10 @@ public class CartService {
         }
 
         if (update == 0) {
-            // 요청 수량 = 0 -> cart에서 삭제
-            if (cartItem != null) {
-                cartItemRepository.delete(cartItem);
+            // 요청 수량 = 0 불가 (장바구니에는 최소 1개)
+            throw new ObjectException(CART_LEAST_ONE);
             }
-        } else {
+        else {
             // CartItem 업데이트
             if (cartItem == null) {
                 cartItem = CartItem.builder()
