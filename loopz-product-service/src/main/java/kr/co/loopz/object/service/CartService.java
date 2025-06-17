@@ -1,19 +1,26 @@
 package kr.co.loopz.object.service;
 
 import kr.co.loopz.object.Exception.ObjectException;
+import kr.co.loopz.object.converter.ObjectConverter;
 import kr.co.loopz.object.domain.Cart;
 import kr.co.loopz.object.domain.CartItem;
 import kr.co.loopz.object.domain.ObjectEntity;
+import kr.co.loopz.object.domain.ObjectImage;
+import kr.co.loopz.object.dto.response.CartListResponse;
 import kr.co.loopz.object.repository.CartItemRepository;
 import kr.co.loopz.object.repository.CartRepository;
+import kr.co.loopz.object.repository.ObjectImageRepository;
 import kr.co.loopz.object.repository.ObjectRepository;
 import kr.co.loopz.object.dto.request.CartUpdateRequest;
 import kr.co.loopz.object.dto.response.CartResponse;
+import kr.co.loopz.object.dto.response.CartItemResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static kr.co.loopz.object.Exception.ObjectErrorCode.*;
@@ -26,13 +33,14 @@ public class CartService {
     private final CartRepository cartRepository;
     private final ObjectRepository objectRepository;
     private final CartItemRepository cartItemRepository;
+    private final ObjectImageRepository objectImageRepository;
+    private final ObjectConverter objectConverter;
 
     @Transactional
     public CartResponse updateCart(String userId, CartUpdateRequest request) {
 
         // 장바구니 정보 없으면 생성
-        Cart cart = cartRepository.findByUserId(userId)
-                .orElseGet(() -> cartRepository.save(new Cart(userId)));
+        Cart cart = createCart(userId);
 
         ObjectEntity object = objectRepository.findByObjectId(request.objectId())
                 .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND, "Object not found" + request.objectId()));
@@ -81,5 +89,51 @@ public class CartService {
         }
 
         return new CartResponse(total);
+    }
+
+    @Transactional
+    public CartListResponse getCart(String userId) {
+
+        Cart cart = createCart(userId);
+
+        List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getCartId());
+
+        List<CartItemResponse> responses = new ArrayList<>();
+        int totalQuantity = 0;
+        long totalPrice = 0;
+
+        for (CartItem item : cartItems) {
+            ObjectEntity object = objectRepository.findByObjectId(item.getObjectId())
+                    .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND, "Object not found: " + item.getObjectId()));
+
+            // 기본 이미지 사용
+            List<ObjectImage> images = objectImageRepository.findByObjectId(object.getObjectId());
+            String imageUrl = images.isEmpty() ? null : images.get(0).getImageUrl();
+
+            // 상품 선택 여부
+            boolean selected = item.isSelected();
+
+            // 선택된 것만 반영
+            if (selected) {
+                totalQuantity += item.getQuantity();
+                totalPrice += item.getQuantity() * object.getObjectPrice();
+            }
+
+            CartItemResponse response = objectConverter.toCartItemResponse(item, object, imageUrl, selected);
+            responses.add(response);
+        }
+
+        int shippingFee = 3000; // 고정 배송비
+        long finalPrice = totalPrice + shippingFee;
+
+        return new CartListResponse(responses, totalQuantity, totalPrice, shippingFee,finalPrice);
+
+    }
+
+    //장바구니 생성
+    @Transactional
+    public Cart createCart(String userId) {
+        return cartRepository.findByUserId(userId)
+                .orElseGet(() -> cartRepository.save(new Cart(userId)));
     }
 }

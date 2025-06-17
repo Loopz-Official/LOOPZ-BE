@@ -1,8 +1,10 @@
 package kr.co.loopz.object.converter;
 
+import kr.co.loopz.object.domain.CartItem;
 import kr.co.loopz.object.domain.ObjectDetail;
 import kr.co.loopz.object.domain.ObjectEntity;
 import kr.co.loopz.object.dto.response.BoardResponse;
+import kr.co.loopz.object.dto.response.CartItemResponse;
 import kr.co.loopz.object.dto.response.DetailResponse;
 import kr.co.loopz.object.dto.response.ObjectResponse;
 import org.mapstruct.Mapper;
@@ -61,6 +63,18 @@ public interface ObjectConverter {
                 detail.getStock(),
                 imageUrls
 
+        );
+    }
+
+    default CartItemResponse toCartItemResponse(CartItem item, ObjectEntity object, String imageUrl, boolean selected) {
+        return new CartItemResponse(
+                item.getObjectId(),
+                object.getObjectName(),
+                object.getObjectPrice(),
+                item.getQuantity(),
+                item.getQuantity() * object.getObjectPrice(),
+                imageUrl,
+                selected
         );
     }
 }

@@ -1,7 +1,9 @@
 package kr.co.loopz.object.apiExternal;
 
+import feign.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import kr.co.loopz.object.dto.request.CartUpdateRequest;
+import kr.co.loopz.object.dto.response.CartListResponse;
 import kr.co.loopz.object.dto.response.CartResponse;
 import kr.co.loopz.object.dto.response.DetailResponse;
 import kr.co.loopz.object.service.CartService;
@@ -29,6 +31,16 @@ public class CartController {
 
         String userId = currentUser.getUsername();
         CartResponse response = cartService.updateCart(userId, request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping
+    @Operation(summary="카트 조회")
+    public ResponseEntity<CartListResponse> getCart(@AuthenticationPrincipal User currentUser) {
+
+        String userId = currentUser.getUsername();
+        CartListResponse response = cartService.getCart(userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
