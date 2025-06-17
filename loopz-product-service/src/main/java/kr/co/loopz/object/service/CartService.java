@@ -76,6 +76,10 @@ public class CartService {
         // Cart 전체 수량 업데이트
         int total = cartItemRepository.countDistinctObjectByCartId(cart.getCartId());
 
+        if (total>100) {
+            throw new ObjectException(CART_LIMIT_EXCEEDS, "현재: " + total);
+        }
+
         return new CartResponse(total);
     }
 }
