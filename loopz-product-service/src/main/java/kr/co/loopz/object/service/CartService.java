@@ -114,6 +114,7 @@ public class CartService {
         List<CartItemResponse> responses = new ArrayList<>();
         int totalQuantity = 0;
         long totalPrice = 0;
+        int selectedCount = 0;
 
         for (CartItem item : cartItems) {
             ObjectEntity object = objectRepository.findByObjectId(item.getObjectId())
@@ -130,13 +131,14 @@ public class CartService {
             if (selected) {
                 totalQuantity += item.getQuantity();
                 totalPrice += item.getQuantity() * object.getObjectPrice();
+                selectedCount++;
             }
 
             CartItemResponse response = objectConverter.toCartItemResponse(item, object, imageUrl, selected);
             responses.add(response);
         }
 
-        int shippingFee = 3000; // 고정 배송비
+        int shippingFee = selectedCount == 0 ? 0 : 3000;// 고정 배송비
         long finalPrice = totalPrice + shippingFee;
 
         return new CartListResponse(responses, totalQuantity, totalPrice, shippingFee,finalPrice);
