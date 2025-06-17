@@ -49,6 +49,9 @@ public class ObjectEntity extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private ObjectSize objectSize;
 
+    //cart 참조
+    private String cartId;
+
     // 키워드 (다중선택 가능)
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "object_keywords", joinColumns = @JoinColumn(name = "object_id", referencedColumnName = "objectId"))
