@@ -6,6 +6,7 @@ import kr.co.loopz.object.domain.Cart;
 import kr.co.loopz.object.domain.CartItem;
 import kr.co.loopz.object.domain.ObjectEntity;
 import kr.co.loopz.object.domain.ObjectImage;
+import kr.co.loopz.object.dto.request.CartSelectRequest;
 import kr.co.loopz.object.dto.response.CartListResponse;
 import kr.co.loopz.object.repository.CartItemRepository;
 import kr.co.loopz.object.repository.CartRepository;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +42,8 @@ public class CartService {
     public CartResponse updateCart(String userId, CartUpdateRequest request) {
 
         // 장바구니 정보 없으면 생성
-        Cart cart = createCart(userId);
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseGet(() -> cartRepository.save(new Cart(userId)));
 
         ObjectEntity object = objectRepository.findByObjectId(request.objectId())
                 .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND, "Object not found" + request.objectId()));
@@ -91,10 +94,21 @@ public class CartService {
         return new CartResponse(total);
     }
 
-    @Transactional
+
     public CartListResponse getCart(String userId) {
 
-        Cart cart = createCart(userId);
+        Cart cart = cartRepository.findByUserId(userId).orElse(null);
+
+        if (cart == null) {
+            // 비어있는 장바구니 응답 반환
+            return new CartListResponse(
+                    Collections.emptyList(), // cartItems
+                    0, // totalQuantity
+                    0L, // totalPrice
+                    0, // shippingFee
+                    0L // finalPrice
+            );
+        }
 
         List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getCartId());
 
@@ -130,10 +144,18 @@ public class CartService {
 
     }
 
-    //장바구니 생성
+
+    // 선택 여부 변경
     @Transactional
-    public Cart createCart(String userId) {
-        return cartRepository.findByUserId(userId)
-                .orElseGet(() -> cartRepository.save(new Cart(userId)));
+    public void updateSelected(String userId, CartSelectRequest request) {
+
+        Cart cart = cartRepository.findByUserId(userId).orElse(null);
+
+        CartItem item = cartItemRepository.findByCartIdAndObjectId(cart.getCartId(), request.objectId())
+                .orElseThrow(() -> new ObjectException(CART_ITEM_NOT_FOUND));
+
+        item.updateSelected(request.selected());
+
+        cartItemRepository.save(item);
     }
 }

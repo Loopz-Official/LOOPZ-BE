@@ -2,6 +2,7 @@ package kr.co.loopz.object.apiExternal;
 
 import feign.Response;
 import io.swagger.v3.oas.annotations.Operation;
+import kr.co.loopz.object.dto.request.CartSelectRequest;
 import kr.co.loopz.object.dto.request.CartUpdateRequest;
 import kr.co.loopz.object.dto.response.CartListResponse;
 import kr.co.loopz.object.dto.response.CartResponse;
@@ -43,6 +44,17 @@ public class CartController {
         CartListResponse response = cartService.getCart(userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PatchMapping("/selected")
+    @Operation(summary="장바구니 상품 선택")
+    public ResponseEntity<Void> updateSelected(@AuthenticationPrincipal User currentUser,
+                                                @RequestBody CartSelectRequest request) {
+
+        String userId = currentUser.getUsername();
+        cartService.updateSelected(userId, request);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
 
