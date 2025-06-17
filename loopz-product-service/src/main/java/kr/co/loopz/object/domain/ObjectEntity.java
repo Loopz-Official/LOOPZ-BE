@@ -49,8 +49,6 @@ public class ObjectEntity extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private ObjectSize objectSize;
 
-    //cart 참조
-    private String cartId;
 
     // 키워드 (다중선택 가능)
     @ElementCollection(fetch = FetchType.LAZY)
@@ -64,7 +62,7 @@ public class ObjectEntity extends BaseTimeEntity {
 
 
     @Builder(access = AccessLevel.PRIVATE)
-    private ObjectEntity(String objectName, Long objectPrice, String intro, ObjectType objectType, ObjectSize objectSize, Set<Keyword> keywords, ObjectDetail detail, int likeCount) {
+    private ObjectEntity(String objectName, Long objectPrice, String intro, ObjectType objectType, ObjectSize objectSize, Set<Keyword> keywords, ObjectDetail detail) {
         this.objectId = UUID.randomUUID().toString();
         this.objectName = objectName;
         this.objectPrice = objectPrice;

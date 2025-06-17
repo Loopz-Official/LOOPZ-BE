@@ -1,9 +1,13 @@
 package kr.co.loopz.object.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import kr.co.loopz.object.domain.enums.Keyword;
+import kr.co.loopz.object.domain.enums.ObjectSize;
+import kr.co.loopz.object.domain.enums.ObjectType;
+import lombok.*;
+
+import java.util.Set;
+import java.util.UUID;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -22,6 +26,11 @@ public class Cart {
     private String cartId;
 
     @Column(nullable = false)
-    private String quantity;
+    private String userId;
 
+    @Builder(access = AccessLevel.PRIVATE)
+    public Cart(String userId) {
+        this.cartId = UUID.randomUUID().toString();
+        this.userId = userId;
+    }
 }
