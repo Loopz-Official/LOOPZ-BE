@@ -25,6 +25,7 @@ public class UserTerms {
 
     private LocalDateTime agreedServiceTermsAt;
     private LocalDateTime agreedMarketingAt;
+    @Column(name = "agreed_event_sms_at")
     private LocalDateTime agreedEventSMSAt;
 
     public void updateTerms(boolean over14, boolean agreedServiceTerms, boolean agreedMarketing, boolean agreedEventSMS) {
