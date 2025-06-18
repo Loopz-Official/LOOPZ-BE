@@ -2,6 +2,7 @@ package kr.co.loopz.user.dto.request;
 
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import kr.co.loopz.user.domain.SocialLoginType;
 
 public record UserInternalRegisterRequest(
@@ -12,7 +13,7 @@ public record UserInternalRegisterRequest(
         String givenName,
         String familyName,
         String picture,
-        @NotBlank
+        @NotNull
         SocialLoginType socialLoginType
 ) {
 }
