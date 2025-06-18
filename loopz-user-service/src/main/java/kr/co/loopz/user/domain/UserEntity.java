@@ -54,6 +54,9 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
     @Enumerated(STRING)
     private Role role;
 
+    @Enumerated(STRING)
+    private SocialLoginType socialLoginType = SocialLoginType.NONE;
+
     @Embedded
     private UserTerms userTerms = new UserTerms();
 
@@ -66,7 +69,7 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
                 .email(registerRequest.email())
                 .loginName(registerRequest.name())
                 .imageUrl(registerRequest.picture())
-
+                .socialLoginType(registerRequest.socialLoginType())
                 .role(Role.USER)
                 .enabled(false)
                 .build();
@@ -87,13 +90,13 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
     public void updateTerms(boolean over14, boolean agreedServiceTerms, boolean agreedMarketing, boolean agreedEventSMS) {
         this.userTerms.updateTerms(over14, agreedServiceTerms, agreedMarketing, agreedEventSMS);
 
-        if (over14 && agreedServiceTerms) {
+        if (over14 && agreedServiceTerms && this.nickName != null) {
             this.enabled = true;
         }
     }
 
     @Builder(access = PRIVATE)
-    private UserEntity(String email, String loginName, String nickName, boolean enabled, Role role, String imageUrl) {
+    private UserEntity(String email, String loginName, String nickName, boolean enabled, Role role, String imageUrl, SocialLoginType socialLoginType) {
 
         this.userId = UUID.randomUUID().toString();
 
@@ -104,5 +107,6 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
 
         this.role = role;
         this.enabled = enabled;
+        this.socialLoginType = socialLoginType != null ? socialLoginType : SocialLoginType.NONE;
     }
 }
