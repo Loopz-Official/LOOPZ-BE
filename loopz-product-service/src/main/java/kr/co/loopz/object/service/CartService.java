@@ -149,7 +149,8 @@ public class CartService {
     @Transactional
     public void updateSelected(String userId, CartSelectRequest request) {
 
-        Cart cart = cartRepository.findByUserId(userId).orElse(null);
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseThrow(() -> new ObjectException(CART_NOT_FOUND, "Cart not found for user: " + userId));
 
         CartItem item = cartItemRepository.findByCartIdAndObjectId(cart.getCartId(), request.objectId())
                 .orElseThrow(() -> new ObjectException(CART_ITEM_NOT_FOUND));
@@ -163,7 +164,9 @@ public class CartService {
     @Transactional
     public void deleteSelected(String userId) {
 
-        Cart cart = cartRepository.findByUserId(userId).orElse(null);
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseThrow(() -> new ObjectException(CART_NOT_FOUND, "Cart not found for user: " + userId));
+
 
         // 장바구니 상품 가져오기
         List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getCartId());
@@ -180,7 +183,8 @@ public class CartService {
     @Transactional
     public void deleteCart(String userId, String objectId) {
 
-        Cart cart = cartRepository.findByUserId(userId).orElse(null);
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseThrow(() -> new ObjectException(CART_NOT_FOUND, "Cart not found for user: " + userId));
 
         CartItem item = cartItemRepository.findByCartIdAndObjectId(cart.getCartId(), objectId)
                 .orElseThrow(() -> new ObjectException(CART_ITEM_NOT_FOUND, "상품Id: " + objectId));

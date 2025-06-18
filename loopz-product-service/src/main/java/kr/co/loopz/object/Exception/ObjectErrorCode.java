@@ -13,6 +13,7 @@ public enum ObjectErrorCode implements ErrorCode {
     OBJECT_ID_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 상품이 존재하지 않습니다."),
     USER_ID_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 사용자가 존재하지 않습니다."),
 
+    CART_NOT_FOUND(HttpStatus.BAD_REQUEST, "사용자의 장바구니가 존재하지 않습니다."),
     QUANTITY_EXCEEDS_STOCK(HttpStatus.BAD_REQUEST, "입력 수량이 입고 수량을 초과합니다."),
     INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "수량은 0 이상이어야 합니다."),
     CART_LEAST_ONE(HttpStatus.BAD_REQUEST, "장바구니 수량은 1 이상이어야 합니다."),
