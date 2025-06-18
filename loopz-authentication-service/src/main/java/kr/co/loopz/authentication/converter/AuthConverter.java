@@ -1,5 +1,6 @@
 package kr.co.loopz.authentication.converter;
 
+import kr.co.loopz.authentication.constants.SocialLoginType;
 import kr.co.loopz.authentication.dto.request.InternalRegisterRequest;
 import kr.co.loopz.authentication.dto.response.GoogleResourceServerResponse;
 import kr.co.loopz.authentication.dto.response.InternalRegisterResponse;
@@ -22,6 +23,7 @@ public interface AuthConverter {
 
     AuthConverter INSTANCE = Mappers.getMapper(AuthConverter.class);
 
+    @Mapping(target = "socialLoginType", constant = "GOOGLE")
     InternalRegisterRequest toInternalRegisterRequest(GoogleResourceServerResponse response);
 
     @Mapping(target = "email", source = "kakaoAccount.email")
@@ -29,6 +31,7 @@ public interface AuthConverter {
     @Mapping(target = "givenName", source = "properties.nickname")
     @Mapping(target = "familyName", expression = "java(\"\")")
     @Mapping(target = "picture", source = "properties.profileImage")
+    @Mapping(target = "socialLoginType", constant = "KAKAO")
     InternalRegisterRequest toInternalRegisterRequest(KakaoResourceServerResponse response);
 
     SocialLoginResponse toSocialLoginResponse(InternalRegisterResponse response);
