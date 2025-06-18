@@ -175,4 +175,17 @@ public class CartService {
             }
         }
     }
-}
+
+    // 개별 상품 삭제
+    @Transactional
+    public void deleteCart(String userId, String objectId) {
+
+        Cart cart = cartRepository.findByUserId(userId).orElse(null);
+
+        CartItem item = cartItemRepository.findByCartIdAndObjectId(cart.getCartId(), objectId)
+                .orElseThrow(() -> new ObjectException(CART_ITEM_NOT_FOUND, "상품Id: " + objectId));
+
+            cartItemRepository.delete(item);
+        }
+    }
+

@@ -66,5 +66,15 @@ public class CartController {
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @DeleteMapping("/{objectId}")
+    @Operation(summary="개별 상품 삭제")
+    public ResponseEntity<Void> deleteObject(@AuthenticationPrincipal User currentUser, @PathVariable String objectId) {
+
+        String userId = currentUser.getUsername();
+        cartService.deleteCart(userId, objectId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }
 
