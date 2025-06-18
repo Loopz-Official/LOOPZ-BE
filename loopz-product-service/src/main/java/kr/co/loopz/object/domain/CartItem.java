@@ -23,23 +23,19 @@ public class CartItem {
     @Column(nullable = false)
     private int quantity;
 
-    @Column(nullable = false)
-    private boolean selected = false;
 
     @Builder
-    public CartItem(String cartId,String objectId, int quantity, boolean selected) {
+    public CartItem(String cartId,String objectId, int quantity) {
         this.cartId = cartId;
         this.objectId = objectId;
         this.quantity = quantity;
-        this.selected = selected;
+
     }
 
     public void updateQuantity(int quantity) {
         this.quantity = quantity;
     }
 
-    public void updateSelected(boolean selected) {
-        this.selected = selected;
-    }
+
 }
 

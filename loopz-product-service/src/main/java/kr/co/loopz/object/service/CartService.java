@@ -8,6 +8,7 @@ import kr.co.loopz.object.domain.ObjectEntity;
 import kr.co.loopz.object.domain.ObjectImage;
 import kr.co.loopz.object.dto.request.CartSelectRequest;
 import kr.co.loopz.object.dto.response.CartListResponse;
+import kr.co.loopz.object.dto.response.ObjectResponse;
 import kr.co.loopz.object.repository.CartItemRepository;
 import kr.co.loopz.object.repository.CartRepository;
 import kr.co.loopz.object.repository.ObjectImageRepository;
@@ -101,12 +102,7 @@ public class CartService {
 
         if (cart == null) {
             // 비어있는 장바구니 응답 반환
-            return new CartListResponse(
-                    Collections.emptyList(), // cartItems
-                    0, // totalQuantity
-                    0L, // totalPrice
-                    0, // shippingFee
-                    0L // finalPrice
+            return new CartListResponse(Collections.emptyList()
             );
         }
 
@@ -133,73 +129,33 @@ public class CartService {
                         e -> e.getValue().isEmpty() ? null : e.getValue().get(0)
                 ));
 
-        List<CartItemResponse> responses = new ArrayList<>();
-        int totalQuantity = 0;
-        long totalPrice = 0;
-        int selectedCount = 0;
 
-        for (CartItem item : cartItems) {
-            ObjectEntity object = objectMap.get(item.getObjectId());
-            if (object == null) {
-                throw new ObjectException(OBJECT_ID_NOT_FOUND, "Object not found: " + item.getObjectId());
-            }
+        List<CartItemResponse> responses = cartItems.stream()
+                .map(item -> {
+                    ObjectEntity object = objectMap.get(item.getObjectId());
+                    String imageUrl = imageMap.get(item.getObjectId());
 
-            String imageUrl = imageMap.get(item.getObjectId());
+                    ObjectResponse objectResponse = objectConverter.toObjectResponse(object, imageUrl);
+                    return new CartItemResponse(objectResponse, item.getQuantity());
+                })
+                .collect(Collectors.toList());
 
-            // 상품 선택 여부
-            boolean selected = item.isSelected();
-
-            // 선택된 것만 반영
-            if (selected) {
-                totalQuantity += item.getQuantity();
-                totalPrice += item.getQuantity() * object.getObjectPrice();
-                selectedCount++;
-            }
-
-            CartItemResponse response = objectConverter.toCartItemResponse(item, object, imageUrl, selected);
-            responses.add(response);
-        }
-
-        int shippingFee = selectedCount == 0 ? 0 : 3000;// 고정 배송비
-        long finalPrice = totalPrice + shippingFee;
-
-        return new CartListResponse(responses, totalQuantity, totalPrice, shippingFee, finalPrice);
-
-    }
-
-
-    // 선택 여부 변경
-    @Transactional
-    public void updateSelected(String userId, CartSelectRequest request) {
-
-        Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new ObjectException(CART_NOT_FOUND, "Cart not found for user: " + userId));
-
-        CartItem item = cartItemRepository.findByCartIdAndObjectId(cart.getCartId(), request.objectId())
-                .orElseThrow(() -> new ObjectException(CART_ITEM_NOT_FOUND));
-
-        item.updateSelected(request.selected());
-
-        cartItemRepository.save(item);
+        return new CartListResponse(responses);
     }
 
     // 선택 상품 삭제
     @Transactional
-    public void deleteSelected(String userId) {
+    public void deleteSelected(String userId,List<String> objectIds) {
 
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new ObjectException(CART_NOT_FOUND, "Cart not found for user: " + userId));
 
-
         // 장바구니 상품 가져오기
-        List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getCartId());
+        List<CartItem> cartItems = cartItemRepository.findByCartIdAndObjectIdIn(cart.getCartId(),objectIds);
 
         // 선택된 상품만 삭제
-        for (CartItem item : cartItems) {
-            if (item.isSelected()) {
-                cartItemRepository.delete(item);
-            }
-        }
+        cartItemRepository.deleteAll(cartItems);
+
     }
 
     // 개별 상품 삭제

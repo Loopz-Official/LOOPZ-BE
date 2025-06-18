@@ -16,6 +16,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -46,23 +48,12 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PatchMapping("/selected")
-    @Operation(summary="장바구니 상품 선택")
-    public ResponseEntity<Void> updateSelected(@AuthenticationPrincipal User currentUser,
-                                                @RequestBody CartSelectRequest request) {
-
-        String userId = currentUser.getUsername();
-        cartService.updateSelected(userId, request);
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
     @DeleteMapping("/selected")
     @Operation(summary="선택 상품 삭제")
-    public ResponseEntity<Void> deleteSelected(@AuthenticationPrincipal User currentUser){
+    public ResponseEntity<Void> deleteSelected(@AuthenticationPrincipal User currentUser, @RequestBody List<String> objectIds){
 
         String userId = currentUser.getUsername();
-        cartService.deleteSelected(userId);
+        cartService.deleteSelected(userId,objectIds);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

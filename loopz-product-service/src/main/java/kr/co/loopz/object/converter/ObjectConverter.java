@@ -22,6 +22,19 @@ public interface ObjectConverter {
     // List<Product> -> List<ObjectResponse>
     List<ObjectResponse> toObjectResponseList(List<ObjectEntity> objectEntities);
 
+    default ObjectResponse toObjectResponse(ObjectEntity entity, String imageUrl) {
+        ObjectResponse baseDto = toObjectResponse(entity);
+        return new ObjectResponse(
+                baseDto.objectId(),
+                baseDto.objectName(),
+                null,
+                imageUrl,
+                baseDto.objectPrice(),
+                baseDto.soldOut(),
+                null
+        );
+    }
+
 
     // 찜 여부와 image url 반영해 새로운 DTO 리스트 반환
     default List<ObjectResponse> toObjectResponseList(List<ObjectResponse> dtos, Map<String, String> imageUrlMap,Map<String, Boolean> likeMap) {
@@ -66,15 +79,4 @@ public interface ObjectConverter {
         );
     }
 
-    default CartItemResponse toCartItemResponse(CartItem item, ObjectEntity object, String imageUrl, boolean selected) {
-        return new CartItemResponse(
-                item.getObjectId(),
-                object.getObjectName(),
-                object.getObjectPrice(),
-                item.getQuantity(),
-                item.getQuantity() * object.getObjectPrice(),
-                imageUrl,
-                selected
-        );
-    }
 }
