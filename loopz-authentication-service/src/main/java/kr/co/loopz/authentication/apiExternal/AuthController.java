@@ -11,10 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,9 +30,40 @@ public class AuthController {
      */
     @PostMapping("/login/google")
     public ResponseEntity<SocialLoginResponse> googleLogin (
-            @Valid @RequestBody TokenRequest tokenRequest) {
+            @Valid @RequestBody TokenRequest tokenRequest
+    ) {
 
-        SocialLoginResponse socialLoginResponse = authService.loginOrRegister(tokenRequest);
+        SocialLoginResponse socialLoginResponse = authService.loginOrRegisterGoogle(tokenRequest);
+        String accessWithBearer = authService.createAccessTokenWhenLogin(socialLoginResponse.userId());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.AUTHORIZATION, accessWithBearer)
+                .body(socialLoginResponse);
+
+    }
+
+
+    @GetMapping("/login/kakao")
+    public ResponseEntity<SocialLoginResponse> kakaoLogin(
+            @RequestParam("code") String accessCode
+    ) {
+
+        SocialLoginResponse socialLoginResponse = authService.loginOrRegisterKakao(accessCode);
+        String accessWithBearer = authService.createAccessTokenWhenLogin(socialLoginResponse.userId());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.AUTHORIZATION, accessWithBearer)
+                .body(socialLoginResponse);
+
+    }
+
+
+    @PostMapping("/login/naver")
+    public ResponseEntity<SocialLoginResponse> naverLogin(
+            @Valid @RequestBody TokenRequest tokenRequest
+    ) {
+
+        SocialLoginResponse socialLoginResponse = authService.loginOrRegisterNaver(tokenRequest);
         String accessWithBearer = authService.createAccessTokenWhenLogin(socialLoginResponse.userId());
 
         return ResponseEntity.status(HttpStatus.OK)
