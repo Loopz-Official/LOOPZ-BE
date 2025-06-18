@@ -79,12 +79,18 @@ etc:
   base-url: ${BASE_URL}
   #  front-url: ${FRONT_URL}
   google-profile-url: https://www.googleapis.com/userinfo/v2/me
+  kakao-profile-url: https://kapi.kakao.com/v2/user/me
+  kakao-token-url: https://kauth.kakao.com/oauth/token
   apple:
     client-id: ${APPLE_BUNDLE_ID}
     client-secret: ${APPLE_CLIENT_SECRET_FILE}
     key-id: ${APPLE_KEY_ID}
     team-id: ${APPLE_TEAM_ID}
     redirect-uri: ${BASE_URL}/login/oauth2/code/apple
+  kakao:
+    client-id: ${KAKAO_CLIENT}
+    redirect-uri: ${BASE_URL}/auth/v1/login/kakao
+
   user-service-url: ${USER_SERVICE_URL}
   authentication-service-url: ${AUTHENTICATION_SERVICE_URL}
   admin-service-url: ${ADMIN_SERVICE_URL}
