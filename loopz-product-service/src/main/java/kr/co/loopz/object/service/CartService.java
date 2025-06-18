@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static kr.co.loopz.object.Exception.ObjectErrorCode.*;
 
@@ -92,7 +94,7 @@ public class CartService {
         return new CartResponse(total);
     }
 
-
+    // 장바구니 조회
     public CartListResponse getCart(String userId) {
 
         Cart cart = cartRepository.findByUserId(userId).orElse(null);
@@ -110,18 +112,39 @@ public class CartService {
 
         List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getCartId());
 
+        List<String> objectIds = cartItems.stream()
+                .map(CartItem::getObjectId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 상품 리스트 조회
+        List<ObjectEntity> objects = objectRepository.findAllByObjectIdIn(objectIds);
+        Map<String, ObjectEntity> objectMap = objects.stream()
+                .collect(Collectors.toMap(ObjectEntity::getObjectId, Function.identity()));
+
+        List<ObjectImage> images = objectImageRepository.findByObjectIdIn(objectIds);
+
+        Map<String, String> imageMap = images.stream()
+                .collect(Collectors.groupingBy(ObjectImage::getObjectId,
+                        Collectors.mapping(ObjectImage::getImageUrl, Collectors.toList())))
+                .entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().isEmpty() ? null : e.getValue().get(0)
+                ));
+
         List<CartItemResponse> responses = new ArrayList<>();
         int totalQuantity = 0;
         long totalPrice = 0;
         int selectedCount = 0;
 
         for (CartItem item : cartItems) {
-            ObjectEntity object = objectRepository.findByObjectId(item.getObjectId())
-                    .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND, "Object not found: " + item.getObjectId()));
+            ObjectEntity object = objectMap.get(item.getObjectId());
+            if (object == null) {
+                throw new ObjectException(OBJECT_ID_NOT_FOUND, "Object not found: " + item.getObjectId());
+            }
 
-            // 기본 이미지 사용
-            List<ObjectImage> images = objectImageRepository.findByObjectId(object.getObjectId());
-            String imageUrl = images.isEmpty() ? null : images.get(0).getImageUrl();
+            String imageUrl = imageMap.get(item.getObjectId());
 
             // 상품 선택 여부
             boolean selected = item.isSelected();
