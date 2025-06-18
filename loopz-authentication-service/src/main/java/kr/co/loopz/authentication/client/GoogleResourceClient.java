@@ -11,7 +11,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
         name = "google-oauth-client",
         url  = "${etc.google-profile-url}"
 )
-public interface GoogleClient {
+public interface GoogleResourceClient {
 
     /**
      * 구글의 /userinfo 엔드포인트를 호출하여 사용자 정보를 가져옴
