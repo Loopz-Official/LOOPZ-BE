@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import static kr.co.loopz.authentication.constants.SecurityConstants.TOKEN_PREFIX;
+import static kr.co.loopz.authentication.exception.AuthenticationErrorCode.*;
 import static kr.co.loopz.authentication.exception.AuthenticationErrorCode.GOOGLE_AUTHENTICATION_FAILED;
 
 @Service
@@ -62,7 +63,7 @@ public class GoogleAuthService {
             return user;
         } catch (Exception e) {
             log.error("user-service 요청 중 오류 발생: {}", e.getMessage());
-            throw new AuthenticationException(kr.co.loopz.authentication.exception.AuthenticationErrorCode.USER_SERVICE_FAILED);
+            throw new AuthenticationException(USER_SERVICE_FAILED);
         }
     }
 }
