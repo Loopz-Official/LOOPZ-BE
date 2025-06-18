@@ -1,20 +1,32 @@
 package kr.co.loopz.object.service;
 
 import kr.co.loopz.object.Exception.ObjectException;
+import kr.co.loopz.object.converter.ObjectConverter;
 import kr.co.loopz.object.domain.Cart;
 import kr.co.loopz.object.domain.CartItem;
 import kr.co.loopz.object.domain.ObjectEntity;
+import kr.co.loopz.object.domain.ObjectImage;
+import kr.co.loopz.object.dto.request.CartSelectRequest;
+import kr.co.loopz.object.dto.response.CartListResponse;
+import kr.co.loopz.object.dto.response.ObjectResponse;
 import kr.co.loopz.object.repository.CartItemRepository;
 import kr.co.loopz.object.repository.CartRepository;
+import kr.co.loopz.object.repository.ObjectImageRepository;
 import kr.co.loopz.object.repository.ObjectRepository;
 import kr.co.loopz.object.dto.request.CartUpdateRequest;
 import kr.co.loopz.object.dto.response.CartResponse;
+import kr.co.loopz.object.dto.response.CartItemResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static kr.co.loopz.object.Exception.ObjectErrorCode.*;
 
@@ -26,6 +38,8 @@ public class CartService {
     private final CartRepository cartRepository;
     private final ObjectRepository objectRepository;
     private final CartItemRepository cartItemRepository;
+    private final ObjectImageRepository objectImageRepository;
+    private final ObjectConverter objectConverter;
 
     @Transactional
     public CartResponse updateCart(String userId, CartUpdateRequest request) {
@@ -50,15 +64,13 @@ public class CartService {
         }
 
         // 요청 수량 < 0
-        if (update < 0){
-            throw new ObjectException(INVALID_QUANTITY, "입력 수량:"+update);
+        if (update < 0) {
+            throw new ObjectException(INVALID_QUANTITY, "입력 수량:" + update);
         }
 
         if (update == 0) {
-            // 요청 수량 = 0 -> cart에서 삭제
-            if (cartItem != null) {
-                cartItemRepository.delete(cartItem);
-            }
+            // 요청 수량 = 0 불가 (장바구니에는 최소 1개)
+            throw new ObjectException(CART_LEAST_ONE);
         } else {
             // CartItem 업데이트
             if (cartItem == null) {
@@ -76,10 +88,92 @@ public class CartService {
         // Cart 전체 수량 업데이트
         int total = cartItemRepository.countDistinctObjectByCartId(cart.getCartId());
 
-        if (total>100) {
+        if (total > 100) {
             throw new ObjectException(CART_LIMIT_EXCEEDS, "현재: " + total);
         }
 
         return new CartResponse(total);
     }
-}
+
+    // 장바구니 조회
+    public CartListResponse getCart(String userId) {
+
+        Cart cart = cartRepository.findByUserId(userId).orElse(null);
+
+        if (cart == null) {
+            // 비어있는 장바구니 응답 반환
+            return new CartListResponse(Collections.emptyList(),Collections.emptyList());
+        }
+
+        List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getCartId());
+
+        List<String> objectIds = cartItems.stream()
+                .map(CartItem::getObjectId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 상품 리스트 조회
+        List<ObjectEntity> objects = objectRepository.findAllByObjectIdIn(objectIds);
+        Map<String, ObjectEntity> objectMap = objects.stream()
+                .collect(Collectors.toMap(ObjectEntity::getObjectId, Function.identity()));
+
+        List<ObjectImage> images = objectImageRepository.findByObjectIdIn(objectIds);
+
+        Map<String, String> imageMap = images.stream()
+                .collect(Collectors.groupingBy(ObjectImage::getObjectId,
+                        Collectors.mapping(ObjectImage::getImageUrl, Collectors.toList())))
+                .entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().isEmpty() ? null : e.getValue().get(0)
+                ));
+
+
+        // 재고 확인: 장바구니 수량 > 재고면 예외 발생
+        List<CartItemResponse> availableObject = new ArrayList<>();
+        List<String> outOfStock = new ArrayList<>();
+
+        for (CartItem item : cartItems) {
+            ObjectEntity object = objectMap.get(item.getObjectId());
+            if (item.getQuantity() > object.getDetail().getStock()) {
+                outOfStock.add(object.getObjectId());
+            } else {
+                // 재고 있는 상품은 응답 반환
+                String imageUrl = imageMap.get(item.getObjectId());
+                ObjectResponse objectResponse = objectConverter.toObjectResponse(object, imageUrl);
+                availableObject.add(new CartItemResponse(objectResponse, item.getQuantity()));
+            }
+        }
+
+        return new CartListResponse(availableObject, outOfStock);
+    }
+
+    // 선택 상품 삭제
+    @Transactional
+    public void deleteSelected(String userId,List<String> objectIds) {
+
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseThrow(() -> new ObjectException(CART_NOT_FOUND, "Cart not found for user: " + userId));
+
+        // 장바구니 상품 가져오기
+        List<CartItem> cartItems = cartItemRepository.findByCartIdAndObjectIdIn(cart.getCartId(),objectIds);
+
+        // 선택된 상품만 삭제
+        cartItemRepository.deleteAll(cartItems);
+
+    }
+
+    // 개별 상품 삭제
+    @Transactional
+    public void deleteCart(String userId, String objectId) {
+
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseThrow(() -> new ObjectException(CART_NOT_FOUND, "Cart not found for user: " + userId));
+
+        CartItem item = cartItemRepository.findByCartIdAndObjectId(cart.getCartId(), objectId)
+                .orElseThrow(() -> new ObjectException(CART_ITEM_NOT_FOUND, "상품Id: " + objectId));
+
+            cartItemRepository.delete(item);
+        }
+    }
+

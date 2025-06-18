@@ -1,8 +1,10 @@
 package kr.co.loopz.object.converter;
 
+import kr.co.loopz.object.domain.CartItem;
 import kr.co.loopz.object.domain.ObjectDetail;
 import kr.co.loopz.object.domain.ObjectEntity;
 import kr.co.loopz.object.dto.response.BoardResponse;
+import kr.co.loopz.object.dto.response.CartItemResponse;
 import kr.co.loopz.object.dto.response.DetailResponse;
 import kr.co.loopz.object.dto.response.ObjectResponse;
 import org.mapstruct.Mapper;
@@ -19,6 +21,19 @@ public interface ObjectConverter {
 
     // List<Product> -> List<ObjectResponse>
     List<ObjectResponse> toObjectResponseList(List<ObjectEntity> objectEntities);
+
+    default ObjectResponse toObjectResponse(ObjectEntity entity, String imageUrl) {
+        ObjectResponse baseDto = toObjectResponse(entity);
+        return new ObjectResponse(
+                baseDto.objectId(),
+                baseDto.objectName(),
+                null,
+                imageUrl,
+                baseDto.objectPrice(),
+                baseDto.soldOut(),
+                null
+        );
+    }
 
 
     // 찜 여부와 image url 반영해 새로운 DTO 리스트 반환
@@ -63,4 +78,5 @@ public interface ObjectConverter {
 
         );
     }
+
 }

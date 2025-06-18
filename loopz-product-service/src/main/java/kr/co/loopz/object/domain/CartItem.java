@@ -23,15 +23,19 @@ public class CartItem {
     @Column(nullable = false)
     private int quantity;
 
+
     @Builder
     public CartItem(String cartId,String objectId, int quantity) {
         this.cartId = cartId;
         this.objectId = objectId;
         this.quantity = quantity;
+
     }
 
     public void updateQuantity(int quantity) {
         this.quantity = quantity;
     }
+
+
 }
 
