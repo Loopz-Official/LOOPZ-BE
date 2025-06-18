@@ -56,5 +56,15 @@ public class CartController {
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @DeleteMapping("/selected")
+    @Operation(summary="선택 상품 삭제")
+    public ResponseEntity<Void> deleteSelected(@AuthenticationPrincipal User currentUser){
+
+        String userId = currentUser.getUsername();
+        cartService.deleteSelected(userId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }
 

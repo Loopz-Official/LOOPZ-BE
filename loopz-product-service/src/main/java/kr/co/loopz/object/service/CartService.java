@@ -61,15 +61,14 @@ public class CartService {
         }
 
         // 요청 수량 < 0
-        if (update < 0){
-            throw new ObjectException(INVALID_QUANTITY, "입력 수량:"+update);
+        if (update < 0) {
+            throw new ObjectException(INVALID_QUANTITY, "입력 수량:" + update);
         }
 
         if (update == 0) {
             // 요청 수량 = 0 불가 (장바구니에는 최소 1개)
             throw new ObjectException(CART_LEAST_ONE);
-            }
-        else {
+        } else {
             // CartItem 업데이트
             if (cartItem == null) {
                 cartItem = CartItem.builder()
@@ -86,7 +85,7 @@ public class CartService {
         // Cart 전체 수량 업데이트
         int total = cartItemRepository.countDistinctObjectByCartId(cart.getCartId());
 
-        if (total>100) {
+        if (total > 100) {
             throw new ObjectException(CART_LIMIT_EXCEEDS, "현재: " + total);
         }
 
@@ -141,7 +140,7 @@ public class CartService {
         int shippingFee = selectedCount == 0 ? 0 : 3000;// 고정 배송비
         long finalPrice = totalPrice + shippingFee;
 
-        return new CartListResponse(responses, totalQuantity, totalPrice, shippingFee,finalPrice);
+        return new CartListResponse(responses, totalQuantity, totalPrice, shippingFee, finalPrice);
 
     }
 
@@ -158,5 +157,22 @@ public class CartService {
         item.updateSelected(request.selected());
 
         cartItemRepository.save(item);
+    }
+
+    // 선택 상품 삭제
+    @Transactional
+    public void deleteSelected(String userId) {
+
+        Cart cart = cartRepository.findByUserId(userId).orElse(null);
+
+        // 장바구니 상품 가져오기
+        List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getCartId());
+
+        // 선택된 상품만 삭제
+        for (CartItem item : cartItems) {
+            if (item.isSelected()) {
+                cartItemRepository.delete(item);
+            }
+        }
     }
 }
