@@ -102,8 +102,7 @@ public class CartService {
 
         if (cart == null) {
             // 비어있는 장바구니 응답 반환
-            return new CartListResponse(Collections.emptyList()
-            );
+            return new CartListResponse(Collections.emptyList(),Collections.emptyList());
         }
 
         List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getCartId());
@@ -130,17 +129,23 @@ public class CartService {
                 ));
 
 
-        List<CartItemResponse> responses = cartItems.stream()
-                .map(item -> {
-                    ObjectEntity object = objectMap.get(item.getObjectId());
-                    String imageUrl = imageMap.get(item.getObjectId());
+        // 재고 확인: 장바구니 수량 > 재고면 예외 발생
+        List<CartItemResponse> availableObject = new ArrayList<>();
+        List<String> outOfStock = new ArrayList<>();
 
-                    ObjectResponse objectResponse = objectConverter.toObjectResponse(object, imageUrl);
-                    return new CartItemResponse(objectResponse, item.getQuantity());
-                })
-                .collect(Collectors.toList());
+        for (CartItem item : cartItems) {
+            ObjectEntity object = objectMap.get(item.getObjectId());
+            if (item.getQuantity() > object.getDetail().getStock()) {
+                outOfStock.add(object.getObjectId());
+            } else {
+                // 재고 있는 상품은 응답 반환
+                String imageUrl = imageMap.get(item.getObjectId());
+                ObjectResponse objectResponse = objectConverter.toObjectResponse(object, imageUrl);
+                availableObject.add(new CartItemResponse(objectResponse, item.getQuantity()));
+            }
+        }
 
-        return new CartListResponse(responses);
+        return new CartListResponse(availableObject, outOfStock);
     }
 
     // 선택 상품 삭제
