@@ -87,7 +87,7 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
     public void updateTerms(boolean over14, boolean agreedServiceTerms, boolean agreedMarketing, boolean agreedEventSMS) {
         this.userTerms.updateTerms(over14, agreedServiceTerms, agreedMarketing, agreedEventSMS);
 
-        if (over14 && agreedServiceTerms) {
+        if (over14 && agreedServiceTerms && this.nickName != null) {
             this.enabled = true;
         }
     }
