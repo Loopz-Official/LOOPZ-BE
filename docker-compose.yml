@@ -12,7 +12,7 @@ services:
 
   application:
     container_name: loopz_be
-    image: gothax2/loopz_backend:latest
+    image: gothax2/loopz_backend:${IMAGE_TAG}
     ports:
       - 8080:8080
     depends_on:
