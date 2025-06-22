@@ -40,7 +40,7 @@ jobs:
 
     # gradle build
     - name: Build with Gradle
-      run: ./gradlew clean build -x test
+      run: ./gradlew :loopz-backend:clean :loopz-backend:build -x test
 
     # docker login
     - name: Docker Hub Login
