@@ -1,0 +1,30 @@
+services:
+
+  cache:
+    container_name: redis
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+    networks:
+      - loopz_network
+
+  application:
+    container_name: loopz_be
+    image: gothax2/loopz_backend:latest
+    ports:
+      - 8080:8080
+    depends_on:
+      - cache
+    env_file:
+      - .env
+    networks:
+      - loopz_network
+
+volumes:
+  redis_data:
+
+networks:
+  loopz_network:
+    driver: bridge
