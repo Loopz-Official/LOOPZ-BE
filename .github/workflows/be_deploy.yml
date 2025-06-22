@@ -68,7 +68,7 @@ jobs:
         host: ${{ secrets.HOST_PROD }}
         username: ubuntu
         key: ${{ secrets.EC2_PRIVATE_KEY }}
-        envs: IMAGE_TAG
+        envs: SHORT_SHA
         script: |
           IMAGE_TAG=${SHORT_SHA}
           echo "Deploying image tag: $IMAGE_TAG"
