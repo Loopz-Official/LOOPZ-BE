@@ -13,4 +13,8 @@ public interface ProductClient {
 
     @GetMapping("/internal/object/{objectId}")
     ObjectResponse getObjectById(@PathVariable("objectId") String objectId);
+
+    // 재고 조회
+    @GetMapping("/internal/object/{objectId}/stock")
+    int getStockByObjectId(@PathVariable String objectId);
 }

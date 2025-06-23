@@ -228,7 +228,12 @@ public class ObjectService {
         );
     }
 
+    public int getStock(String objectId) {
+        ObjectEntity object = objectRepository.findByObjectId(objectId)
+                .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND));
+        return object.getDetail().getStock();
 
+    }
 }
 
 

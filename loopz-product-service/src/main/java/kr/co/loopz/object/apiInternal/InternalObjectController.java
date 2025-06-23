@@ -30,5 +30,11 @@ public class InternalObjectController {
         return ResponseEntity.ok(response);
     }
 
+    // 남은 재고 확인
+    @GetMapping("/{objectId}/stock")
+    public int getStock(@PathVariable String objectId) {
+        return objectService.getStock(objectId);
+    }
+
 
 }
