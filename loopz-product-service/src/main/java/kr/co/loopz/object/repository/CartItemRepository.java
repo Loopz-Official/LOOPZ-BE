@@ -16,6 +16,8 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     List<CartItem> findByCartIdAndObjectIdIn(String cartId, List<String> objectIds);
 
+    boolean existsByCartIdAndObjectId(String cartId, String objectId);
+
     @Query("SELECT COUNT(DISTINCT c.objectId) FROM CartItem c WHERE c.cartId = :cartId")
     int countDistinctObjectByCartId(@Param("cartId") String cartId);
 }

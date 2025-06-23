@@ -3,6 +3,7 @@ package kr.co.loopz.order.domain;
 import jakarta.persistence.*;
 import kr.co.loopz.order.domain.enums.OrderStatus;
 import kr.co.loopz.order.domain.enums.PaymentMethod;
+import kr.co.loopz.order.dto.request.CartOrderRequest;
 import kr.co.loopz.order.dto.request.OrderRequest;
 import lombok.*;
 
@@ -31,9 +32,6 @@ public class Order {
     @Column
     private String productId;
 
-    @Column
-    private String cartId;
-
     @Column(nullable = false)
     private String addressId;
 
@@ -52,7 +50,6 @@ public class Order {
     @Builder
     public Order(String userId,
                  String productId,
-                 String cartId,
                  String addressId,
                  OrderStatus status,
                  PaymentMethod paymentMethod,
@@ -60,7 +57,6 @@ public class Order {
         this.orderId = UUID.randomUUID().toString();
         this.userId = userId;
         this.productId = productId;
-        this.cartId = cartId != null ? cartId : null;
         this.addressId = addressId;
         this.status = status;
         this.paymentMethod = paymentMethod;
@@ -71,7 +67,17 @@ public class Order {
         return Order.builder()
                 .userId(userId)
                 .productId(productId)
-                .cartId(null)
+                .addressId(request.addressId())
+                .status(OrderStatus.ORDERED)
+                .paymentMethod(request.paymentMethod())
+                .deliveryRequest(request.deliveryRequest())
+                .build();
+    }
+
+    public static Order createMultiOrder(String userId, CartOrderRequest request) {
+        return Order.builder()
+                .userId(userId)
+                .productId(null)
                 .addressId(request.addressId())
                 .status(OrderStatus.ORDERED)
                 .paymentMethod(request.paymentMethod())

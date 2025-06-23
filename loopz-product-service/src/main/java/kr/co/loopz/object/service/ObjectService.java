@@ -248,6 +248,8 @@ public class ObjectService {
 
         object.getDetail().decreaseStock(quantity);
     }
+
+
 }
 
 

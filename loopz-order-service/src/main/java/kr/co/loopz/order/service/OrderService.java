@@ -3,9 +3,10 @@ package kr.co.loopz.order.service;
 import kr.co.loopz.order.client.ProductClient;
 import kr.co.loopz.order.client.UserClient;
 import kr.co.loopz.order.converter.OrderConverter;
+import kr.co.loopz.order.dto.request.CartOrderRequest;
+import kr.co.loopz.order.dto.request.CartRequest;
 import kr.co.loopz.order.dto.request.OrderRequest;
-import kr.co.loopz.order.dto.response.ObjectResponse;
-import kr.co.loopz.order.dto.response.OrderResponse;
+import kr.co.loopz.order.dto.response.*;
 import kr.co.loopz.order.exception.OrderException;
 import kr.co.loopz.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import kr.co.loopz.order.domain.Order;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static kr.co.loopz.order.exception.OrderErrorCode.*;
 
@@ -32,13 +36,13 @@ public class OrderService {
 
         // 주소 확인
         if (!userClient.existsAddressByUserId(userId, request.addressId())) {
-            throw new OrderException(INVALID_ADDRESS, "addressId:"+request.addressId());
+            throw new OrderException(INVALID_ADDRESS, "addressId:" + request.addressId());
         }
 
         // 상품 정보 조회
         ObjectResponse object = productClient.getObjectById(objectId);
         if (object == null) {
-            throw new OrderException(OBJECT_ID_NOT_FOUND,"objectId:"+objectId);
+            throw new OrderException(OBJECT_ID_NOT_FOUND, "objectId:" + objectId);
         }
 
         // 재고 확인
@@ -51,9 +55,10 @@ public class OrderService {
         orderRepository.save(order);
 
         // 주문 생성 후 재고 감소
-        productClient.decreaseStock(objectId,request.quantity());
+        productClient.decreaseStock(objectId, request.quantity());
 
         ObjectResponse orderItem = new ObjectResponse(
+                object.objectId(),
                 object.objectName(),
                 object.imageUrl(),
                 object.objectPrice(),
@@ -68,6 +73,89 @@ public class OrderService {
         return orderConverter.toOrderResponse(
                 order,
                 List.of(orderItem),
+                shippingFee,
+                totalProductPrice,
+                totalPayment
+        );
+    }
+
+    @Transactional
+    public OrderResponse orderCart(String userId, CartOrderRequest request) {
+
+        // 주소 확인
+        if (!userClient.existsAddressByUserId(userId, request.addressId())) {
+            throw new OrderException(INVALID_ADDRESS, "addressId:" + request.addressId());
+        }
+
+        // 장바구니 리스트 조회
+        CartWithQuantityResponse cartResponse = productClient.getCartByUserId(userId);
+        String cartId = cartResponse.cartId();
+        List<CartItemResponse> cartItems = cartResponse.items();
+
+        List<ObjectResponse> orderItems = new ArrayList<>();
+        int totalProductPrice = 0;
+
+        // 각 카트 상품별 주문
+        for (CartRequest cartItem : request.items()) {
+            String objectId = cartItem.objectId();
+
+            // objectId에 해당하는 카트 상품 찾기 (수량 포함)
+            CartItemResponse cartItemResponse = cartItems.stream()
+                    .filter(ci -> ci.object().objectId().equals(objectId))
+                    .findFirst()
+                    .orElseThrow(() -> new OrderException(CART_ITEM_NOT_FOUND, "카트에 없는 상품입니다. objectId: " + objectId));
+
+            int quantity = cartItemResponse.quantity();
+
+            // 상품 정보 조회
+            ObjectResponse object = productClient.getObjectById(objectId);
+            if (object == null) {
+                throw new OrderException(OBJECT_ID_NOT_FOUND, "objectId: " + objectId);
+            }
+
+            // 재고 확인
+            int stock = productClient.getStockByObjectId(objectId);
+            if (quantity > stock) {
+                throw new OrderException(OUT_OF_STOCK, "상품ID: " + objectId + " 재고 부족: 현재 재고 " + stock + ", 요청 수량 " + quantity);
+            }
+
+            ObjectResponse orderItem = new ObjectResponse(
+                    object.objectId(),
+                    object.objectName(),
+                    object.imageUrl(),
+                    object.objectPrice(),
+                    quantity,
+                    object.objectPrice() * quantity
+            );
+
+            orderItems.add(orderItem);
+            totalProductPrice += orderItem.totalPrice();
+        }
+
+        // 주문 생성
+        Order order = Order.createMultiOrder(userId, request);
+        orderRepository.save(order);
+
+        // 주문 생성 후 재고 감소
+        for (CartRequest cartRequest : request.items()) {
+            String objectId = cartRequest.objectId();
+
+            CartItemResponse cartItemResponse = cartItems.stream()
+                    .filter(ci -> ci.object().objectId().equals(objectId))
+                    .findFirst()
+                    .get();
+
+            int quantity = cartItemResponse.quantity();
+
+            productClient.decreaseStock(objectId, quantity);
+        }
+
+        int shippingFee = 3000;
+        int totalPayment = totalProductPrice + shippingFee;
+
+        return orderConverter.toOrderResponse(
+                order,
+                orderItems,
                 shippingFee,
                 totalProductPrice,
                 totalPayment

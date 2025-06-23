@@ -1,6 +1,7 @@
 package kr.co.loopz.order.apiExternal;
 
 import io.swagger.v3.oas.annotations.Operation;
+import kr.co.loopz.order.dto.request.CartOrderRequest;
 import kr.co.loopz.order.dto.request.OrderRequest;
 import kr.co.loopz.order.dto.response.OrderResponse;
 import kr.co.loopz.order.service.OrderService;
@@ -34,4 +35,20 @@ public class OrderController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    // 장바구니에서 주문 (여러 상품)
+    @PostMapping("/cart")
+    @Operation(summary = "장바구니에서 주문")
+    public ResponseEntity<OrderResponse> orderCart(
+            @AuthenticationPrincipal User currentUser,
+            @RequestBody CartOrderRequest request) {
+
+        String userId = currentUser.getUsername();
+
+        OrderResponse response=orderService.orderCart(userId,request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+
 }
