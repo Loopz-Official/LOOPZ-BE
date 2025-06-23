@@ -2,6 +2,7 @@ package kr.co.loopz.object.apiInternal;
 
 import kr.co.loopz.object.Exception.ObjectException;
 import kr.co.loopz.object.domain.Cart;
+import kr.co.loopz.object.dto.request.DeleteCartItemRequest;
 import kr.co.loopz.object.dto.response.CartItemResponse;
 import kr.co.loopz.object.dto.response.CartResponse;
 import kr.co.loopz.object.dto.response.CartWithQuantityResponse;
@@ -76,5 +77,13 @@ public class InternalObjectController {
         CartWithQuantityResponse cartResponse = cartService.getCartByUserId(userId);
         return ResponseEntity.ok(cartResponse);
     }
+
+    // 장바구니 상품 삭제
+    @DeleteMapping("/cart")
+    public ResponseEntity<Void> deleteCartItem(@RequestBody DeleteCartItemRequest request) {
+        cartService.deleteSelected(request.userId(), List.of(request.objectId()));
+        return ResponseEntity.noContent().build();
+    }
+
 
 }

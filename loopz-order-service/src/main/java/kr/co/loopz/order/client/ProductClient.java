@@ -1,5 +1,6 @@
 package kr.co.loopz.order.client;
 
+import kr.co.loopz.order.dto.request.DeleteCartItemRequest;
 import kr.co.loopz.order.dto.response.CartWithQuantityResponse;
 import kr.co.loopz.order.dto.response.ObjectResponse;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -29,4 +30,7 @@ public interface ProductClient {
     @GetMapping("/internal/cart/user/{userId}")
     CartWithQuantityResponse getCartByUserId(@PathVariable String userId);
 
+    //카트 상품 삭제
+    @DeleteMapping("/internal/cart")
+    void deleteCartItem(@RequestBody DeleteCartItemRequest request);
 }

@@ -5,6 +5,7 @@ import kr.co.loopz.order.client.UserClient;
 import kr.co.loopz.order.converter.OrderConverter;
 import kr.co.loopz.order.dto.request.CartOrderRequest;
 import kr.co.loopz.order.dto.request.CartRequest;
+import kr.co.loopz.order.dto.request.DeleteCartItemRequest;
 import kr.co.loopz.order.dto.request.OrderRequest;
 import kr.co.loopz.order.dto.response.*;
 import kr.co.loopz.order.exception.OrderException;
@@ -111,7 +112,11 @@ public class OrderService {
 
             int quantity = cartItemResponse.quantity();
 
+            //재고 차감
             productClient.decreaseStock(objectId, quantity);
+
+            // 카트 상품 삭제
+            productClient.deleteCartItem(new DeleteCartItemRequest(userId, objectId));
         }
 
         int shippingFee = 3000;
