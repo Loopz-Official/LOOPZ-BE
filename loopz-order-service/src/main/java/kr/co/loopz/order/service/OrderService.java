@@ -130,6 +130,11 @@ public class OrderService {
 
     // 공통: 주소 검증
     private void validateAddress(String userId, String addressId) {
+
+        if (addressId == null || addressId.isBlank()) {
+            throw new OrderException(INVALID_ADDRESS, "addressId는 필수입니다.");
+        }
+
         if (!userClient.existsAddressByUserId(userId, addressId)) {
             throw new OrderException(INVALID_ADDRESS, "addressId:" + addressId);
         }
