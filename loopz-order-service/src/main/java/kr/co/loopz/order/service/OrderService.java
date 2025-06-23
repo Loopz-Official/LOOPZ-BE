@@ -35,21 +35,10 @@ public class OrderService {
     public OrderResponse orderSingle(String userId, String objectId, OrderRequest request) {
 
         // 주소 확인
-        if (!userClient.existsAddressByUserId(userId, request.addressId())) {
-            throw new OrderException(INVALID_ADDRESS, "addressId:" + request.addressId());
-        }
+        validateAddress(userId, request.addressId());
 
-        // 상품 정보 조회
-        ObjectResponse object = productClient.getObjectById(objectId);
-        if (object == null) {
-            throw new OrderException(OBJECT_ID_NOT_FOUND, "objectId:" + objectId);
-        }
-
-        // 재고 확인
-        int stock = productClient.getStockByObjectId(objectId);
-        if (request.quantity() > stock) {
-            throw new OrderException(OUT_OF_STOCK, "재고 부족: 현재 재고 " + stock + ", 요청 수량 " + request.quantity());
-        }
+        // 상품 정보 조회+ 재고 확인
+        ObjectResponse object = validateObject(objectId, request.quantity());
 
         Order order = Order.createSingleOrder(userId, objectId, request);
         orderRepository.save(order);
@@ -57,14 +46,7 @@ public class OrderService {
         // 주문 생성 후 재고 감소
         productClient.decreaseStock(objectId, request.quantity());
 
-        ObjectResponse orderItem = new ObjectResponse(
-                object.objectId(),
-                object.objectName(),
-                object.imageUrl(),
-                object.objectPrice(),
-                request.quantity(),
-                object.objectPrice() * request.quantity()
-        );
+        ObjectResponse orderItem = createOrderItem(object, request.quantity());
 
         int shippingFee = 3000;
         int totalProductPrice = orderItem.totalPrice();
@@ -83,13 +65,10 @@ public class OrderService {
     public OrderResponse orderCart(String userId, CartOrderRequest request) {
 
         // 주소 확인
-        if (!userClient.existsAddressByUserId(userId, request.addressId())) {
-            throw new OrderException(INVALID_ADDRESS, "addressId:" + request.addressId());
-        }
+        validateAddress(userId, request.addressId());
 
         // 장바구니 리스트 조회
         CartWithQuantityResponse cartResponse = productClient.getCartByUserId(userId);
-        String cartId = cartResponse.cartId();
         List<CartItemResponse> cartItems = cartResponse.items();
 
         List<ObjectResponse> orderItems = new ArrayList<>();
@@ -107,26 +86,11 @@ public class OrderService {
 
             int quantity = cartItemResponse.quantity();
 
-            // 상품 정보 조회
-            ObjectResponse object = productClient.getObjectById(objectId);
-            if (object == null) {
-                throw new OrderException(OBJECT_ID_NOT_FOUND, "objectId: " + objectId);
-            }
+            // 상품 정보 조회 + 재고 확인
+            ObjectResponse object = validateObject(objectId, quantity);
 
-            // 재고 확인
-            int stock = productClient.getStockByObjectId(objectId);
-            if (quantity > stock) {
-                throw new OrderException(OUT_OF_STOCK, "상품ID: " + objectId + " 재고 부족: 현재 재고 " + stock + ", 요청 수량 " + quantity);
-            }
+            ObjectResponse orderItem = createOrderItem(object, quantity);
 
-            ObjectResponse orderItem = new ObjectResponse(
-                    object.objectId(),
-                    object.objectName(),
-                    object.imageUrl(),
-                    object.objectPrice(),
-                    quantity,
-                    object.objectPrice() * quantity
-            );
 
             orderItems.add(orderItem);
             totalProductPrice += orderItem.totalPrice();
@@ -159,6 +123,40 @@ public class OrderService {
                 shippingFee,
                 totalProductPrice,
                 totalPayment
+        );
+    }
+
+    // 공통: 주소 검증
+    private void validateAddress(String userId, String addressId) {
+        if (!userClient.existsAddressByUserId(userId, addressId)) {
+            throw new OrderException(INVALID_ADDRESS, "addressId:" + addressId);
+        }
+    }
+
+    // 공통: 상품 조회 + 재고 검증
+    private ObjectResponse validateObject(String objectId, int quantity) {
+        ObjectResponse object = productClient.getObjectById(objectId);
+        if (object == null) {
+            throw new OrderException(OBJECT_ID_NOT_FOUND, "objectId:" + objectId);
+        }
+
+        int stock = productClient.getStockByObjectId(objectId);
+        if (quantity > stock) {
+            throw new OrderException(OUT_OF_STOCK, "상품ID: " + objectId + " 재고 부족: 현재 재고 " + stock + ", 요청 수량 " + quantity);
+        }
+
+        return object;
+    }
+
+    // 공통: 주문 상품 생성
+    private ObjectResponse createOrderItem(ObjectResponse object, int quantity) {
+        return new ObjectResponse(
+                object.objectId(),
+                object.objectName(),
+                object.imageUrl(),
+                object.objectPrice(),
+                quantity,
+                object.objectPrice() * quantity
         );
     }
 }
