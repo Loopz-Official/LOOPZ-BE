@@ -27,6 +27,7 @@ public interface ProductClient {
     @GetMapping("/internal/object/cart")
     boolean checkObjectInCart(@RequestParam String cartId, @RequestParam String objectId);
 
+    // 사용자 카트 존재여부 조회
     @GetMapping("/internal/cart/user/{userId}")
     CartWithQuantityResponse getCartByUserId(@PathVariable String userId);
 

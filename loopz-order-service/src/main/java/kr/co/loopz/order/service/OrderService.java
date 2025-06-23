@@ -40,6 +40,12 @@ public class OrderService {
         // 상품 정보 조회+ 재고 확인
         ObjectResponse object = validateObject(objectId, request.quantity());
 
+        // 약관 동의 여부 확인
+        if (!request.agreedToTerms()) {
+            throw new OrderException(ORDER_TERM_NOT_AGREED);
+        }
+
+
         Order order = Order.createSingleOrder(userId, objectId, request);
         orderRepository.save(order);
 
@@ -66,6 +72,11 @@ public class OrderService {
 
         // 주소 확인
         validateAddress(userId, request.addressId());
+
+        // 약관 동의 여부 확인
+        if (!request.agreedToTerms()) {
+            throw new OrderException(ORDER_TERM_NOT_AGREED);
+        }
 
         // 장바구니 리스트 조회
         CartWithQuantityResponse cartResponse = productClient.getCartByUserId(userId);

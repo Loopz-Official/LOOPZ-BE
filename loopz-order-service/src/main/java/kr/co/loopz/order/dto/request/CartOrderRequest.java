@@ -8,5 +8,6 @@ public record CartOrderRequest(
         String addressId,
         PaymentMethod paymentMethod,
         String deliveryRequest,
-        List<String> objectIds
+        List<String> objectIds,
+        boolean agreedToTerms
 ) {}

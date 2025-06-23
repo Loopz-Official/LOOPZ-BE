@@ -6,6 +6,7 @@ public record OrderRequest(
         int quantity,
         String addressId,
         PaymentMethod paymentMethod,
-        String deliveryRequest
+        String deliveryRequest,
+        boolean agreedToTerms
 ) {
 }
