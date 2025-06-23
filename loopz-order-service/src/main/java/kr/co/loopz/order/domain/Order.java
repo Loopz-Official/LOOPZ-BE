@@ -3,6 +3,7 @@ package kr.co.loopz.order.domain;
 import jakarta.persistence.*;
 import kr.co.loopz.order.domain.enums.OrderStatus;
 import kr.co.loopz.order.domain.enums.PaymentMethod;
+import kr.co.loopz.order.dto.request.OrderRequest;
 import lombok.*;
 
 import java.util.UUID;
@@ -14,6 +15,7 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 @Getter
 @AllArgsConstructor
+@Table(name = "orders")
 public class Order {
 
     @Id
@@ -43,6 +45,9 @@ public class Order {
     @Column(nullable = false)
     private PaymentMethod paymentMethod;
 
+    @Column(length = 500)
+    private String deliveryRequest;
+
 
     @Builder
     public Order(String userId,
@@ -50,14 +55,29 @@ public class Order {
                  String cartId,
                  String addressId,
                  OrderStatus status,
-                 PaymentMethod paymentMethod) {
+                 PaymentMethod paymentMethod,
+                 String deliveryRequest) {
         this.orderId = UUID.randomUUID().toString();
         this.userId = userId;
         this.productId = productId;
-        this.cartId = cartId;
+        this.cartId = cartId != null ? cartId : null;
         this.addressId = addressId;
         this.status = status;
         this.paymentMethod = paymentMethod;
+        this.deliveryRequest = deliveryRequest;
     }
+
+    public static Order createSingleOrder(String userId, String productId, OrderRequest request) {
+        return Order.builder()
+                .userId(userId)
+                .productId(productId)
+                .cartId(null)
+                .addressId(request.addressId())
+                .status(OrderStatus.ORDERED)
+                .paymentMethod(request.paymentMethod())
+                .deliveryRequest(request.deliveryRequest())
+                .build();
+    }
+
 
 }

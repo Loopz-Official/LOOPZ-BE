@@ -210,6 +210,24 @@ public class ObjectService {
         return objectConverter.toDetailResponse(entity, imageUrls, liked);
     }
 
+    public ObjectResponse getObjectById(String objectId) {
+        ObjectEntity entity = objectRepository.findByObjectId(objectId)
+                .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND, "Object not found: " + objectId));
+
+        List<ObjectImage> images = objectImageRepository.findByObjectId(objectId);
+        String firstImageUrl = images.isEmpty() ? "" : images.get(0).getImageUrl();
+
+        return new ObjectResponse(
+                entity.getObjectId(),
+                entity.getObjectName(),
+                entity.getIntro(),
+                firstImageUrl,
+                entity.getObjectPrice(),
+                entity.isSoldOut(),
+                false
+        );
+    }
+
 
 }
 
