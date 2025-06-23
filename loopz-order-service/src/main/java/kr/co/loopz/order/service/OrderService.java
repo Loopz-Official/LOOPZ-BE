@@ -4,7 +4,6 @@ import kr.co.loopz.order.client.ProductClient;
 import kr.co.loopz.order.client.UserClient;
 import kr.co.loopz.order.converter.OrderConverter;
 import kr.co.loopz.order.dto.request.CartOrderRequest;
-import kr.co.loopz.order.dto.request.CartRequest;
 import kr.co.loopz.order.dto.request.DeleteCartItemRequest;
 import kr.co.loopz.order.dto.request.OrderRequest;
 import kr.co.loopz.order.dto.response.*;
@@ -76,8 +75,7 @@ public class OrderService {
         int totalProductPrice = 0;
 
         // 각 카트 상품별 주문
-        for (CartRequest cartItem : request.items()) {
-            String objectId = cartItem.objectId();
+        for (String objectId : request.objectIds()){
 
             // objectId에 해당하는 카트 상품 찾기 (수량 포함)
             CartItemResponse cartItemResponse = cartItems.stream()
@@ -102,8 +100,7 @@ public class OrderService {
         orderRepository.save(order);
 
         // 주문 생성 후 재고 감소
-        for (CartRequest cartRequest : request.items()) {
-            String objectId = cartRequest.objectId();
+        for (String objectId : request.objectIds()) {
 
             CartItemResponse cartItemResponse = cartItems.stream()
                     .filter(ci -> ci.object().objectId().equals(objectId))

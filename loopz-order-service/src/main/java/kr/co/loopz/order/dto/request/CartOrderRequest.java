@@ -8,5 +8,5 @@ public record CartOrderRequest(
         String addressId,
         PaymentMethod paymentMethod,
         String deliveryRequest,
-        List<CartRequest> items
+        List<String> objectIds
 ) {}
