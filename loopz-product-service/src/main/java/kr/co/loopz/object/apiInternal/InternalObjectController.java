@@ -31,9 +31,19 @@ public class InternalObjectController {
     }
 
     // 남은 재고 확인
-    @GetMapping("/{objectId}/stock")
+    @GetMapping("/object/{objectId}/stock")
     public int getStock(@PathVariable String objectId) {
         return objectService.getStock(objectId);
+    }
+
+    // 재고 감소
+    @PostMapping("/object/{objectId}/stock")
+    public ResponseEntity<Void> decreaseStock(
+            @PathVariable String objectId,
+            @RequestParam int quantity
+    ) {
+        objectService.decreaseStock(objectId, quantity);
+        return ResponseEntity.ok().build();
     }
 
 

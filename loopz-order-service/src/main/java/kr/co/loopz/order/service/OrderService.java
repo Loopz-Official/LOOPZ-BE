@@ -41,8 +41,17 @@ public class OrderService {
             throw new OrderException(OBJECT_ID_NOT_FOUND,"objectId:"+objectId);
         }
 
+        // 재고 확인
+        int stock = productClient.getStockByObjectId(objectId);
+        if (request.quantity() > stock) {
+            throw new OrderException(OUT_OF_STOCK, "재고 부족: 현재 재고 " + stock + ", 요청 수량 " + request.quantity());
+        }
+
         Order order = Order.createSingleOrder(userId, objectId, request);
         orderRepository.save(order);
+
+        // 주문 생성 후 재고 감소
+        productClient.decreaseStock(objectId,request.quantity());
 
         ObjectResponse orderItem = new ObjectResponse(
                 object.objectName(),

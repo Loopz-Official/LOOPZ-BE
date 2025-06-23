@@ -20,13 +20,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static kr.co.loopz.object.Exception.ObjectErrorCode.INVALID_SORT_TYPE;
-import static kr.co.loopz.object.Exception.ObjectErrorCode.OBJECT_ID_NOT_FOUND;
+import static kr.co.loopz.object.Exception.ObjectErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -233,6 +233,20 @@ public class ObjectService {
                 .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND));
         return object.getDetail().getStock();
 
+    }
+
+    // 주문 후 재고 감소
+    @Transactional
+    public void decreaseStock(String objectId, int quantity) {
+        ObjectEntity object = objectRepository.findByObjectId(objectId)
+                .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND));
+
+        int currentStock = object.getDetail().getStock();
+        if (currentStock < quantity) {
+            throw new ObjectException(INSUFFICIENT_STOCK, "현재 재고: " + currentStock);
+        }
+
+        object.getDetail().decreaseStock(quantity);
     }
 }
 
