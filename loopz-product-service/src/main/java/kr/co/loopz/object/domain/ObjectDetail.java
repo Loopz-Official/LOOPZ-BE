@@ -31,7 +31,7 @@ public class ObjectDetail {
 
     public void decreaseStock(int quantity) {
         if (this.stock < quantity) {
-            throw new ObjectException(INSUFFICIENT_STOCK);
+            throw new ObjectException(INSUFFICIENT_STOCK,"현재 재고: " + this.stock);
         }
         this.stock -= quantity;
     }

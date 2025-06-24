@@ -241,11 +241,6 @@ public class ObjectService {
         ObjectEntity object = objectRepository.findByObjectId(objectId)
                 .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND));
 
-        int currentStock = object.getDetail().getStock();
-        if (currentStock < quantity) {
-            throw new ObjectException(INSUFFICIENT_STOCK, "현재 재고: " + currentStock);
-        }
-
         object.getDetail().decreaseStock(quantity);
     }
 
