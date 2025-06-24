@@ -7,15 +7,12 @@ import kr.co.loopz.object.domain.CartItem;
 import kr.co.loopz.object.domain.ObjectEntity;
 import kr.co.loopz.object.domain.ObjectImage;
 import kr.co.loopz.object.dto.request.CartSelectRequest;
-import kr.co.loopz.object.dto.response.CartListResponse;
-import kr.co.loopz.object.dto.response.ObjectResponse;
+import kr.co.loopz.object.dto.response.*;
 import kr.co.loopz.object.repository.CartItemRepository;
 import kr.co.loopz.object.repository.CartRepository;
 import kr.co.loopz.object.repository.ObjectImageRepository;
 import kr.co.loopz.object.repository.ObjectRepository;
 import kr.co.loopz.object.dto.request.CartUpdateRequest;
-import kr.co.loopz.object.dto.response.CartResponse;
-import kr.co.loopz.object.dto.response.CartItemResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +37,7 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
     private final ObjectImageRepository objectImageRepository;
     private final ObjectConverter objectConverter;
+    private final ObjectService objectService;
 
     @Transactional
     public CartResponse updateCart(String userId, CartUpdateRequest request) {
@@ -175,5 +173,19 @@ public class CartService {
 
             cartItemRepository.delete(item);
         }
-    }
 
+    public CartWithQuantityResponse getCartByUserId(String userId) {
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseThrow(() -> new ObjectException(CART_NOT_FOUND, "Cart not found for user: " + userId));
+
+        List<CartItemResponse> items = cartItemRepository.findByCartId(cart.getCartId())
+                .stream()
+                .map(item -> {
+                    ObjectResponse object = objectService.getObjectById(item.getObjectId());
+                    return new CartItemResponse(object, item.getQuantity());
+                })
+                .collect(Collectors.toList());
+
+        return new CartWithQuantityResponse(cart.getCartId(), items);
+    }
+}

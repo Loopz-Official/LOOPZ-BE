@@ -29,7 +29,8 @@ public class LikeService {
 
         // userId 존재여부 확인
         if (!userClient.existsByUserId(userId)) {
-            throw new ObjectException(USER_ID_NOT_FOUND, "User with ID not found: "+ userId);
+            throw new ObjectException(
+                    USER_ID_NOT_FOUND, "User with ID not found: "+ userId);
         }
 
         // objectId 존재 여부 확인

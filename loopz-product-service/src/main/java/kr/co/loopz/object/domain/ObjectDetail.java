@@ -2,9 +2,12 @@ package kr.co.loopz.object.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import kr.co.loopz.object.Exception.ObjectException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import static kr.co.loopz.object.Exception.ObjectErrorCode.INSUFFICIENT_STOCK;
 
 @Embeddable
 @Getter
@@ -24,4 +27,13 @@ public class ObjectDetail {
 
     // 입고 수량
     private int stock;
+
+
+    public void decreaseStock(int quantity) {
+        if (this.stock < quantity) {
+            throw new ObjectException(INSUFFICIENT_STOCK,"현재 재고: " + this.stock);
+        }
+        this.stock -= quantity;
+    }
+
 }

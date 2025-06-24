@@ -27,11 +27,11 @@ public interface ObjectConverter {
         return new ObjectResponse(
                 baseDto.objectId(),
                 baseDto.objectName(),
-                null,
+                baseDto.intro(),
                 imageUrl,
                 baseDto.objectPrice(),
                 baseDto.soldOut(),
-                null
+                baseDto.liked()
         );
     }
 
