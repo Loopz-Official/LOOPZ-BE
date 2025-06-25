@@ -41,6 +41,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             return;
         }
 
+        String remote = request.getRemoteAddr();
+        String xff = request.getHeader("X-Forwarded-For");
+        log.info("[DebugIpFilter] Request URI={}, RemoteAddr={}, X-Forwarded-For={}",
+                 request.getRequestURI(), remote, xff);
+
         log.debug("Access token from request: {}", accessToken);
 
         validateAndReissue(response, accessToken);
