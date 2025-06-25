@@ -94,3 +94,4 @@ etc:
   order-service-url: ${ORDER_SERVICE_URL}
   payment-service-url: ${PAYMENT_SERVICE_URL}
   search-service-url: ${SEARCH_SERVICE_URL}
+
