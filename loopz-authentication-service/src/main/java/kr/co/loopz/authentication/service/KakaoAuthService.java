@@ -52,9 +52,12 @@ public class KakaoAuthService {
 
             String bearerHeader = TOKEN_PREFIX + kakaoToken.accessToken();
             return kakaoResourceClient.getUserInfo(bearerHeader);
+        } catch (feign.FeignException e) {
+            log.error("카카오 API 호출 실패: status={}, message={}", e.status(), e.getMessage());
+            throw new AuthenticationException(KAKAO_AUTHENTICATION_FAILED, "카카오 인증에 실패했습니다. " + e.getMessage());
         } catch (Exception e) {
-            log.error("카카오 사용자 정보 요청 실패: {}", e.getMessage());
-            throw new AuthenticationException(KAKAO_AUTHENTICATION_FAILED, e.getMessage() + "사용자 이메일 값은 필수입니다.");
+            log.error("카카오 사용자 정보 요청 중 예상치 못한 오류 발생: {}", e.getMessage());
+            throw new AuthenticationException(KAKAO_AUTHENTICATION_FAILED, "카카오 인증 중 오류가 발생했습니다. " + e.getMessage());
         }
     }
 
