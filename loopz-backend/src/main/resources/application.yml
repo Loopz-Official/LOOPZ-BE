@@ -83,7 +83,7 @@ etc:
   kakao-token-url: https://kauth.kakao.com/oauth/token
   kakao:
     client-id: ${KAKAO_CLIENT}
-    redirect-uri: ${FRONT_URL}/auth/v1/login/kakao
+    redirect-uri: ${FRONT_URL}/oauth/kakao
 
   user-service-url: ${USER_SERVICE_URL}
   authentication-service-url: ${AUTHENTICATION_SERVICE_URL}
