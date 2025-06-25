@@ -19,12 +19,6 @@ public class ObjectDetail {
     // HTML로 받을 상세 설명 (버킷주소)
     private String descriptionUrl;
 
-    // 상품 정보
-    private String productInfo;
-
-    // 구매 전 읽어주세요
-    private String notice;
-
     // 입고 수량
     private int stock;
 
