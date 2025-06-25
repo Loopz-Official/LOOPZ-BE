@@ -76,6 +76,7 @@ cloud:
 
 etc:
   base-url: ${BASE_URL}
+  base-ip: ${BASE_IP}
   #  front-url: ${FRONT_URL}
   google-profile-url: https://www.googleapis.com/userinfo/v2/me
   kakao-profile-url: https://kapi.kakao.com/v2/user/me

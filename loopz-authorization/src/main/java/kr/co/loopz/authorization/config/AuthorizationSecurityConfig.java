@@ -3,12 +3,14 @@ package kr.co.loopz.authorization.config;
 import kr.co.loopz.authorization.filter.JwtAuthorizationFilter;
 import kr.co.loopz.authorization.filter.JwtExceptionFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -20,6 +22,10 @@ public class AuthorizationSecurityConfig {
 
     private final JwtAuthorizationFilter jwtAuthorizationFilter;
     private final JwtExceptionFilter jwtExceptionFilter;
+
+    @Value("${etc.base-ip}")
+    private String BASE_IP;
+
 
     /**
      * authorization 모듈에서 인가 작업만 수행
@@ -33,7 +39,6 @@ public class AuthorizationSecurityConfig {
             "/swagger-ui/**",
             "/auth/v1/login/google",
             "/auth/v1/login/kakao",
-            "/internal/**",
             "/object/v1",
             "/object/v1/*",
     };
@@ -53,6 +58,9 @@ public class AuthorizationSecurityConfig {
 
                 // 경로별 인가
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/internal/**").access(
+                                new WebExpressionAuthorizationManager("hasIpAddress('" + BASE_IP + "')")
+                        )
                         .requestMatchers(WHITE_LIST).permitAll()
                         .anyRequest().authenticated()
                 )
