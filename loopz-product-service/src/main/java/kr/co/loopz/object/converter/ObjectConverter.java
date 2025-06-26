@@ -71,11 +71,7 @@ public interface ObjectConverter {
                 objectResponse,
                 detail.getSize(),
                 detail.getDescriptionUrl(),
-                detail.getProductInfo(),
-                detail.getNotice(),
-                detail.getStock(),
-                imageUrls
-
+                detail.getStock()
         );
     }
 
