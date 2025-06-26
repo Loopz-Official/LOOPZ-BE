@@ -51,7 +51,7 @@ public class AuthorizationSecurityConfig {
                 // cors
                 .cors(cors -> cors.configurationSource(corsConfig.apiCorsConfigurationSource()))
 
-                // 경로별 인가
+                // 경로별 인가 - internal 보안 추가 필요
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITE_LIST).permitAll()
                         .anyRequest().authenticated()
