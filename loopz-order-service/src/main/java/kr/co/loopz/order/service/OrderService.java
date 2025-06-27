@@ -3,11 +3,13 @@ package kr.co.loopz.order.service;
 import kr.co.loopz.order.client.ProductClient;
 import kr.co.loopz.order.client.UserClient;
 import kr.co.loopz.order.converter.OrderConverter;
+import kr.co.loopz.order.domain.OrderItem;
 import kr.co.loopz.order.dto.request.CartOrderRequest;
 import kr.co.loopz.order.dto.request.DeleteCartItemRequest;
 import kr.co.loopz.order.dto.request.OrderRequest;
 import kr.co.loopz.order.dto.response.*;
 import kr.co.loopz.order.exception.OrderException;
+import kr.co.loopz.order.repository.OrderItemRepository;
 import kr.co.loopz.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,8 @@ public class OrderService {
     private final UserClient userClient;
     private final ProductClient productClient;
     private final OrderConverter orderConverter;
+    private final OrderItemRepository orderItemRepository;
+
 
     @Transactional
     public OrderResponse orderSingle(String userId, String objectId, OrderRequest request) {
@@ -46,21 +50,30 @@ public class OrderService {
         }
 
 
-        Order order = Order.createSingleOrder(userId, objectId, request);
+        Order order = Order.createSingleOrder(userId, request);
         orderRepository.save(order);
+
+        // OrderItem 생성 및 저장
+        OrderItem orderItem = OrderItem.builder()
+                .orderId(order.getOrderId())
+                .objectId(objectId)
+                .quantity(request.quantity())
+                .price(object.objectPrice() * (long) request.quantity())
+                .build();
+        orderItemRepository.save(orderItem);
 
         // 주문 생성 후 재고 감소
         productClient.decreaseStock(objectId, request.quantity());
 
-        ObjectResponse orderItem = createOrderItem(object, request.quantity());
+        ObjectResponse orderItemDto = createOrderItem(object, request.quantity());
 
         int shippingFee = 3000;
-        int totalProductPrice = orderItem.totalPrice();
+        int totalProductPrice = orderItemDto.totalPrice();
         int totalPayment = totalProductPrice + shippingFee;
 
         return orderConverter.toOrderResponse(
                 order,
-                List.of(orderItem),
+                List.of(orderItemDto),
                 shippingFee,
                 totalProductPrice,
                 totalPayment
@@ -85,6 +98,9 @@ public class OrderService {
         List<ObjectResponse> orderItems = new ArrayList<>();
         int totalProductPrice = 0;
 
+        Order order = Order.createMultiOrder(userId, request);
+        orderRepository.save(order);
+
         // 각 카트 상품별 주문
         for (String objectId : request.objectIds()){
 
@@ -99,16 +115,21 @@ public class OrderService {
             // 상품 정보 조회 + 재고 확인
             ObjectResponse object = validateObject(objectId, quantity);
 
-            ObjectResponse orderItem = createOrderItem(object, quantity);
+            // OrderItem 엔티티 저장
+            OrderItem orderItem = OrderItem.builder()
+                    .orderId(order.getOrderId())
+                    .objectId(objectId)
+                    .quantity(quantity)
+                    .price(object.objectPrice() * (long) quantity)
+                    .build();
+            orderItemRepository.save(orderItem);
+
+            ObjectResponse orderItemDto = createOrderItem(object, quantity);
 
 
-            orderItems.add(orderItem);
-            totalProductPrice += orderItem.totalPrice();
+            orderItems.add(orderItemDto);
+            totalProductPrice += orderItemDto.totalPrice();
         }
-
-        // 주문 생성
-        Order order = Order.createMultiOrder(userId, request);
-        orderRepository.save(order);
 
         // 주문 생성 후 재고 감소
         for (String objectId : request.objectIds()) {

@@ -29,9 +29,6 @@ public class Order {
     @Column(nullable = false)
     private String userId;
 
-    @Column
-    private String productId;
-
     @Column(nullable = false)
     private String addressId;
 
@@ -49,24 +46,21 @@ public class Order {
 
     @Builder
     public Order(String userId,
-                 String productId,
                  String addressId,
                  OrderStatus status,
                  PaymentMethod paymentMethod,
                  String deliveryRequest) {
         this.orderId = UUID.randomUUID().toString();
         this.userId = userId;
-        this.productId = productId;
         this.addressId = addressId;
         this.status = status;
         this.paymentMethod = paymentMethod;
         this.deliveryRequest = deliveryRequest;
     }
 
-    public static Order createSingleOrder(String userId, String productId, OrderRequest request) {
+    public static Order createSingleOrder(String userId, OrderRequest request) {
         return Order.builder()
                 .userId(userId)
-                .productId(productId)
                 .addressId(request.addressId())
                 .status(OrderStatus.ORDERED)
                 .paymentMethod(request.paymentMethod())
@@ -77,7 +71,6 @@ public class Order {
     public static Order createMultiOrder(String userId, CartOrderRequest request) {
         return Order.builder()
                 .userId(userId)
-                .productId(null)
                 .addressId(request.addressId())
                 .status(OrderStatus.ORDERED)
                 .paymentMethod(request.paymentMethod())
