@@ -38,7 +38,6 @@ public class AuthorizationSecurityConfig {
             "/object/v1/*",
     };
 
-
     @Bean
     public SecurityFilterChain authorizationFilterChain(HttpSecurity http) throws Exception {
 
