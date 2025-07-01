@@ -27,7 +27,7 @@ public class AuthorizationSecurityConfig {
      */
 
     private static final String[] WHITE_LIST = {
-            "/actuator/health",
+            "/actuator/**",
             "/error",
             "/v3/api-docs/**",
             "/swagger-ui/**",
