@@ -29,7 +29,8 @@ public interface ObjectConverter {
                 imageUrl,
                 baseDto.objectPrice(),
                 baseDto.soldOut(),
-                baseDto.liked()
+                baseDto.liked(),
+                baseDto.stock()
         );
     }
 
@@ -44,7 +45,8 @@ public interface ObjectConverter {
                         imageUrlMap.get(dto.objectId()),
                         dto.objectPrice(),
                         dto.soldOut(),
-                        likeMap.getOrDefault(dto.objectId(), false)
+                        likeMap.getOrDefault(dto.objectId(), false),
+                        dto.stock()
                 )).collect(Collectors.toList());
     }
 
@@ -61,7 +63,8 @@ public interface ObjectConverter {
                 imageUrls.isEmpty() ? null : imageUrls.get(0),
                 entity.getObjectPrice(),
                 entity.isSoldOut(),
-                liked
+                liked,
+                entity.getDetail().getStock()
         );
 
         ObjectDetail detail = entity.getDetail();

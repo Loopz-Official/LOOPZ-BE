@@ -73,4 +73,8 @@ public class ObjectEntity extends BaseTimeEntity {
         this.detail = detail;
     }
 
+    public int getStock() {
+        return detail != null ? detail.getStock() : 0;
+    }
+
 }

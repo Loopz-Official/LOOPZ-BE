@@ -10,7 +10,8 @@ public record ObjectResponse (
         String imageUrl,
         Long objectPrice,
         boolean soldOut,
-        Boolean liked
+        Boolean liked,
+        int stock
 ){
 }
 
