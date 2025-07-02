@@ -2,9 +2,10 @@ package kr.co.loopz.user.apiExternal;
 
 import jakarta.validation.Valid;
 import kr.co.loopz.user.dto.request.NickNameUpdateRequest;
+import kr.co.loopz.user.dto.response.DetailInfoUpdateResponse;
 import kr.co.loopz.user.dto.response.NickNameAvailableResponse;
-import kr.co.loopz.user.dto.response.NickNameUpdateResponse;
 import kr.co.loopz.user.exception.UserException;
+import kr.co.loopz.user.service.UserDetailInfoService;
 import kr.co.loopz.user.service.UserNickNameService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,32 +16,34 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/user/v1/nickname")
+@RequestMapping("/user/v1")
 @RequiredArgsConstructor
 @Slf4j
-public class UserNickNameController {
+public class UserDetailInfoController {
 
     private final UserNickNameService userNickNameService;
+    private final UserDetailInfoService userDetailInfoService;
 
-    @PatchMapping
-    public ResponseEntity<NickNameUpdateResponse> updateNickName(
+    @PatchMapping("/nickname")
+    public ResponseEntity<DetailInfoUpdateResponse> updateNickName(
             @AuthenticationPrincipal User currentUser,
-            @RequestBody @Valid NickNameUpdateRequest nickNameUpdateRequest) {
+            @RequestBody @Valid NickNameUpdateRequest nickNameUpdateRequest)
+    {
 
         String userId = currentUser.getUsername();
         String nickname = nickNameUpdateRequest.nickname();
         log.debug("Received request to update nickname for userId: {}, with request: {}", userId, nickname);
 
-        NickNameUpdateResponse response = userNickNameService.updateNickName(userId, nickname);
+        DetailInfoUpdateResponse response = userNickNameService.updateNickName(userId, nickname);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 
-    @GetMapping("/validate")
+    @GetMapping("/nickname/validate")
     public ResponseEntity<NickNameAvailableResponse> validateNickName(
-            @RequestParam String nickname) {
-
+            @RequestParam String nickname)
+    {
         try {
             userNickNameService.nickNameValidation(nickname);
         } catch (UserException e) {
@@ -50,5 +53,17 @@ public class UserNickNameController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new NickNameAvailableResponse(true));
     }
+
+//    @PatchMapping("/gender")
+//    public ResponseEntity<DetailInfoUpdateResponse> updateGender(
+//            @AuthenticationPrincipal User currentUser,
+//            @RequestBody @Valid GenderUpdateRequest genderUpdateRequest
+//    ) {
+//
+//        String userId = currentUser.getUsername();
+//
+//
+//
+//    }
 
 }

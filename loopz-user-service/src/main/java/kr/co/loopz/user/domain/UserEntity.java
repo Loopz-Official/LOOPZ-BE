@@ -43,7 +43,7 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
     private String loginName;
 
     // 닉네임
-    @Column(length = 20, nullable = true, unique = true)
+    @Column(length = 20, nullable = true)
     private String nickName;
 
     @Column(length = 1024)
