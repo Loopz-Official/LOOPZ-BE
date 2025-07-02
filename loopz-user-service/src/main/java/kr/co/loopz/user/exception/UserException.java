@@ -1,15 +1,14 @@
 package kr.co.loopz.user.exception;
 
 import kr.co.loopz.common.exception.CustomException;
-import kr.co.loopz.common.exception.ErrorCode;
 
 public class UserException extends CustomException {
 
-  public UserException(ErrorCode errorCode) {
+  public UserException(UserErrorCode errorCode) {
     super(errorCode);
   }
 
-  public UserException(ErrorCode errorCode, String message) {
+  public UserException(UserErrorCode errorCode, String message) {
     super(errorCode, message);
   }
 

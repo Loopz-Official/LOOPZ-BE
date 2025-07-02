@@ -1,13 +1,10 @@
 package kr.co.loopz.user.apiExternal;
 
-import feign.Response;
 import jakarta.validation.Valid;
 import kr.co.loopz.user.dto.request.AddressRegisterRequest;
 import kr.co.loopz.user.dto.request.AddressUpdateRequest;
-import kr.co.loopz.user.dto.request.NickNameUpdateRequest;
 import kr.co.loopz.user.dto.response.AddressListResponse;
 import kr.co.loopz.user.dto.response.AddressResponse;
-import kr.co.loopz.user.dto.response.NickNameUpdateResponse;
 import kr.co.loopz.user.service.UserAddressService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

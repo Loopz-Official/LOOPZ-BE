@@ -1,6 +1,6 @@
 package kr.co.loopz.user.dto.response;
 
-public record NickNameUpdateResponse(
+public record DetailInfoUpdateResponse(
         String userId,
         String email,
         String loginName,

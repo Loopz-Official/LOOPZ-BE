@@ -3,7 +3,7 @@ package kr.co.loopz.user.service;
 import com.vane.badwordfiltering.BadWordFiltering;
 import kr.co.loopz.user.converter.UserConverter;
 import kr.co.loopz.user.domain.UserEntity;
-import kr.co.loopz.user.dto.response.NickNameUpdateResponse;
+import kr.co.loopz.user.dto.response.DetailInfoUpdateResponse;
 import kr.co.loopz.user.exception.UserException;
 import kr.co.loopz.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,14 +27,14 @@ public class UserNickNameService {
 
 
     @Transactional
-    public NickNameUpdateResponse updateNickName(String userId, String nickname) {
+    public DetailInfoUpdateResponse updateNickName(String userId, String nickname) {
 
         UserEntity user = userService.findByUserId(userId);
 
         nickNameValidation(nickname);
         user.updateNickName(nickname);
 
-        return userConverter.toNickNameUpdateResponse(user);
+        return userConverter.toDetailInfoUpdateResponse(user);
     }
 
     /**
