@@ -34,20 +34,10 @@ public class UserAddressService {
         boolean isFirstAddress = addressRepository.countByUserId(userId) == 0;
 
         // 이미 동일한 주소가 존재하면 예외
-        boolean exists = addressRepository.existsByUserIdAndZoneCodeAndAddressAndAddressDetail(
-                userId,
-                request.zoneCode(),
-                request.address(),
-                request.addressDetail()
-        );
-
-        if (exists) {
-            throw new UserException(ADDRESS_EXISTS);
-        }
+        checkDuplicatedAddress(userId, request.zoneCode(), request.address(), request.addressDetail());
 
         //요청에서 기본 배송지로 설정했으면 trueg
         boolean isDefault = request.defaultAddress();
-
         // 기존 기본배송지가 있으면 기본 설정 해제
         if (isDefault) {
             unsetDefaultAddress(userId);
@@ -55,15 +45,14 @@ public class UserAddressService {
 
         // Address 엔티티 생성
         Address address = Address.from(request, userId, isDefault);
+        addressRepository.save(address);
 
-        Address saved = addressRepository.save(address);
-
-        return userConverter.toAddressResponse(saved);
+        return userConverter.toAddressResponse(address);
     }
 
     //배송지 목록 조회
     public AddressListResponse getAddressList(String userId) {
-        List<Address> addresses = addressRepository.findAllByUserId(userId);
+        List<Address> addresses = addressRepository.findAllByUserIdOrderByIdAsc(userId);
         List<AddressResponse> addressResponses = addresses.stream()
                 .map(userConverter::toAddressResponse)
                 .toList();
@@ -74,8 +63,8 @@ public class UserAddressService {
     //배송지 수정
     @Transactional
     public AddressResponse updateAddress(String userId, Long addressId, AddressUpdateRequest request) {
-        Address address = addressRepository.findByIdAndUserId(addressId, userId)
-                .orElseThrow(() -> new UserException(ADDRESS_NOT_FOUND,"Addreess id: "+ addressId));
+        Address address = getAddress(userId, addressId);
+        checkDuplicatedAddress(userId, request.zoneCode(), request.address(), request.addressDetail());
 
         address.update(request);
         address.updateDefaultAddress(request.defaultAddress(), () -> unsetDefaultAddress(userId));
@@ -86,8 +75,7 @@ public class UserAddressService {
     // 배송지 삭제
     @Transactional
     public void deleteAddress(String userId, Long addressId){
-        Address address = addressRepository.findByIdAndUserId(addressId, userId)
-                .orElseThrow(() -> new UserException(ADDRESS_NOT_FOUND,"Addreess id: "+ addressId));
+        Address address = getAddress(userId, addressId);
 
         addressRepository.delete(address);
     }
@@ -101,5 +89,23 @@ public class UserAddressService {
                 });
     }
 
+    private void checkDuplicatedAddress(String userId, String zoneCode, String address, String addressDetail) {
 
+        if (addressRepository.existsByUserIdAndZoneCodeAndAddressAndAddressDetail(
+                userId,
+                zoneCode,
+                address,
+                addressDetail
+        )) {
+            throw new UserException(ADDRESS_EXISTS);
+        }
     }
+
+
+    private Address getAddress(String userId, Long addressId) {
+        return addressRepository.findByIdAndUserId(addressId, userId)
+                .orElseThrow(() -> new UserException(ADDRESS_NOT_FOUND,"Addreess id: "+ addressId));
+    }
+
+
+}
