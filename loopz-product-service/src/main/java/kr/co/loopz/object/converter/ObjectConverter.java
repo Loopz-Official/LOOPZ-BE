@@ -64,7 +64,7 @@ public interface ObjectConverter {
                 entity.getObjectPrice(),
                 entity.isSoldOut(),
                 liked,
-                entity.getDetail().getStock()
+                entity.getStock()
         );
 
         ObjectDetail detail = entity.getDetail();
