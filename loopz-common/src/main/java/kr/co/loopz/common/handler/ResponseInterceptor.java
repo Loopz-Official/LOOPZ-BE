@@ -30,15 +30,14 @@ public class ResponseInterceptor implements ResponseBodyAdvice {
 
         // swagger 제외
         String path = request.getURI().getPath();
-        if (path.contains("swagger") || path.contains("api-docs") || path.contains("webjars")) {
+
+        if (path.startsWith("/actuator") ||
+                path.contains("swagger") ||
+                path.contains("api-docs") ||
+                path.contains("webjars") ||
+                path.startsWith("/internal")) {
             return body;
         }
-
-        // 내부 API 제외 internal
-        if (path.startsWith("/internal")) {
-            return body;
-        }
-
         // 조건부 메시지 처리: 2xx -> "Success", 그 외 -> "Error"
         String message = (status >= 200 && status < 300) ? "OK" : "Error";
 
