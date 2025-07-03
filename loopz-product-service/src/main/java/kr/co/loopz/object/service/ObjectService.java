@@ -225,7 +225,8 @@ public class ObjectService {
                 firstImageUrl,
                 entity.getObjectPrice(),
                 entity.isSoldOut(),
-                false
+                false,
+                entity.getStock()
         );
     }
 

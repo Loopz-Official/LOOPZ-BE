@@ -133,7 +133,7 @@ public class CartService {
 
         for (CartItem item : cartItems) {
             ObjectEntity object = objectMap.get(item.getObjectId());
-            if (item.getQuantity() > object.getDetail().getStock()) {
+            if (item.getQuantity() > object.getStock()) {
                 outOfStock.add(object.getObjectId());
             } else {
                 // 재고 있는 상품은 응답 반환
