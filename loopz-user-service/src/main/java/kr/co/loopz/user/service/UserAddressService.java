@@ -105,7 +105,7 @@ public class UserAddressService {
 
     private Address getAddress(String userId, String addressId) {
         return addressRepository.findByAddressIdAndUserId(addressId, userId)
-                .orElseThrow(() -> new UserException(ADDRESS_NOT_FOUND,"Addreess id: "+ addressId));
+                .orElseThrow(() -> new UserException(ADDRESS_NOT_FOUND,"Address id: "+ addressId));
     }
 
 
