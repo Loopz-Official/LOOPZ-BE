@@ -26,7 +26,8 @@ public class UserAddressController {
     @PostMapping
     public ResponseEntity<AddressResponse> registerAddress(
             @AuthenticationPrincipal User currentUser,
-            @RequestBody @Valid AddressRegisterRequest request){
+            @RequestBody @Valid AddressRegisterRequest request
+    ){
 
         String userId = currentUser.getUsername();
 
@@ -51,7 +52,8 @@ public class UserAddressController {
     public ResponseEntity<AddressResponse> updateAddress(
             @AuthenticationPrincipal User currentUser,
             @PathVariable String addressId,
-            @RequestBody @Valid AddressUpdateRequest request) {
+            @RequestBody @Valid AddressUpdateRequest request
+    ){
         String userId = currentUser.getUsername();
 
         AddressResponse response = userAddressService.updateAddress(userId, addressId, request);
