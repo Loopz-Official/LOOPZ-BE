@@ -11,12 +11,12 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     // userId로 주소 개수 조회
     long countByUserId(String userId);
 
-    boolean existsByUserIdAndZoneCodeAndAddressAndAddressDetail(
-            String userId, String zoneCode, String address, String addressDetail);
+    boolean existsByUserIdAndZoneCodeAndAddressAndAddressDetailAndDefaultAddress(
+            String userId, String zoneCode, String address, String addressDetail, boolean defaultAddress);
 
     Optional<Address> findByUserIdAndDefaultAddressTrue(String userId);
 
-    Optional<Address> findByIdAndUserId(Long id, String userId);
+    Optional<Address> findByAddressIdAndUserId(String addressId, String userId);
 
     List<Address> findAllByUserIdOrderByIdAsc(String userId);
 

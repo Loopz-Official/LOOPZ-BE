@@ -34,7 +34,7 @@ public class UserAddressService {
         boolean isFirstAddress = addressRepository.countByUserId(userId) == 0;
 
         // 이미 동일한 주소가 존재하면 예외
-        checkDuplicatedAddress(userId, request.zoneCode(), request.address(), request.addressDetail());
+        checkDuplicatedAddress(userId, request.zoneCode(), request.address(), request.addressDetail(), request.defaultAddress());
 
         //요청에서 기본 배송지로 설정했으면 trueg
         boolean isDefault = request.defaultAddress();
@@ -62,9 +62,9 @@ public class UserAddressService {
 
     //배송지 수정
     @Transactional
-    public AddressResponse updateAddress(String userId, Long addressId, AddressUpdateRequest request) {
+    public AddressResponse updateAddress(String userId, String addressId, AddressUpdateRequest request) {
         Address address = getAddress(userId, addressId);
-        checkDuplicatedAddress(userId, request.zoneCode(), request.address(), request.addressDetail());
+        checkDuplicatedAddress(userId, request.zoneCode(), request.address(), request.addressDetail(), request.defaultAddress());
 
         address.update(request);
         address.updateDefaultAddress(request.defaultAddress(), () -> unsetDefaultAddress(userId));
@@ -74,7 +74,7 @@ public class UserAddressService {
 
     // 배송지 삭제
     @Transactional
-    public void deleteAddress(String userId, Long addressId){
+    public void deleteAddress(String userId, String addressId){
         Address address = getAddress(userId, addressId);
 
         addressRepository.delete(address);
@@ -89,21 +89,22 @@ public class UserAddressService {
                 });
     }
 
-    private void checkDuplicatedAddress(String userId, String zoneCode, String address, String addressDetail) {
+    private void checkDuplicatedAddress(String userId, String zoneCode, String address, String addressDetail, boolean defaultAddress) {
 
-        if (addressRepository.existsByUserIdAndZoneCodeAndAddressAndAddressDetail(
+        if (addressRepository.existsByUserIdAndZoneCodeAndAddressAndAddressDetailAndDefaultAddress(
                 userId,
                 zoneCode,
                 address,
-                addressDetail
+                addressDetail,
+                defaultAddress
         )) {
             throw new UserException(ADDRESS_EXISTS);
         }
     }
 
 
-    private Address getAddress(String userId, Long addressId) {
-        return addressRepository.findByIdAndUserId(addressId, userId)
+    private Address getAddress(String userId, String addressId) {
+        return addressRepository.findByAddressIdAndUserId(addressId, userId)
                 .orElseThrow(() -> new UserException(ADDRESS_NOT_FOUND,"Addreess id: "+ addressId));
     }
 

@@ -37,7 +37,9 @@ public class UserAddressController {
 
     //배송지 목록 조회
     @GetMapping
-    public ResponseEntity<AddressListResponse> addressList(@AuthenticationPrincipal User currentUser){
+    public ResponseEntity<AddressListResponse> addressList(
+            @AuthenticationPrincipal User currentUser
+    ){
         String userId = currentUser.getUsername();
 
         AddressListResponse response= userAddressService.getAddressList(userId);
@@ -46,9 +48,10 @@ public class UserAddressController {
 
     //배송지 수정
     @PatchMapping("/{addressId}")
-    public ResponseEntity<AddressResponse> updateAddress(@AuthenticationPrincipal User currentUser,
-                                                         @PathVariable Long addressId,
-                                                         @RequestBody @Valid AddressUpdateRequest request) {
+    public ResponseEntity<AddressResponse> updateAddress(
+            @AuthenticationPrincipal User currentUser,
+            @PathVariable String addressId,
+            @RequestBody @Valid AddressUpdateRequest request) {
         String userId = currentUser.getUsername();
 
         AddressResponse response = userAddressService.updateAddress(userId, addressId, request);
@@ -58,7 +61,10 @@ public class UserAddressController {
 
     // 배송지 삭제
     @DeleteMapping("/{addressId}")
-    public ResponseEntity<Void> deleteAddress(@AuthenticationPrincipal User currentUser, @PathVariable Long addressId){
+    public ResponseEntity<Void> deleteAddress(
+            @AuthenticationPrincipal User currentUser,
+            @PathVariable String addressId
+    ){
         String userId = currentUser.getUsername();
 
         userAddressService.deleteAddress(userId, addressId);
