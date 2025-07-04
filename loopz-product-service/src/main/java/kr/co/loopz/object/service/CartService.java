@@ -51,20 +51,19 @@ public class CartService {
                 .orElse(null);
 
         // 요청 수량 반영
-//        int current = cartItem != null ? cartItem.getQuantity() : 0;
-        int update = request.quantity();
+        int updateQuantity = request.quantity();
 
         // 요청 수량 > 입고 수량
-        if (update > object.getDetail().getStock()) {
-            throw new ObjectException(QUANTITY_EXCEEDS_STOCK, "입고 수량:" + object.getDetail().getStock() + "  요청 수량:" + update);
+        if (updateQuantity > object.getDetail().getStock()) {
+            throw new ObjectException(QUANTITY_EXCEEDS_STOCK, "입고 수량:" + object.getDetail().getStock() + "  요청 수량:" + updateQuantity);
         }
 
         // 요청 수량 < 0
-        if (update < 0) {
-            throw new ObjectException(INVALID_QUANTITY, "입력 수량:" + update);
+        if (updateQuantity < 0) {
+            throw new ObjectException(INVALID_QUANTITY, "입력 수량:" + updateQuantity);
         }
 
-        if (update == 0) {
+        if (updateQuantity == 0) {
             // 요청 수량 = 0 불가 (장바구니에는 최소 1개)
             throw new ObjectException(CART_LEAST_ONE);
         } else {
@@ -73,10 +72,10 @@ public class CartService {
                 cartItem = CartItem.builder()
                         .cartId(cart.getCartId())
                         .objectId(request.objectId())
-                        .quantity(update)
+                        .quantity(updateQuantity)
                         .build();
             } else {
-                cartItem.updateQuantity(update);
+                cartItem.updateQuantity(updateQuantity);
             }
             cartItemRepository.save(cartItem);
         }
