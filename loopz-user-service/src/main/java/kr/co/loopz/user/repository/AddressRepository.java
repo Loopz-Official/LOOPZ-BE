@@ -11,8 +11,8 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     // userId로 주소 개수 조회
     long countByUserId(String userId);
 
-    boolean existsByUserIdAndZoneCodeAndAddressAndAddressDetailAndDefaultAddress(
-            String userId, String zoneCode, String address, String addressDetail, boolean defaultAddress);
+    boolean existsByUserIdAndZoneCodeAndAddressAndAddressDetail(
+            String userId, String zoneCode, String address, String addressDetail);
 
     Optional<Address> findByUserIdAndDefaultAddressTrue(String userId);
 

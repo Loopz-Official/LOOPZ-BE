@@ -34,7 +34,7 @@ public class UserAddressService {
         boolean isFirstAddress = addressRepository.countByUserId(userId) == 0;
 
         // 이미 동일한 주소가 존재하면 예외
-        checkDuplicatedAddress(userId, request.zoneCode(), request.address(), request.addressDetail(), request.defaultAddress());
+        checkDuplicatedAddress(userId, request.zoneCode(), request.address(), request.addressDetail());
 
         //요청에서 기본 배송지로 설정했으면 trueg
         boolean isDefault = request.defaultAddress();
@@ -64,12 +64,33 @@ public class UserAddressService {
     @Transactional
     public AddressResponse updateAddress(String userId, String addressId, AddressUpdateRequest request) {
         Address address = getAddress(userId, addressId);
-        checkDuplicatedAddress(userId, request.zoneCode(), request.address(), request.addressDetail(), request.defaultAddress());
-
+        boolean patchOnlyDefault = isOnlyDefaultChanged(address, request);
+        if (!patchOnlyDefault) {
+            checkDuplicatedAddress(userId, request.zoneCode(), request.address(), request.addressDetail());
+        }
         address.update(request);
         address.updateDefaultAddress(request.defaultAddress(), () -> unsetDefaultAddress(userId));
 
         return userConverter.toAddressResponse(address);
+    }
+
+    private boolean isOnlyDefaultChanged(Address address, AddressUpdateRequest req) {
+        if (req.address() != null && !req.address().equals(address.getAddress())) {
+            return false;
+        }
+        if (req.addressDetail() != null && !req.addressDetail().equals(address.getAddressDetail())) {
+            return false;
+        }
+        if (req.zoneCode() != null && !req.zoneCode().equals(address.getZoneCode())) {
+            return false;
+        }
+        if (req.recipientName() != null && !req.recipientName().equals(address.getRecipientName())) {
+            return false;
+        }
+        if (req.phoneNumber() != null && !req.phoneNumber().equals(address.getPhoneNumber())) {
+            return false;
+        }
+        return true;
     }
 
     // 배송지 삭제
@@ -89,14 +110,13 @@ public class UserAddressService {
                 });
     }
 
-    private void checkDuplicatedAddress(String userId, String zoneCode, String address, String addressDetail, boolean defaultAddress) {
+    private void checkDuplicatedAddress(String userId, String zoneCode, String address, String addressDetail) {
 
-        if (addressRepository.existsByUserIdAndZoneCodeAndAddressAndAddressDetailAndDefaultAddress(
+        if (addressRepository.existsByUserIdAndZoneCodeAndAddressAndAddressDetail(
                 userId,
                 zoneCode,
                 address,
-                addressDetail,
-                defaultAddress
+                addressDetail
         )) {
             throw new UserException(ADDRESS_EXISTS);
         }
