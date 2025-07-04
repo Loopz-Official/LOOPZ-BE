@@ -6,17 +6,15 @@ import kr.co.loopz.object.domain.Cart;
 import kr.co.loopz.object.domain.CartItem;
 import kr.co.loopz.object.domain.ObjectEntity;
 import kr.co.loopz.object.domain.ObjectImage;
-import kr.co.loopz.object.dto.request.CartSelectRequest;
+import kr.co.loopz.object.dto.request.CartUpdateRequest;
 import kr.co.loopz.object.dto.response.*;
 import kr.co.loopz.object.repository.CartItemRepository;
 import kr.co.loopz.object.repository.CartRepository;
 import kr.co.loopz.object.repository.ObjectImageRepository;
 import kr.co.loopz.object.repository.ObjectRepository;
-import kr.co.loopz.object.dto.request.CartUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,8 +51,8 @@ public class CartService {
                 .orElse(null);
 
         // 요청 수량 반영
-        int current = cartItem != null ? cartItem.getQuantity() : 0;
-        int update = current + request.quantity();
+//        int current = cartItem != null ? cartItem.getQuantity() : 0;
+        int update = request.quantity();
 
         // 요청 수량 > 입고 수량
         if (update > object.getDetail().getStock()) {
