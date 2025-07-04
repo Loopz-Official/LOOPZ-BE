@@ -1,7 +1,7 @@
 package kr.co.loopz.user.dto.response;
 
 public record AddressResponse (
-        Long addressId,
+        String addressId,
         String userId,
         String recipientName,
         String phoneNumber,

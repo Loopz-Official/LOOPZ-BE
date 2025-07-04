@@ -29,7 +29,6 @@ public interface UserConverter {
     @Mapping(source = "userTerms.agreedEventSMS", target = "agreedEventSMS")
     AgreeTermsResponse toAgreeTermsResponse(UserEntity user);
 
-    @Mapping(source = "id", target = "addressId")
     AddressResponse toAddressResponse(Address address);
 
 }
