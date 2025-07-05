@@ -35,7 +35,8 @@ public class SearchService {
     }
 
     public List<SearchHistoryResponse> getRecentSearchKeywords(String userId) {
-        List<Search> searches = searchRepository.findTop5ByUserIdOrderByCreatedAtDesc(userId);
+        List<Search> searches = searchRepository.findTop20ByUserIdOrderByCreatedAtDesc(userId);
+        log.info("Searches fetched from DB (size={}): {}", searches.size(), searches.stream().map(Search::getContent).toList());
 
         // 중복 제거하면서 최대 5개만 리턴
         LinkedHashSet<String> uniqueKeywords = new LinkedHashSet<>();
@@ -43,6 +44,7 @@ public class SearchService {
             uniqueKeywords.add(s.getContent());
             if (uniqueKeywords.size() >= 5) break;
         }
+        log.info("Unique keywords to return: {}", uniqueKeywords);
 
         return uniqueKeywords.stream()
                 .map(SearchHistoryResponse::new)

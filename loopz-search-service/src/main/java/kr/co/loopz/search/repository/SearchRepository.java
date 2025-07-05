@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface SearchRepository extends JpaRepository<Search, Long> {
 
-    List<Search> findTop5ByUserIdOrderByCreatedAtDesc(String userId);
+    List<Search> findTop20ByUserIdOrderByCreatedAtDesc(String userId);
 
 }
