@@ -4,6 +4,7 @@ import kr.co.loopz.object.domain.ObjectDetail;
 import kr.co.loopz.object.domain.ObjectEntity;
 import kr.co.loopz.object.dto.response.BoardResponse;
 import kr.co.loopz.object.dto.response.DetailResponse;
+import kr.co.loopz.object.dto.response.ObjectNameResponse;
 import kr.co.loopz.object.dto.response.ObjectResponse;
 import org.mapstruct.Mapper;
 
@@ -74,6 +75,12 @@ public interface ObjectConverter {
                 detail.getDescriptionUrl(),
                 detail.getStock()
         );
+    }
+
+    default List<ObjectNameResponse> toObjectNameResponseList(List<ObjectEntity> entities) {
+        return entities.stream()
+                .map(entity -> new ObjectNameResponse(entity.getObjectId(), entity.getObjectName()))
+                .collect(Collectors.toList());
     }
 
 }

@@ -3,10 +3,7 @@ package kr.co.loopz.object.apiInternal;
 import kr.co.loopz.object.Exception.ObjectException;
 import kr.co.loopz.object.domain.Cart;
 import kr.co.loopz.object.dto.request.DeleteCartItemRequest;
-import kr.co.loopz.object.dto.response.CartItemResponse;
-import kr.co.loopz.object.dto.response.CartResponse;
-import kr.co.loopz.object.dto.response.CartWithQuantityResponse;
-import kr.co.loopz.object.dto.response.ObjectResponse;
+import kr.co.loopz.object.dto.response.*;
 import kr.co.loopz.object.repository.CartItemRepository;
 import kr.co.loopz.object.repository.CartRepository;
 import kr.co.loopz.object.repository.ObjectRepository;
@@ -85,5 +82,10 @@ public class InternalObjectController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/object/search")
+    public ResponseEntity<List<ObjectNameResponse>> searchObjectsByKeyword(@RequestParam String keyword) {
+        List<ObjectNameResponse> nameResponse = objectService.searchObjectsByKeyword(keyword);
+        return ResponseEntity.ok(nameResponse);
+    }
 
 }

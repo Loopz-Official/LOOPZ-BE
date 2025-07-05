@@ -36,6 +36,7 @@ public class AuthorizationSecurityConfig {
             "/internal/**",
             "/object/v1",
             "/object/v1/*",
+            "/search/v1"
     };
 
     @Bean

@@ -9,6 +9,7 @@ import kr.co.loopz.object.domain.*;
 import kr.co.loopz.object.dto.request.FilterRequest;
 import kr.co.loopz.object.dto.response.BoardResponse;
 import kr.co.loopz.object.dto.response.DetailResponse;
+import kr.co.loopz.object.dto.response.ObjectNameResponse;
 import kr.co.loopz.object.dto.response.ObjectResponse;
 import kr.co.loopz.object.repository.LikeRepository;
 import kr.co.loopz.object.repository.ObjectImageRepository;
@@ -246,6 +247,13 @@ public class ObjectService {
         object.getDetail().decreaseStock(quantity);
     }
 
+    // 검색 시 키워드 포함 상품 제목 반환
+    public List<ObjectNameResponse> searchObjectsByKeyword(String keyword) {
+
+        List<ObjectEntity> response = objectRepository.findTop10ByObjectNameContainingIgnoreCase(keyword);
+
+        return objectConverter.toObjectNameResponseList(response);
+    }
 
 }
 
