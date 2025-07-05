@@ -63,7 +63,7 @@ public class UserNickNameService {
     }
 
     private void checkFormat(String nickname) {
-        if (!nickname.matches("^[가-힣a-zA-Z]+$")) {
+        if (nickname==null || !nickname.matches("^[가-힣a-zA-Z]+$")) {
             throw new UserException(NICKNAME_INVALID, "닉네임은 한글과 영문만 사용할 수 있습니다.");
         }
     }
@@ -76,10 +76,7 @@ public class UserNickNameService {
 
 
     private void checkAllowed(String nickname) {
-        if (badWordFiltering.check(nickname)) {
-            throw new UserException(NICKNAME_INVALID, "닉네임에 부적절한 단어가 포함되어 있습니다.");
-        }
-        if (badWordFiltering.blankCheck(nickname)) {
+        if (badWordFiltering.check(nickname) || badWordFiltering.blankCheck(nickname)) {
             throw new UserException(NICKNAME_INVALID, "닉네임에 부적절한 단어가 포함되어 있습니다.");
         }
         if (RESERVED_NICKNAMES.contains(nickname.toLowerCase())) {
