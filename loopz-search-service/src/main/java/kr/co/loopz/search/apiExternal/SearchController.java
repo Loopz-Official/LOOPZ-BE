@@ -1,5 +1,7 @@
 package kr.co.loopz.search.apiExternal;
 
+import kr.co.loopz.search.dto.request.SearchFilterRequest;
+import kr.co.loopz.search.dto.response.BoardResponse;
 import kr.co.loopz.search.dto.response.SearchHistoryResponse;
 import kr.co.loopz.search.dto.response.ObjectNameResponse;
 import kr.co.loopz.search.service.SearchService;
@@ -32,6 +34,27 @@ public class SearchController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    //최근 검색어 목록 조회
+    @GetMapping("/history")
+    public ResponseEntity<List<SearchHistoryResponse>> getRecentKeywords(@AuthenticationPrincipal User currentUser) {
 
+        String userId = currentUser.getUsername();
 
+        List<SearchHistoryResponse> recentKeywords = searchService.getRecentSearchKeywords(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(recentKeywords);
+    }
+
+    // 검색 후 상품 목록 반환
+    @PostMapping("/objects")
+    public ResponseEntity<BoardResponse> search(
+            @AuthenticationPrincipal User currentUser,
+            SearchFilterRequest filter
+    ) {
+
+        String userId = currentUser != null ? currentUser.getUsername() : null;
+
+        BoardResponse response = searchService.searchAndSaveKeyword(userId, filter);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }

@@ -1,10 +1,10 @@
 package kr.co.loopz.search.client;
 
+import kr.co.loopz.search.dto.request.SearchFilterRequest;
+import kr.co.loopz.search.dto.response.BoardResponse;
 import kr.co.loopz.search.dto.response.ObjectNameResponse;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -17,5 +17,7 @@ public interface ProductClient {
     @GetMapping("/internal/object/search")
     List<ObjectNameResponse> findProductNamesByKeyword(@RequestParam("keyword") String keyword);
 
+    @PostMapping("/internal/object/search")
+    BoardResponse searchObjects(@RequestBody SearchFilterRequest filter);
 
 }

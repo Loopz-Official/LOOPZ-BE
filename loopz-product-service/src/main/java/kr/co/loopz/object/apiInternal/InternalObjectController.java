@@ -3,6 +3,7 @@ package kr.co.loopz.object.apiInternal;
 import kr.co.loopz.object.Exception.ObjectException;
 import kr.co.loopz.object.domain.Cart;
 import kr.co.loopz.object.dto.request.DeleteCartItemRequest;
+import kr.co.loopz.object.dto.request.SearchFilterRequest;
 import kr.co.loopz.object.dto.response.*;
 import kr.co.loopz.object.repository.CartItemRepository;
 import kr.co.loopz.object.repository.CartRepository;
@@ -88,4 +89,17 @@ public class InternalObjectController {
         return ResponseEntity.ok(nameResponse);
     }
 
+    @PostMapping("/object/search")
+    public ResponseEntity<BoardResponse> searchObjects(
+            @AuthenticationPrincipal User currentUser,
+            @RequestBody SearchFilterRequest filter) {
+
+        String userId = null;
+        if (currentUser != null) {
+            userId = currentUser.getUsername();
+        }
+
+        BoardResponse result = objectService.searchObjectsByKeyword(userId, filter);
+        return ResponseEntity.ok(result);
+    }
 }

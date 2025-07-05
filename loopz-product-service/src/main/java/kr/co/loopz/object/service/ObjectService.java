@@ -3,10 +3,12 @@ package kr.co.loopz.object.service;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import io.micrometer.core.instrument.search.Search;
 import kr.co.loopz.object.Exception.ObjectException;
 import kr.co.loopz.object.converter.ObjectConverter;
 import kr.co.loopz.object.domain.*;
 import kr.co.loopz.object.dto.request.FilterRequest;
+import kr.co.loopz.object.dto.request.SearchFilterRequest;
 import kr.co.loopz.object.dto.response.BoardResponse;
 import kr.co.loopz.object.dto.response.DetailResponse;
 import kr.co.loopz.object.dto.response.ObjectNameResponse;
@@ -159,8 +161,7 @@ public class ObjectService {
             boolean next = hasNext(content, filter.getSize());
 
             return new SliceImpl<>(content, pageable, next);
-        }
-        else throw new ObjectException(INVALID_SORT_TYPE,"popular 또는 latest를 입력해주세요.");
+        } else throw new ObjectException(INVALID_SORT_TYPE, "popular 또는 latest를 입력해주세요.");
 
     }
 
@@ -196,8 +197,8 @@ public class ObjectService {
 
     // 제품 상세보기
     public DetailResponse getObjectDetails(String userId, String objectId) {
-        ObjectEntity entity =objectRepository.findByObjectId(objectId)
-                .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND,"Object not found: " + objectId));
+        ObjectEntity entity = objectRepository.findByObjectId(objectId)
+                .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND, "Object not found: " + objectId));
 
         Boolean liked = false;
         if (userId != null) {
@@ -255,13 +256,97 @@ public class ObjectService {
         return objectConverter.toObjectNameResponseList(response);
     }
 
+    @Transactional
+    public BoardResponse searchObjectsByKeyword(String userId, SearchFilterRequest filter) {
+
+        Pageable pageable = PageRequest.of(filter.page(), filter.size());
+
+        QObjectEntity object = QObjectEntity.objectEntity;
+        BooleanBuilder builder = new BooleanBuilder();
+
+        // 상품 이름과 인트로에서 검색
+        if (filter.keyword() != null && !filter.keyword().isEmpty()) {
+            String keywordPattern = "%" + filter.keyword() + "%";
+            builder.and(object.objectName.likeIgnoreCase(keywordPattern)
+                    .or(object.intro.likeIgnoreCase(keywordPattern)));
+        }
+
+        // 품절 제외 여부 필터
+        if (Boolean.TRUE.equals(filter.excludeSoldOut())) {
+            builder.and(object.soldOut.eq(false));
+        }
+
+        // 정렬 조건
+        if ("popular".equals(filter.sort())) {
+            QLikes like = QLikes.likes;
+
+            List<Tuple> likeCountTuples = queryFactory
+                    .select(object, like.count())
+                    .from(object)
+                    .leftJoin(like).on(like.objectId.eq(object.objectId))
+                    .where(builder)
+                    .groupBy(object.id, object.createdAt, object.intro, object.objectId, object.objectName,
+                            object.objectPrice, object.objectSize, object.objectType, object.soldOut, object.updatedAt)
+                    .orderBy(like.count().desc(), object.createdAt.desc())
+                    .offset((long) filter.page() * filter.size())
+                    .limit(filter.size() + 1)
+                    .fetch();
+
+            boolean hasNext = hasNext(likeCountTuples, filter.size());
+
+            List<ObjectEntity> orderedObjects = likeCountTuples.stream()
+                    .map(tuple -> tuple.get(object))
+                    .collect(Collectors.toList());
+
+            return buildBoardResponse(userId, orderedObjects, hasNext, pageable);
+        } else if ("latest".equals(filter.sort())) {
+            List<ObjectEntity> content = queryFactory
+                    .selectFrom(object)
+                    .where(builder)
+                    .orderBy(object.createdAt.desc())
+                    .offset((long) filter.page() * filter.size())
+                    .limit(filter.size() + 1)
+                    .fetch();
+
+            boolean hasNext = hasNext(content, filter.size());
+
+            return buildBoardResponse(userId, content, hasNext, pageable);
+        } else {
+            throw new ObjectException(INVALID_SORT_TYPE, "popular 또는 latest를 입력해주세요.");
+        }
+    }
+
+    private BoardResponse buildBoardResponse(String userId, List<ObjectEntity> entities, boolean hasNext, Pageable pageable) {
+        List<String> objectIds = entities.stream()
+                .map(ObjectEntity::getObjectId)
+                .collect(Collectors.toList());
+
+        List<ObjectResponse> objects = objectConverter.toObjectResponseList(entities);
+
+        List<ObjectImage> objectImages = objectImageRepository.findByObjectIdIn(objectIds);
+        Map<String, String> imageMap = objectImages.stream()
+                .collect(Collectors.groupingBy(
+                        ObjectImage::getObjectId,
+                        LinkedHashMap::new,
+                        Collectors.mapping(
+                                ObjectImage::getImageUrl,
+                                Collectors.collectingAndThen(
+                                        Collectors.toList(),
+                                        list -> list.get(0)
+                                )
+                        )
+                ));
+
+        Map<String, Boolean> likeMap = checkLikedObject(userId, objectIds);
+
+        long totalCount = objectRepository.count();
+
+        return objectConverter.toBoardResponse(
+                Math.toIntExact(totalCount),
+                objects,
+                imageMap,
+                likeMap,
+                hasNext
+        );
+    }
 }
-
-
-
-
-
-
-
-
-
