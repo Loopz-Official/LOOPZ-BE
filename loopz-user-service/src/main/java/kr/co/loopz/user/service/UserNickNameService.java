@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
+
 import static kr.co.loopz.user.exception.UserErrorCode.NICKNAME_DUPLICATED;
 import static kr.co.loopz.user.exception.UserErrorCode.NICKNAME_INVALID;
 
@@ -48,7 +50,7 @@ public class UserNickNameService {
 
         checkDuplicate(nickname);
         checkLength(nickname);
-//        checkFormat(nickname);
+        checkFormat(nickname);
         checkAllowed(nickname);
 
     }
@@ -60,6 +62,11 @@ public class UserNickNameService {
         }
     }
 
+    private void checkFormat(String nickname) {
+        if (!nickname.matches("^[가-힣a-zA-Z]+$")) {
+            throw new UserException(NICKNAME_INVALID, "닉네임은 한글과 영문만 사용할 수 있습니다.");
+        }
+    }
 
     private void checkDuplicate(String nickname) {
         if (userRepository.existsByNickName(nickname)) {
@@ -75,6 +82,15 @@ public class UserNickNameService {
         if (badWordFiltering.blankCheck(nickname)) {
             throw new UserException(NICKNAME_INVALID, "닉네임에 부적절한 단어가 포함되어 있습니다.");
         }
+        if (RESERVED_NICKNAMES.contains(nickname.toLowerCase())) {
+            throw new UserException(NICKNAME_INVALID, "사용할 수 없는 닉네임입니다.");
+        }
     }
+
+    // 예약어 추가
+    private static final Set<String> RESERVED_NICKNAMES = Set.of(
+            "admin", "manager", "system", "root", "운영자", "관리자", "null"
+    );
+
 
 }
