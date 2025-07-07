@@ -28,7 +28,6 @@ public interface ObjectConverter {
                 baseDto.intro(),
                 imageUrl,
                 baseDto.objectPrice(),
-                baseDto.soldOut(),
                 baseDto.liked(),
                 baseDto.stock()
         );
@@ -44,7 +43,6 @@ public interface ObjectConverter {
                         dto.intro(),
                         imageUrlMap.get(dto.objectId()),
                         dto.objectPrice(),
-                        dto.soldOut(),
                         likeMap.getOrDefault(dto.objectId(), false),
                         dto.stock()
                 )).collect(Collectors.toList());
@@ -56,24 +54,20 @@ public interface ObjectConverter {
     }
 
     default DetailResponse toDetailResponse(ObjectEntity entity, List<String> imageUrls, Boolean liked) {
-        ObjectResponse objectResponse = new ObjectResponse(
+
+        ObjectDetail detail = entity.getDetail();
+        return new DetailResponse(
                 entity.getObjectId(),
                 entity.getObjectName(),
                 entity.getIntro(),
                 imageUrls.isEmpty() ? null : imageUrls.get(0),
                 entity.getObjectPrice(),
-                entity.isSoldOut(),
                 liked,
-                entity.getStock()
+                detail.getStock(),
+                detail.getSize(),
+                detail.getDescriptionUrl()
         );
 
-        ObjectDetail detail = entity.getDetail();
-        return new DetailResponse(
-                objectResponse,
-                detail.getSize(),
-                detail.getDescriptionUrl(),
-                detail.getStock()
-        );
     }
 
 }
