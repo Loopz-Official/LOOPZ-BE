@@ -1,5 +1,6 @@
 package kr.co.loopz.object.service;
 
+import kr.co.loopz.common.domain.Image;
 import kr.co.loopz.object.Exception.ObjectException;
 import kr.co.loopz.object.converter.ObjectConverter;
 import kr.co.loopz.object.domain.ObjectEntity;
@@ -39,7 +40,7 @@ public class ObjectDetailService {
         }
 
         List<String> imageUrls = objectImageRepository.findByObjectId(objectId).stream()
-                .map(img -> img.getImageUrl())
+                .map(Image::getImageUrl)
                 .collect(Collectors.toList());
 
         return objectConverter.toDetailResponse(entity, imageUrls, liked);
@@ -58,21 +59,18 @@ public class ObjectDetailService {
 
     @Transactional
     public void decreaseStock(String objectId, int quantity) {
-        ObjectEntity object = objectRepository.findByObjectId(objectId)
-                .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND));
+        ObjectEntity object = findObjectEntity(objectId);
         object.getDetail().decreaseStock(quantity);
     }
 
     public int getStock(String objectId) {
-        ObjectEntity object = objectRepository.findByObjectId(objectId)
-                .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND));
+        ObjectEntity object = findObjectEntity(objectId);
         return object.getDetail().getStock();
     }
 
     private ObjectEntity findObjectEntity(String objectId) {
-        ObjectEntity entity = objectRepository.findByObjectId(objectId)
+        return objectRepository.findByObjectId(objectId)
                 .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND, "Object not found: " + objectId));
-        return entity;
     }
 
 }
