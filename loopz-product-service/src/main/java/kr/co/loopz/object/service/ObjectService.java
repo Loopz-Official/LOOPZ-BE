@@ -224,25 +224,27 @@ public class ObjectService {
                 entity.getIntro(),
                 firstImageUrl,
                 entity.getObjectPrice(),
-                entity.isSoldOut(),
+                false,
                 entity.getStock()
         );
     }
 
     public int getStock(String objectId) {
-        ObjectEntity object = objectRepository.findByObjectId(objectId)
-                .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND));
+        ObjectEntity object = findObject(objectId);
         return object.getDetail().getStock();
-
     }
 
     // 주문 후 재고 감소
     @Transactional
     public void decreaseStock(String objectId, int quantity) {
-        ObjectEntity object = objectRepository.findByObjectId(objectId)
-                .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND));
+        ObjectEntity object = findObject(objectId);
 
         object.getDetail().decreaseStock(quantity);
+    }
+
+    private ObjectEntity findObject(String objectId) {
+        return objectRepository.findByObjectId(objectId)
+                .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND));
     }
 
 
