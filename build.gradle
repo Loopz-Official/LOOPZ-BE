@@ -65,6 +65,7 @@ subprojects {
 
         // monitoring
         implementation 'io.micrometer:micrometer-registry-prometheus'
+
     }
 
     dependencyManagement {
