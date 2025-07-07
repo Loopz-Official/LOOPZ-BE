@@ -35,7 +35,7 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
     private final ObjectImageRepository objectImageRepository;
     private final ObjectConverter objectConverter;
-    private final ObjectService objectService;
+    private final ObjectDetailService objectDetailService;
 
     @Transactional
     public CartResponse updateCart(String userId, CartUpdateRequest request) {
@@ -178,7 +178,7 @@ public class CartService {
         List<CartItemResponse> items = cartItemRepository.findByCartId(cart.getCartId())
                 .stream()
                 .map(item -> {
-                    ObjectResponse object = objectService.getObjectById(item.getObjectId());
+                    ObjectResponse object = objectDetailService.getObjectById(item.getObjectId());
                     return new CartItemResponse(object, item.getQuantity());
                 })
                 .collect(Collectors.toList());

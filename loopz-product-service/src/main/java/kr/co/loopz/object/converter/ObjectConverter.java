@@ -16,25 +16,9 @@ public interface ObjectConverter {
 
     //Product 엔티티를 ObjectResponseDTO로
     ObjectResponse toObjectResponse(ObjectEntity entity);
+    ObjectResponse toObjectResponse(ObjectEntity entity, String imageUrl);
 
-    // List<Product> -> List<ObjectResponse>
     List<ObjectResponse> toObjectResponseList(List<ObjectEntity> objectEntities);
-
-    default ObjectResponse toObjectResponse(ObjectEntity entity, String imageUrl) {
-        ObjectResponse baseDto = toObjectResponse(entity);
-        return new ObjectResponse(
-                baseDto.objectId(),
-                baseDto.objectName(),
-                baseDto.intro(),
-                imageUrl,
-                baseDto.objectPrice(),
-                baseDto.soldOut(),
-                baseDto.liked(),
-                baseDto.stock()
-        );
-    }
-
-
     // 찜 여부와 image url 반영해 새로운 DTO 리스트 반환
     default List<ObjectResponse> toObjectResponseList(List<ObjectResponse> dtos, Map<String, String> imageUrlMap,Map<String, Boolean> likeMap) {
         return dtos.stream()
@@ -44,7 +28,6 @@ public interface ObjectConverter {
                         dto.intro(),
                         imageUrlMap.get(dto.objectId()),
                         dto.objectPrice(),
-                        dto.soldOut(),
                         likeMap.getOrDefault(dto.objectId(), false),
                         dto.stock()
                 )).collect(Collectors.toList());
@@ -56,24 +39,20 @@ public interface ObjectConverter {
     }
 
     default DetailResponse toDetailResponse(ObjectEntity entity, List<String> imageUrls, Boolean liked) {
-        ObjectResponse objectResponse = new ObjectResponse(
+
+        ObjectDetail detail = entity.getDetail();
+        return new DetailResponse(
                 entity.getObjectId(),
                 entity.getObjectName(),
                 entity.getIntro(),
                 imageUrls.isEmpty() ? null : imageUrls.get(0),
                 entity.getObjectPrice(),
-                entity.isSoldOut(),
                 liked,
-                entity.getStock()
+                detail.getStock(),
+                detail.getSize(),
+                detail.getDescriptionUrl()
         );
 
-        ObjectDetail detail = entity.getDetail();
-        return new DetailResponse(
-                objectResponse,
-                detail.getSize(),
-                detail.getDescriptionUrl(),
-                detail.getStock()
-        );
     }
 
 }

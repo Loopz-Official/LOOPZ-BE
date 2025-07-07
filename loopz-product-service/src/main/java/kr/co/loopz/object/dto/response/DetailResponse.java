@@ -1,9 +1,14 @@
 package kr.co.loopz.object.dto.response;
 
-import java.util.List;
-
 public record DetailResponse(
-        ObjectResponse objectResponse,
+        String objectId,
+        String objectName,
+        String intro,
+        String imageUrl,
+        Long objectPrice,
+        Boolean liked,
+        int stock,
         String size,
-        String descriptionUrl,
-        int stock) {}
+        String descriptionUrl
+) {
+}
