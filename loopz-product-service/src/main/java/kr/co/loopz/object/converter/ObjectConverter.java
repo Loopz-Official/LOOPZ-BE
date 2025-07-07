@@ -17,22 +17,12 @@ public interface ObjectConverter {
     //Product 엔티티를 ObjectResponseDTO로
     ObjectResponse toObjectResponse(ObjectEntity entity);
 
+
+    ObjectResponse toObjectResponse(ObjectEntity entity, String imageUrl);
+
+
     // List<Product> -> List<ObjectResponse>
     List<ObjectResponse> toObjectResponseList(List<ObjectEntity> objectEntities);
-
-    default ObjectResponse toObjectResponse(ObjectEntity entity, String imageUrl) {
-        ObjectResponse baseDto = toObjectResponse(entity);
-        return new ObjectResponse(
-                baseDto.objectId(),
-                baseDto.objectName(),
-                baseDto.intro(),
-                imageUrl,
-                baseDto.objectPrice(),
-                baseDto.liked(),
-                baseDto.stock()
-        );
-    }
-
 
     // 찜 여부와 image url 반영해 새로운 DTO 리스트 반환
     default List<ObjectResponse> toObjectResponseList(List<ObjectResponse> dtos, Map<String, String> imageUrlMap,Map<String, Boolean> likeMap) {
