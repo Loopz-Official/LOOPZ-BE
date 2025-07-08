@@ -48,7 +48,7 @@ public class SearchController {
     @PostMapping("/objects")
     public ResponseEntity<BoardResponse> search(
             @AuthenticationPrincipal User currentUser,
-            SearchFilterRequest filter
+            @RequestBody SearchFilterRequest filter
     ) {
 
         String userId = currentUser != null ? currentUser.getUsername() : null;

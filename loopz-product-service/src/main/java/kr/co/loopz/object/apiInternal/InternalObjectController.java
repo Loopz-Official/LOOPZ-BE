@@ -93,13 +93,14 @@ public class InternalObjectController {
 
     @PostMapping("/object/search")
     public ResponseEntity<BoardResponse> searchObjects(
+            @RequestParam(name = "userId", required = false) String userId,
             @AuthenticationPrincipal User currentUser,
             @RequestBody SearchFilterRequest filter) {
 
-        String userId = null;
-        if (currentUser != null) {
+        if (currentUser != null && userId == null) {
             userId = currentUser.getUsername();
         }
+
 
         BoardResponse result = objectListService.searchObjectsByKeyword(userId, filter);
         return ResponseEntity.ok(result);
