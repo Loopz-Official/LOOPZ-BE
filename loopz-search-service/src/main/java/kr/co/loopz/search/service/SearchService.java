@@ -1,17 +1,20 @@
 package kr.co.loopz.search.service;
 
 import com.querydsl.core.BooleanBuilder;
+import jdk.jshell.spi.ExecutionControl;
+import kr.co.loopz.common.exception.CustomException;
 import kr.co.loopz.search.client.ProductClient;
 import kr.co.loopz.search.domain.Search;
 import kr.co.loopz.search.dto.request.SearchFilterRequest;
 import kr.co.loopz.search.dto.response.BoardResponse;
 import kr.co.loopz.search.dto.response.ObjectNameResponse;
 import kr.co.loopz.search.dto.response.SearchHistoryResponse;
+import kr.co.loopz.search.exception.SearchErrorCode;
+import kr.co.loopz.search.exception.SearchException;
 import kr.co.loopz.search.repository.SearchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +23,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+
+import static kr.co.loopz.search.exception.SearchErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -73,5 +78,21 @@ public class SearchService {
 
         // object 서비스 호출
         return productClient.searchObjects(filter);
+    }
+
+    @Transactional
+    public ResponseEntity<Void> deleteHistory(String userId, String searchId) {
+
+        Search search = searchRepository.findBySearchIdAndDeletedAtIsNull(searchId)
+                .orElseThrow(() -> new SearchException(SEARCH_ID_NOT_FOUND, "SearchId:"+searchId));
+
+        if (!search.getUserId().equals(userId)) {
+            throw new SearchException(USER_ID_NOT_MATCH);
+        }
+
+        searchRepository.delete(search); // soft delete 자동 실행
+
+        return ResponseEntity.noContent().build();
+
     }
 }

@@ -57,4 +57,16 @@ public class SearchController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    // 최근 검색어 삭제
+    @DeleteMapping("/{searchId}")
+    public ResponseEntity<Void> deleteHistory(@AuthenticationPrincipal User currentUser,
+                                             @PathVariable String searchId) {
+
+        String userId = currentUser.getUsername();
+
+        searchService.deleteHistory(userId, searchId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }

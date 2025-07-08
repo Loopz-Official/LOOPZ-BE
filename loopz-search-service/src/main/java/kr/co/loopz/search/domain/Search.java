@@ -5,10 +5,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import kr.co.loopz.common.domain.BaseTimeEntity;
+import kr.co.loopz.common.domain.BaseTimeEntityWithDeletion;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.UUID;
 
@@ -19,7 +22,9 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 @Getter
 @AllArgsConstructor
-public class Search extends BaseTimeEntity {
+@SQLDelete(sql = "UPDATE search SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
+public class Search extends BaseTimeEntityWithDeletion {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -33,7 +38,6 @@ public class Search extends BaseTimeEntity {
 
     @Column(nullable = false)
     private String content;
-
 
     @Builder
     public Search(String userId,
