@@ -11,6 +11,7 @@ import kr.co.loopz.object.repository.ObjectRepository;
 import kr.co.loopz.object.service.CartService;
 import kr.co.loopz.object.service.ObjectDetailService;
 import kr.co.loopz.object.service.ObjectListService;
+import kr.co.loopz.object.service.ObjectSearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,6 +32,7 @@ public class InternalObjectController {
     private final CartService cartService;
     private final ObjectDetailService objectDetailService;
     private final ObjectListService objectListService;
+    private final ObjectSearchService objectSearchService;
 
     // objectId 존재 여부 확인 API
     @GetMapping("/objects/{objectId}/exists")
@@ -87,7 +89,7 @@ public class InternalObjectController {
 
     @GetMapping("/object/search")
     public ResponseEntity<List<ObjectNameResponse>> searchObjectsByKeyword(@RequestParam String keyword) {
-        List<ObjectNameResponse> nameResponse = objectListService.searchObjectsByKeyword(keyword);
+        List<ObjectNameResponse> nameResponse = objectSearchService.searchObjectsByKeyword(keyword);
         return ResponseEntity.ok(nameResponse);
     }
 
@@ -102,7 +104,7 @@ public class InternalObjectController {
         }
 
 
-        BoardResponse result = objectListService.searchObjectsByKeyword(userId, filter);
+        BoardResponse result = objectSearchService.searchObjectsByKeyword(userId, filter);
         return ResponseEntity.ok(result);
     }
 }
