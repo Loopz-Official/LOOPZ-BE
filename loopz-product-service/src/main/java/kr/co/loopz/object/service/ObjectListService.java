@@ -3,10 +3,13 @@ package kr.co.loopz.object.service;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import io.micrometer.core.instrument.search.Search;
 import kr.co.loopz.object.Exception.ObjectException;
 import kr.co.loopz.object.converter.ObjectConverter;
-import kr.co.loopz.object.domain.*;
+import kr.co.loopz.object.domain.Likes;
+import kr.co.loopz.object.domain.ObjectImage;
+import kr.co.loopz.object.domain.ObjectEntity;
+import kr.co.loopz.object.domain.QLikes;
+import kr.co.loopz.object.domain.QObjectEntity;
 import kr.co.loopz.object.dto.request.FilterRequest;
 import kr.co.loopz.object.dto.request.SearchFilterRequest;
 import kr.co.loopz.object.dto.response.BoardResponse;
@@ -35,29 +38,36 @@ import static kr.co.loopz.object.Exception.ObjectErrorCode.OBJECT_ID_NOT_FOUND;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ObjectService {
+public class ObjectListService {
 
     private final ObjectImageRepository objectImageRepository;
-    private final JPAQueryFactory queryFactory;
     private final LikeRepository likeRepository;
-    private final ObjectConverter objectConverter;
     private final ObjectRepository objectRepository;
+    private final ObjectConverter objectConverter;
+    private final JPAQueryFactory queryFactory;
 
     public BoardResponse getBoard(String userId, FilterRequest filter) {
         Slice<ObjectEntity> slice = getFilteredObjects(filter);
         List<ObjectEntity> entities = slice.getContent();
 
-        return buildBoardResponse(userId, entities, slice.hasNext(), PageRequest.of(filter.getPage(), filter.getSize()));
+        List<String> objectIds = entities.stream()
+                .map(ObjectEntity::getObjectId)
+                .collect(Collectors.toList());
+        List<ObjectResponse> objectResponses = objectConverter.toObjectResponseList(entities);
+
+        Map<String, String> imageMap = loadThumbnails(objectIds);
+        Map<String, Boolean> likeMap = loadLikeMap(userId, objectIds);
+
+        long totalCount = objectRepository.count();
+        return objectConverter.toBoardResponse((int) totalCount, objectResponses, imageMap, likeMap, slice.hasNext());
     }
 
     public Slice<ObjectEntity> getFilteredObjects(FilterRequest filter) {
         Pageable pageable = PageRequest.of(filter.getPage(), filter.getSize());
-        BooleanBuilder builder = buildCommonFilter(filter);
+        BooleanBuilder builder = buildFilter(filter, QObjectEntity.objectEntity);
         boolean[] hasNextHolder = new boolean[1];
 
-        List<ObjectEntity> result = fetchFilteredObjects(
-                builder, pageable, filter.getSort(), filter.getSize(), hasNextHolder);
-
+        List<ObjectEntity> result = fetchFilteredObjects(builder, pageable, filter.getSort(), filter.getSize(), hasNextHolder);
         return new SliceImpl<>(result, pageable, hasNextHolder[0]);
     }
 
@@ -72,29 +82,27 @@ public class ObjectService {
         return buildBoardResponse(userId, objects, hasNextHolder[0], pageable);
     }
 
-    private BooleanBuilder buildCommonFilter(FilterRequest filter) {
-        QObjectEntity object = QObjectEntity.objectEntity;
+    private BooleanBuilder buildFilter(FilterRequest filter, QObjectEntity qObj) {
         BooleanBuilder builder = new BooleanBuilder();
 
         if (filter.getObjectTypes() != null && !filter.getObjectTypes().isEmpty()) {
-            builder.and(object.objectType.in(filter.getObjectTypes()));
+            builder.and(qObj.objectType.in(filter.getObjectTypes()));
         }
         if (filter.getObjectSizes() != null && !filter.getObjectSizes().isEmpty()) {
-            builder.and(object.objectSize.in(filter.getObjectSizes()));
+            builder.and(qObj.objectSize.in(filter.getObjectSizes()));
         }
         if (filter.getPriceMin() != null) {
-            builder.and(object.objectPrice.goe(filter.getPriceMin()));
+            builder.and(qObj.objectPrice.goe(filter.getPriceMin()));
         }
         if (filter.getPriceMax() != null) {
-            builder.and(object.objectPrice.loe(filter.getPriceMax()));
+            builder.and(qObj.objectPrice.loe(filter.getPriceMax()));
         }
         if (filter.getKeywords() != null && !filter.getKeywords().isEmpty()) {
-            builder.and(object.keywords.any().in(filter.getKeywords()));
+            builder.and(qObj.keywords.any().in(filter.getKeywords()));
         }
         if (Boolean.TRUE.equals(filter.getExcludeSoldOut())) {
-            builder.and(object.soldOut.eq(false));
+            builder.and(qObj.soldOut.isFalse());
         }
-
         return builder;
     }
 
@@ -114,113 +122,12 @@ public class ObjectService {
         return builder;
     }
 
-    private <T> boolean hasNext(List<T> list, int pageSize) {
-        boolean hasNext = list.size() > pageSize;
-        if (hasNext) {
-            list.remove(list.size() - 1);
-        }
-        return hasNext;
-    }
-
-    private BoardResponse buildBoardResponse(String userId, List<ObjectEntity> entities, boolean hasNext, Pageable pageable) {
-        List<String> objectIds = entities.stream()
-                .map(ObjectEntity::getObjectId)
-                .collect(Collectors.toList());
-
-        List<ObjectResponse> objects = objectConverter.toObjectResponseList(entities);
-
-        List<ObjectImage> objectImages = objectImageRepository.findByObjectIdIn(objectIds);
-        Map<String, String> imageMap = objectImages.stream()
-                .collect(Collectors.groupingBy(
-                        ObjectImage::getObjectId,
-                        LinkedHashMap::new,
-                        Collectors.mapping(
-                                ObjectImage::getImageUrl,
-                                Collectors.collectingAndThen(Collectors.toList(), list -> list.get(0))
-                        )
-                ));
-
-        Map<String, Boolean> likeMap = checkLikedObject(userId, objectIds);
-        long totalCount = objectRepository.count();
-
-        return objectConverter.toBoardResponse(Math.toIntExact(totalCount), objects, imageMap, likeMap, hasNext);
-    }
-
-    private Map<String, Boolean> checkLikedObject(String userId, List<String> objectIds) {
-        if (userId == null || objectIds == null || objectIds.isEmpty()) {
-            return Collections.emptyMap();
-        }
-
-        List<Likes> likes = likeRepository.findAllByUserIdAndObjectIdIn(userId, objectIds);
-
-        Map<String, Boolean> likeMap = objectIds.stream()
-                .collect(Collectors.toMap(Function.identity(), id -> false));
-
-        for (Likes like : likes) {
-            likeMap.put(like.getObjectId(), true);
-        }
-
-        return likeMap;
-    }
-
-    public DetailResponse getObjectDetails(String userId, String objectId) {
-        ObjectEntity entity = objectRepository.findByObjectId(objectId)
-                .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND, "Object not found: " + objectId));
-
-        boolean liked = userId != null && likeRepository.existsByUserIdAndObjectId(userId, objectId);
-
-        List<ObjectImage> images = objectImageRepository.findByObjectId(objectId);
-        List<String> imageUrls = images.stream()
-                .map(ObjectImage::getImageUrl)
-                .collect(Collectors.toList());
-
-        return objectConverter.toDetailResponse(entity, imageUrls, liked);
-    }
-
-    public ObjectResponse getObjectById(String objectId) {
-        ObjectEntity entity = objectRepository.findByObjectId(objectId)
-                .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND, "Object not found: " + objectId));
-
-        List<ObjectImage> images = objectImageRepository.findByObjectId(objectId);
-        String firstImageUrl = images.isEmpty() ? "" : images.get(0).getImageUrl();
-
-        return new ObjectResponse(
-                entity.getObjectId(),
-                entity.getObjectName(),
-                entity.getIntro(),
-                firstImageUrl,
-                entity.getObjectPrice(),
-                entity.isSoldOut(),
-                false,
-                entity.getStock()
-        );
-    }
-
-    public int getStock(String objectId) {
-        ObjectEntity object = objectRepository.findByObjectId(objectId)
-                .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND));
-        return object.getDetail().getStock();
-    }
-
-    @Transactional
-    public void decreaseStock(String objectId, int quantity) {
-        ObjectEntity object = objectRepository.findByObjectId(objectId)
-                .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND));
-        object.getDetail().decreaseStock(quantity);
-    }
-
-    // 제목에 따른 실시간 상품 이름 반환
-    public List<ObjectNameResponse> searchObjectsByKeyword(String keyword) {
-        List<ObjectEntity> result = objectRepository.findTop10ByObjectNameContainingIgnoreCase(keyword);
-        return objectConverter.toObjectNameResponseList(result);
-    }
-
     private List<ObjectEntity> fetchFilteredObjects(
             BooleanBuilder builder,
             Pageable pageable,
             String sortType,
             int size,
-            boolean[] hasNextHolder // [0] = true/false 설정용
+            boolean[] hasNextHolder
     ) {
         QObjectEntity object = QObjectEntity.objectEntity;
 
@@ -260,4 +167,58 @@ public class ObjectService {
         }
     }
 
+    private <T> boolean hasNext(List<T> list, int pageSize) {
+        boolean hasNext = list.size() > pageSize;
+        if (hasNext) {
+            list.remove(list.size() - 1);
+        }
+        return hasNext;
+    }
+
+    private Map<String, String> loadThumbnails(List<String> objectIds) {
+        return objectImageRepository.findByObjectIdIn(objectIds).stream()
+                .collect(Collectors.groupingBy(
+                        ObjectImage::getObjectId,
+                        LinkedHashMap::new,
+                        Collectors.mapping(
+                                ObjectImage::getImageUrl,
+                                Collectors.collectingAndThen(Collectors.toList(), list -> list.get(0))
+                        )
+                ));
+    }
+
+    private Map<String, Boolean> loadLikeMap(String userId, List<String> objectIds) {
+        if (userId == null || objectIds == null || objectIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        List<Likes> likes = likeRepository.findAllByUserIdAndObjectIdIn(userId, objectIds);
+        Map<String, Boolean> likeMap = objectIds.stream()
+                .collect(Collectors.toMap(Function.identity(), id -> false));
+
+        for (Likes like : likes) {
+            likeMap.put(like.getObjectId(), true);
+        }
+
+        return likeMap;
+    }
+
+    private BoardResponse buildBoardResponse(String userId, List<ObjectEntity> entities, boolean hasNext, Pageable pageable) {
+        List<String> objectIds = entities.stream()
+                .map(ObjectEntity::getObjectId)
+                .collect(Collectors.toList());
+
+        List<ObjectResponse> objects = objectConverter.toObjectResponseList(entities);
+        Map<String, String> imageMap = loadThumbnails(objectIds);
+        Map<String, Boolean> likeMap = loadLikeMap(userId, objectIds);
+
+        long totalCount = objectRepository.count();
+        return objectConverter.toBoardResponse((int) totalCount, objects, imageMap, likeMap, hasNext);
+    }
+
+    // 실시간 검색: objectName 기준 Top 10
+    public List<ObjectNameResponse> searchObjectsByKeyword(String keyword) {
+        List<ObjectEntity> result = objectRepository.findTop10ByObjectNameContainingIgnoreCase(keyword);
+        return objectConverter.toObjectNameResponseList(result);
+    }
 }

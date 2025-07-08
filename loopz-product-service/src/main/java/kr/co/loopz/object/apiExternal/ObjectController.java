@@ -2,18 +2,18 @@ package kr.co.loopz.object.apiExternal;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import kr.co.loopz.object.domain.ObjectEntity;
 import kr.co.loopz.object.dto.request.FilterRequest;
 import kr.co.loopz.object.dto.response.BoardResponse;
 import kr.co.loopz.object.dto.response.DetailResponse;
-import kr.co.loopz.object.service.ObjectService;
+import kr.co.loopz.object.service.ObjectDetailService;
+import kr.co.loopz.object.service.ObjectListService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -21,7 +21,8 @@ import org.springframework.security.core.userdetails.User;
 @RequestMapping(value = "/object/v1")
 public class ObjectController {
 
-    private final ObjectService objectService;
+    private final ObjectListService objectListService;
+    private final ObjectDetailService objectDetailService;
 
     @GetMapping
     @Operation(summary= "메인보드 조회")
@@ -37,7 +38,7 @@ public class ObjectController {
             log.debug("비로그인 상태로 접근");
         }
 
-        BoardResponse response = objectService.getBoard(userId, filter);
+        BoardResponse response = objectListService.getBoard(userId, filter);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -50,7 +51,7 @@ public class ObjectController {
     ){
         String userId = currentUser != null ? currentUser.getUsername() : null;
 
-        DetailResponse response = objectService.getObjectDetails(userId, objectId);
+        DetailResponse response = objectDetailService.getObjectDetails(userId, objectId);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
