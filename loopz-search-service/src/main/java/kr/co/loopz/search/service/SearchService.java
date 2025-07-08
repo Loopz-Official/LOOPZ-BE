@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -39,15 +40,16 @@ public class SearchService {
         log.info("Searches fetched from DB (size={}): {}", searches.size(), searches.stream().map(Search::getContent).toList());
 
         // 중복 제거하면서 최대 5개만 리턴
-        LinkedHashSet<String> uniqueKeywords = new LinkedHashSet<>();
+        LinkedHashMap<String, Search> uniqueSearches = new LinkedHashMap<>();
         for (Search s : searches) {
-            uniqueKeywords.add(s.getContent());
-            if (uniqueKeywords.size() >= 5) break;
+            uniqueSearches.putIfAbsent(s.getContent(), s);
+            if (uniqueSearches.size() >= 5) break;
         }
-        log.info("Unique keywords to return: {}", uniqueKeywords);
 
-        return uniqueKeywords.stream()
-                .map(SearchHistoryResponse::new)
+        log.info("Unique keywords to return: {}", uniqueSearches.keySet());
+
+        return uniqueSearches.values().stream()
+                .map(s -> new SearchHistoryResponse(s.getSearchId(), s.getContent()))
                 .toList();
     }
 
