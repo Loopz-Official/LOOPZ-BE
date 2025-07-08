@@ -1,9 +1,11 @@
 package kr.co.loopz.search.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
+
 import java.util.List;
 
 public record SearchFilterRequest(
-        String keyword,
+        @NotBlank String keyword,
         String sort,
         Boolean excludeSoldOut,
         int page,
