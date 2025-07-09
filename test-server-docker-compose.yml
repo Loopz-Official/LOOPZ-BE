@@ -44,4 +44,3 @@ volumes:
 networks:
   loopz_network:
     driver: bridge
-
