@@ -2,10 +2,7 @@ package kr.co.loopz.object.converter;
 
 import kr.co.loopz.object.domain.ObjectDetail;
 import kr.co.loopz.object.domain.ObjectEntity;
-import kr.co.loopz.object.dto.response.BoardResponse;
-import kr.co.loopz.object.dto.response.DetailResponse;
-import kr.co.loopz.object.dto.response.ObjectNameResponse;
-import kr.co.loopz.object.dto.response.ObjectResponse;
+import kr.co.loopz.object.dto.response.*;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -62,4 +59,18 @@ public interface ObjectConverter {
                 .map(entity -> new ObjectNameResponse(entity.getObjectId(), entity.getObjectName()))
                 .collect(Collectors.toList());
     }
+
+    default OrderObjectInfoResponse toOrderObjectInfoResponse(ObjectEntity object, List<String> imageUrls, int quantity) {
+        String firstImageUrl = imageUrls.isEmpty() ? "" : imageUrls.get(0);
+
+        return new OrderObjectInfoResponse(
+                object.getObjectId(),
+                object.getObjectName(),
+                firstImageUrl,
+                object.getObjectPrice(),
+                quantity,
+                object.getDetail().getStock()
+        );
     }
+
+}

@@ -12,10 +12,13 @@ import kr.co.loopz.object.domain.QLikes;
 import kr.co.loopz.object.domain.QObjectEntity;
 import kr.co.loopz.object.domain.ObjectImage;
 import java.util.LinkedHashMap;
+
+import kr.co.loopz.object.exception.ObjectException;
 import kr.co.loopz.object.repository.LikeRepository;
 import kr.co.loopz.object.repository.ObjectImageRepository;
 import kr.co.loopz.object.repository.ObjectRepository;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 
@@ -73,7 +76,11 @@ public abstract class AbstractObjectService {
             List<ObjectEntity> content = queryFactory
                     .selectFrom(object)
                     .where(builder)
-                    .orderBy(object.createdAt.desc())
+                    .orderBy(new CaseBuilder()
+                                    .when(object.detail.stock.eq(0))
+                                    .then(1)
+                                    .otherwise(0).asc(),
+                            object.createdAt.desc())
                     .offset(pageable.getOffset())
                     .limit(size + 1)
                     .fetch();
