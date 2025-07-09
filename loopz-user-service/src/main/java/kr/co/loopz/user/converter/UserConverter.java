@@ -2,10 +2,7 @@ package kr.co.loopz.user.converter;
 
 import kr.co.loopz.user.domain.Address;
 import kr.co.loopz.user.domain.UserEntity;
-import kr.co.loopz.user.dto.response.AddressResponse;
-import kr.co.loopz.user.dto.response.AgreeTermsResponse;
-import kr.co.loopz.user.dto.response.DetailInfoUpdateResponse;
-import kr.co.loopz.user.dto.response.UserInternalRegisterResponse;
+import kr.co.loopz.user.dto.response.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -31,4 +28,5 @@ public interface UserConverter {
 
     AddressResponse toAddressResponse(Address address);
 
+    UserInfoResponse toUserInfoResponse(UserEntity user);
 }

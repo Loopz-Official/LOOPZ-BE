@@ -3,6 +3,7 @@ package kr.co.loopz.user.service;
 import kr.co.loopz.user.converter.UserConverter;
 import kr.co.loopz.user.domain.UserEntity;
 import kr.co.loopz.user.dto.request.UserInternalRegisterRequest;
+import kr.co.loopz.user.dto.response.UserInfoResponse;
 import kr.co.loopz.user.dto.response.UserInternalRegisterResponse;
 import kr.co.loopz.user.exception.UserException;
 import kr.co.loopz.user.repository.UserRepository;
@@ -29,10 +30,8 @@ public class UserService {
      */
     @Transactional
     public void softDeleteUser(String userId) {
-
         UserEntity user = findByUserId(userId);
         userRepository.delete(user);
-
     }
 
     /**
@@ -45,8 +44,17 @@ public class UserService {
     public UserInternalRegisterResponse getOrCreateUser(UserInternalRegisterRequest registerRequest) {
 
         UserEntity userEntity = getOrSave(registerRequest);
-
         return userConverter.toUserInternalRegisterResponse(userEntity);
+    }
+
+    /**
+     * 사용자 정보를 조회
+     * @param userId context에서 가져온 사용자 UUID
+     * @return 사용자 정보 응답
+     */
+    public UserInfoResponse getUserInfo(String userId) {
+        UserEntity user = findByUserId(userId);
+        return userConverter.toUserInfoResponse(user);
     }
 
 
