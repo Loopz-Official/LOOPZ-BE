@@ -1,0 +1,46 @@
+services:
+
+  db:
+    container_name: postgres
+    image: postgres:14-alpine
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - loopz_network
+
+  cache:
+    container_name: redis
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+    networks:
+      - loopz_network
+
+  application:
+    container_name: loopz_be_test
+    image: gothax2/loopz_backend:${IMAGE_TAG}
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+      - cache
+    env_file:
+      - .env
+    networks:
+      - loopz_network
+
+volumes:
+  redis_data:
+  postgres_data:
+
+networks:
+  loopz_network:
+    driver: bridge
