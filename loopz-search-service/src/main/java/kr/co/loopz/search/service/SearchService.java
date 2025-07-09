@@ -44,11 +44,11 @@ public class SearchService {
         List<Search> searches = searchRepository.findTop20ByUserIdOrderByCreatedAtDesc(userId);
         log.info("Searches fetched from DB (size={}): {}", searches.size(), searches.stream().map(Search::getContent).toList());
 
-        // 중복 제거하면서 최대 5개만 리턴
+        // 중복 제거하면서 최대 7개만 리턴
         LinkedHashMap<String, Search> uniqueSearches = new LinkedHashMap<>();
         for (Search s : searches) {
             uniqueSearches.putIfAbsent(s.getContent(), s);
-            if (uniqueSearches.size() >= 5) break;
+            if (uniqueSearches.size() >= 7) break;
         }
 
         log.info("Unique keywords to return: {}", uniqueSearches.keySet());
