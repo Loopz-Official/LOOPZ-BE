@@ -3,6 +3,7 @@ package kr.co.loopz.object.service;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import kr.co.loopz.object.Exception.ObjectException;
 import kr.co.loopz.object.converter.ObjectConverter;
 import kr.co.loopz.object.domain.Likes;
@@ -57,7 +58,11 @@ public abstract class AbstractObjectService {
                     .groupBy(object.id, object.createdAt, object.intro, object.objectId,
                             object.objectName, object.objectPrice, object.objectSize,
                             object.objectType, object.soldOut, object.updatedAt)
-                    .orderBy(like.count().desc(), object.createdAt.desc())
+                    .orderBy(new CaseBuilder()
+                            .when(object.detail.stock.eq(0))
+                            .then(1)
+                            .otherwise(0).asc(),
+                            like.count().desc(), object.createdAt.desc())
                     .offset(pageable.getOffset())
                     .limit(size + 1)
                     .fetch();
