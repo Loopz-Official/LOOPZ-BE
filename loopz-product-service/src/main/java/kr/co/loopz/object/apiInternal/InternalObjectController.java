@@ -29,7 +29,7 @@ public class InternalObjectController {
     private final ObjectListService objectListService;
     private final ObjectSearchService objectSearchService;
 
-    @GetMapping("/objects")
+    @PostMapping("/objects")
     public ResponseEntity<List<ObjectResponse>> getObjectList(
             @RequestBody List<String> objectIds
     ) {
