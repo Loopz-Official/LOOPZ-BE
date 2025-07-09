@@ -1,7 +1,7 @@
 package kr.co.loopz.object.service;
 
 import kr.co.loopz.common.domain.Image;
-import kr.co.loopz.object.Exception.ObjectException;
+import kr.co.loopz.object.exception.ObjectException;
 import kr.co.loopz.object.converter.ObjectConverter;
 import kr.co.loopz.object.domain.ObjectEntity;
 import kr.co.loopz.object.domain.ObjectImage;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static kr.co.loopz.object.Exception.ObjectErrorCode.OBJECT_ID_NOT_FOUND;
+import static kr.co.loopz.object.exception.ObjectErrorCode.OBJECT_ID_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor

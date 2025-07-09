@@ -1,6 +1,6 @@
 package kr.co.loopz.object.service;
 
-import kr.co.loopz.object.Exception.ObjectException;
+import kr.co.loopz.object.exception.ObjectException;
 import kr.co.loopz.object.client.UserClient;
 import kr.co.loopz.object.domain.Likes;
 import kr.co.loopz.object.repository.LikeRepository;
@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static kr.co.loopz.object.Exception.ObjectErrorCode.OBJECT_ID_NOT_FOUND;
-import static kr.co.loopz.object.Exception.ObjectErrorCode.USER_ID_NOT_FOUND;
+import static kr.co.loopz.object.exception.ObjectErrorCode.OBJECT_ID_NOT_FOUND;
+import static kr.co.loopz.object.exception.ObjectErrorCode.USER_ID_NOT_FOUND;
 
 @Service
 @Transactional(readOnly = true)

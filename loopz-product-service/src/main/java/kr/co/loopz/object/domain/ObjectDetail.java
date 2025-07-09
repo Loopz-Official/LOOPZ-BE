@@ -1,13 +1,12 @@
 package kr.co.loopz.object.domain;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import kr.co.loopz.object.Exception.ObjectException;
+import kr.co.loopz.object.exception.ObjectException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import static kr.co.loopz.object.Exception.ObjectErrorCode.INSUFFICIENT_STOCK;
+import static kr.co.loopz.object.exception.ObjectErrorCode.INSUFFICIENT_STOCK;
 
 @Embeddable
 @Getter
