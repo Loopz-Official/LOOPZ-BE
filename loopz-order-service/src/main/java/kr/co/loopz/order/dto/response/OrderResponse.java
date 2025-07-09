@@ -13,4 +13,5 @@ public record OrderResponse(
         int shippingFee,
         int totalProductPrice,
         int totalPayment
-) {}
+) {
+}

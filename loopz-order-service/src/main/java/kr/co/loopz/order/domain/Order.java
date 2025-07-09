@@ -3,13 +3,16 @@ package kr.co.loopz.order.domain;
 import jakarta.persistence.*;
 import kr.co.loopz.order.domain.enums.OrderStatus;
 import kr.co.loopz.order.domain.enums.PaymentMethod;
-import kr.co.loopz.order.dto.request.CartOrderRequest;
 import kr.co.loopz.order.dto.request.OrderRequest;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
@@ -44,8 +47,25 @@ public class Order {
     private String deliveryRequest;
 
 
-    @Builder
-    public Order(String userId,
+    /**
+     * 주문 생성 팩토리 메서드
+     * @param request 주문 요청 정보 - addressId, paymentMethod, deliveryRequest
+     * @param userId 주문을 요청한 사용자 ID
+     * @return 주문 entity
+     */
+    public static Order createOrder(OrderRequest request, String userId) {
+        return Order.builder()
+                .userId(userId)
+                .addressId(request.addressId())
+                .status(OrderStatus.PENDING)
+                .paymentMethod(request.paymentMethod())
+                .deliveryRequest(request.deliveryRequest())
+                .build();
+    }
+
+
+    @Builder(access = PRIVATE)
+    private Order(String userId,
                  String addressId,
                  OrderStatus status,
                  PaymentMethod paymentMethod,
@@ -58,25 +78,6 @@ public class Order {
         this.deliveryRequest = deliveryRequest;
     }
 
-    public static Order createSingleOrder(String userId, OrderRequest request) {
-        return Order.builder()
-                .userId(userId)
-                .addressId(request.addressId())
-                .status(OrderStatus.ORDERED)
-                .paymentMethod(request.paymentMethod())
-                .deliveryRequest(request.deliveryRequest())
-                .build();
-    }
-
-    public static Order createMultiOrder(String userId, CartOrderRequest request) {
-        return Order.builder()
-                .userId(userId)
-                .addressId(request.addressId())
-                .status(OrderStatus.ORDERED)
-                .paymentMethod(request.paymentMethod())
-                .deliveryRequest(request.deliveryRequest())
-                .build();
-    }
 
 
 }
