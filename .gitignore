@@ -43,3 +43,4 @@ application-oauth.yml
 application-aws.yml
 
 .env
+.env.staging

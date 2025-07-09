@@ -1,8 +1,8 @@
 package kr.co.loopz.order.converter;
 
 import kr.co.loopz.order.domain.Order;
-import kr.co.loopz.order.dto.request.OrderRequest;
-import kr.co.loopz.order.domain.enums.OrderStatus;
+import kr.co.loopz.order.domain.OrderItem;
+import kr.co.loopz.order.dto.response.InternalObjectResponse;
 import kr.co.loopz.order.dto.response.ObjectResponse;
 import kr.co.loopz.order.dto.response.OrderResponse;
 import org.mapstruct.Mapper;
@@ -18,12 +18,42 @@ import static org.mapstruct.ReportingPolicy.IGNORE;
 )
 public interface OrderConverter {
 
-    OrderResponse toOrderResponse(
+    default OrderResponse toOrderResponse(
             Order order,
-            List<ObjectResponse> objects,
-            int shippingFee,
-            int totalProductPrice,
-            int totalPayment
-    );
+            List<OrderItem> items,
+            List<InternalObjectResponse> currentObjects,
+            int shippingFee
+    ){
+
+        long totalProductPrice = items.stream()
+                .mapToLong(orderItem -> {
+                    return orderItem.getPurchasePrice() * orderItem.getQuantity();
+                })
+                .sum();
+
+        List<ObjectResponse> objectResponses = items.stream()
+                .map(orderItem -> {
+                    InternalObjectResponse itemDetail = currentObjects.stream()
+                            .filter(matches -> matches.objectId().equals(orderItem.getObjectId()))
+                            .findFirst()
+                            .orElseThrow(() -> new IllegalArgumentException("Object not found for ID: " + orderItem.getObjectId()));
+                    return toObjectResponse(itemDetail, orderItem.getQuantity());
+                })
+                .toList();
+
+        return new OrderResponse(
+                order.getOrderId(),
+                order.getStatus(),
+                order.getPaymentMethod(),
+                objectResponses,
+                shippingFee,
+                totalProductPrice,
+                totalProductPrice + shippingFee
+        );
     }
+
+    @Mapping(source = "internalObjectResponse.objectPrice", target = "purchasePrice")
+    ObjectResponse toObjectResponse(InternalObjectResponse internalObjectResponse, int quantity);
+
+}
 

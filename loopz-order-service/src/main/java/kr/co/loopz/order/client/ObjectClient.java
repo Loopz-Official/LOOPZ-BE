@@ -2,22 +2,26 @@ package kr.co.loopz.order.client;
 
 import kr.co.loopz.order.dto.request.DeleteCartItemRequest;
 import kr.co.loopz.order.dto.response.CartWithQuantityResponse;
-import kr.co.loopz.order.dto.response.ObjectResponse;
+import kr.co.loopz.order.dto.response.InternalObjectResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @FeignClient(
         name = "product-client",
         url = "${etc.product-service-url}"
 )
-public interface ProductClient {
+public interface ObjectClient {
 
-    @GetMapping("/internal/object/{objectId}")
-    ObjectResponse getObjectById(@PathVariable("objectId") String objectId);
-
-    // 재고 조회
-    @GetMapping("/internal/object/{objectId}/stock")
-    int getStockByObjectId(@PathVariable String objectId);
+    /**
+     * 상품 ID 목록을 받아 해당 상품들의 정보를 조회
+     * 주문이 들어온 상품의 정보를 받아올때 사용
+     * @param requestIds 상품 ID 목록
+     * @return 상품 정보 리스트 (상품 UUID, 이름, 재고, 가격)
+     */
+    @PostMapping("/internal/objects")
+    List<InternalObjectResponse> getObjectListByIds(@RequestBody List<String> requestIds);
 
     // 주문 후 재고 감소
     @PostMapping("/internal/object/{objectId}/stock")

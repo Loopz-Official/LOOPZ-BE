@@ -11,6 +11,7 @@ public record OrderResponse(
         PaymentMethod paymentMethod,
         List<ObjectResponse> objects,
         int shippingFee,
-        int totalProductPrice,
-        int totalPayment
-) {}
+        long totalProductPrice,
+        long totalPayment
+) {
+}
