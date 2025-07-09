@@ -4,7 +4,6 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.core.types.dsl.CaseBuilder;
-import kr.co.loopz.object.Exception.ObjectException;
 import kr.co.loopz.object.converter.ObjectConverter;
 import kr.co.loopz.object.domain.Likes;
 import kr.co.loopz.object.domain.ObjectEntity;
@@ -12,6 +11,8 @@ import kr.co.loopz.object.domain.QLikes;
 import kr.co.loopz.object.domain.QObjectEntity;
 import kr.co.loopz.object.domain.ObjectImage;
 import java.util.LinkedHashMap;
+
+import kr.co.loopz.object.exception.ObjectException;
 import kr.co.loopz.object.repository.LikeRepository;
 import kr.co.loopz.object.repository.ObjectImageRepository;
 import kr.co.loopz.object.repository.ObjectRepository;
@@ -26,7 +27,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static kr.co.loopz.object.Exception.ObjectErrorCode.INVALID_SORT_TYPE;
+import static kr.co.loopz.object.exception.ObjectErrorCode.INVALID_SORT_TYPE;
 
 @AllArgsConstructor
 @Slf4j
