@@ -14,4 +14,6 @@ public interface ObjectRepository extends JpaRepository<ObjectEntity, Long> {
     Optional<ObjectEntity> findByObjectId(String objectId);
 
     List<ObjectEntity> findAllByObjectIdIn(List<String> objectIds);
+
+    List<ObjectEntity> findTop10ByObjectNameContainingIgnoreCase(String keyword);
 }

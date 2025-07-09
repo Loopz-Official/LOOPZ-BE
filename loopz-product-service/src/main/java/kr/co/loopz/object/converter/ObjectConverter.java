@@ -4,6 +4,7 @@ import kr.co.loopz.object.domain.ObjectDetail;
 import kr.co.loopz.object.domain.ObjectEntity;
 import kr.co.loopz.object.dto.response.BoardResponse;
 import kr.co.loopz.object.dto.response.DetailResponse;
+import kr.co.loopz.object.dto.response.ObjectNameResponse;
 import kr.co.loopz.object.dto.response.ObjectResponse;
 import org.mapstruct.Mapper;
 
@@ -18,6 +19,7 @@ public interface ObjectConverter {
     ObjectResponse toObjectResponse(ObjectEntity entity);
     ObjectResponse toObjectResponse(ObjectEntity entity, String imageUrl);
 
+    // List<Product> -> List<ObjectResponse>
     List<ObjectResponse> toObjectResponseList(List<ObjectEntity> objectEntities);
     // 찜 여부와 image url 반영해 새로운 DTO 리스트 반환
     default List<ObjectResponse> toObjectResponseList(List<ObjectResponse> dtos, Map<String, String> imageUrlMap,Map<String, Boolean> likeMap) {
@@ -40,19 +42,24 @@ public interface ObjectConverter {
 
     default DetailResponse toDetailResponse(ObjectEntity entity, List<String> imageUrls, Boolean liked) {
 
-        ObjectDetail detail = entity.getDetail();
-        return new DetailResponse(
-                entity.getObjectId(),
-                entity.getObjectName(),
-                entity.getIntro(),
-                imageUrls.isEmpty() ? null : imageUrls.get(0),
-                entity.getObjectPrice(),
-                liked,
-                detail.getStock(),
-                detail.getSize(),
-                detail.getDescriptionUrl()
-        );
 
+            ObjectDetail detail = entity.getDetail();
+            return new DetailResponse(
+                    entity.getObjectId(),
+                    entity.getObjectName(),
+                    entity.getIntro(),
+                    imageUrls.isEmpty() ? null : imageUrls.get(0),
+                    entity.getObjectPrice(),
+                    liked,
+                    detail.getStock(),
+                    detail.getSize(),
+                    detail.getDescriptionUrl()
+            );
+        }
+
+    default List<ObjectNameResponse> toObjectNameResponseList(List<ObjectEntity> entities) {
+        return entities.stream()
+                .map(entity -> new ObjectNameResponse(entity.getObjectId(), entity.getObjectName()))
+                .collect(Collectors.toList());
     }
-
-}
+    }

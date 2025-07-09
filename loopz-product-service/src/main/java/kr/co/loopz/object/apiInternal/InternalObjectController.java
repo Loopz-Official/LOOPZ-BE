@@ -1,17 +1,27 @@
 package kr.co.loopz.object.apiInternal;
 
+import kr.co.loopz.object.Exception.ObjectException;
+import kr.co.loopz.object.domain.Cart;
 import kr.co.loopz.object.dto.request.DeleteCartItemRequest;
-import kr.co.loopz.object.dto.response.CartWithQuantityResponse;
-import kr.co.loopz.object.dto.response.ObjectResponse;
+import kr.co.loopz.object.dto.request.SearchFilterRequest;
+import kr.co.loopz.object.dto.response.*;
 import kr.co.loopz.object.repository.CartItemRepository;
+import kr.co.loopz.object.repository.CartRepository;
 import kr.co.loopz.object.repository.ObjectRepository;
 import kr.co.loopz.object.service.CartService;
 import kr.co.loopz.object.service.ObjectDetailService;
+import kr.co.loopz.object.service.ObjectListService;
+import kr.co.loopz.object.service.ObjectSearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static kr.co.loopz.object.Exception.ObjectErrorCode.CART_NOT_FOUND;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +31,8 @@ public class InternalObjectController {
     private final CartItemRepository cartItemRepository;
     private final CartService cartService;
     private final ObjectDetailService objectDetailService;
+    private final ObjectListService objectListService;
+    private final ObjectSearchService objectSearchService;
 
     // objectId 존재 여부 확인 API
     @GetMapping("/objects/{objectId}/exists")
@@ -75,5 +87,24 @@ public class InternalObjectController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/object/search")
+    public ResponseEntity<List<ObjectNameResponse>> searchObjectsByKeyword(@RequestParam String keyword) {
+        List<ObjectNameResponse> nameResponse = objectSearchService.searchObjectsByKeyword(keyword);
+        return ResponseEntity.ok(nameResponse);
+    }
 
+    @PostMapping("/object/search")
+    public ResponseEntity<BoardResponse> searchObjects(
+            @RequestParam(name = "userId", required = false) String userId,
+            @AuthenticationPrincipal User currentUser,
+            @RequestBody SearchFilterRequest filter) {
+
+        if (currentUser != null && userId == null) {
+            userId = currentUser.getUsername();
+        }
+
+
+        BoardResponse result = objectSearchService.searchObjectsByKeyword(userId, filter);
+        return ResponseEntity.ok(result);
+    }
 }
