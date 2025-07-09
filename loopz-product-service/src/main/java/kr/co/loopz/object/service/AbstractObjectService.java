@@ -74,7 +74,11 @@ public abstract class AbstractObjectService {
             List<ObjectEntity> content = queryFactory
                     .selectFrom(object)
                     .where(builder)
-                    .orderBy(object.createdAt.desc())
+                    .orderBy(new CaseBuilder()
+                                    .when(object.detail.stock.eq(0))
+                                    .then(1)
+                                    .otherwise(0).asc(),
+                            object.createdAt.desc())
                     .offset(pageable.getOffset())
                     .limit(size + 1)
                     .fetch();
