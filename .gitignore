@@ -25,6 +25,7 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+**/src/main/generated/
 
 ### NetBeans ###
 /nbproject/private/
@@ -35,3 +36,11 @@ out/
 
 ### VS Code ###
 .vscode/
+
+application-jwt.yml
+application-prod.yml
+application-oauth.yml
+application-aws.yml
+
+.env
+.env.staging

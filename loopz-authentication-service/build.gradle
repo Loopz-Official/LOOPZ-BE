@@ -1,0 +1,15 @@
+
+dependencies {
+
+    implementation project(':loopz-common')
+    implementation project(':loopz-authorization')
+
+    // oauth
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+
+}
+

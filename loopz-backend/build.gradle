@@ -1,0 +1,46 @@
+
+dependencies {
+
+    /**
+     * 현재 모듈은 진입점 모듈
+     * loopz-backend
+     */
+
+    /**
+     * 공통 모듈 2개
+     * common, authorization
+     * MSA 전환시 authorization -> gateway
+     */
+    implementation project(':loopz-common')
+    implementation project(':loopz-authorization')
+
+    /**
+     * 사용자 관련 모듈 3개
+     * user, authentication, admin
+     */
+    implementation project(':loopz-user-service')
+    // 인증
+    implementation project(':loopz-authentication-service')
+    // 어드민
+    implementation project(':loopz-admin-service')
+
+
+    /**
+     * 상품 관련 모듈 6개
+     * product, snap, magazine, order, payment, search
+     */
+    // 상품
+    implementation project(':loopz-product-service')
+    // 상품 스냅(후기)
+    implementation project(':loopz-snap-service')
+    // 상품 소개
+    implementation project(':loopz-magazine-service')
+    // 주문
+    implementation project(':loopz-order-service')
+    // 결제
+    implementation project(':loopz-payment-service')
+    // 검색
+    implementation project(':loopz-search-service')
+
+}
+
