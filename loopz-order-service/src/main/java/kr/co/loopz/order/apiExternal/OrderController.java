@@ -38,34 +38,4 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-//    // 상품 상세보기에서 주문 (단일 상품)
-//    @PostMapping("/{objectId}")
-//    @Operation(summary = "상품 상세보기 시 주문")
-//    public ResponseEntity<OrderResponse> orderSingle(
-//            @AuthenticationPrincipal User currentUser,
-//            @PathVariable String objectId,
-//            @RequestBody OrderRequest request) {
-//
-//        String userId = currentUser.getUsername();
-//
-//        OrderResponse response=orderService.orderSingle(userId, objectId, request);
-//
-//        return ResponseEntity.status(HttpStatus.OK).body(response);
-//    }
-//
-//    // 장바구니에서 주문 (여러 상품)
-//    @PostMapping("/cart")
-//    @Operation(summary = "장바구니에서 주문")
-//    public ResponseEntity<OrderResponse> orderCart(
-//            @AuthenticationPrincipal User currentUser,
-//            @RequestBody CartOrderRequest request) {
-//
-//        String userId = currentUser.getUsername();
-//
-//        OrderResponse response=orderService.orderCart(userId,request);
-//
-//        return ResponseEntity.status(HttpStatus.OK).body(response);
-//    }
-//
-
 }

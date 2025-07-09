@@ -4,7 +4,7 @@ public record ObjectResponse(
         String objectId,
         String objectName,
         String imageUrl,
-        int purchasePrice,
+        Long purchasePrice,
         int quantity,
         int stock
 ) {

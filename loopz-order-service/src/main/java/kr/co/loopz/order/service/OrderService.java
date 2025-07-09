@@ -59,7 +59,7 @@ public class OrderService {
         // 주문 아이템 생성, 저장
         List<OrderItem> items = saveOrderItems(request.objects(), currentObjects, order);
 
-        return orderConverter.toOrderResponse(order, items, request.paymentMethod(), SHIPPING_FEE);
+        return orderConverter.toOrderResponse(order, items, currentObjects, SHIPPING_FEE);
     }
 
     private List<OrderItem> saveOrderItems(
