@@ -1,14 +1,9 @@
 package kr.co.loopz.object.service;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import kr.co.loopz.object.Exception.ObjectException;
 import kr.co.loopz.object.converter.ObjectConverter;
-import kr.co.loopz.object.domain.Likes;
-import kr.co.loopz.object.domain.ObjectImage;
 import kr.co.loopz.object.domain.ObjectEntity;
-import kr.co.loopz.object.domain.QLikes;
 import kr.co.loopz.object.domain.QObjectEntity;
 import kr.co.loopz.object.dto.request.FilterRequest;
 import kr.co.loopz.object.dto.response.BoardResponse;
@@ -16,20 +11,15 @@ import kr.co.loopz.object.dto.response.ObjectResponse;
 import kr.co.loopz.object.repository.LikeRepository;
 import kr.co.loopz.object.repository.ObjectImageRepository;
 import kr.co.loopz.object.repository.ObjectRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static kr.co.loopz.object.Exception.ObjectErrorCode.*;
 
 @Service
 @Slf4j
