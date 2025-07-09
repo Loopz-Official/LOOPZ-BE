@@ -10,6 +10,7 @@ import kr.co.loopz.object.service.ObjectDetailService;
 import kr.co.loopz.object.service.ObjectListService;
 import kr.co.loopz.object.service.ObjectSearchService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -28,24 +29,19 @@ public class InternalObjectController {
     private final ObjectListService objectListService;
     private final ObjectSearchService objectSearchService;
 
+    @GetMapping("/objects")
+    public ResponseEntity<List<ObjectResponse>> getObjectList(
+            @RequestBody List<String> objectIds
+    ) {
+        List<ObjectResponse> response = objectDetailService.getObjectListByIds(objectIds);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     // objectId 존재 여부 확인 API
     @GetMapping("/objects/{objectId}/exists")
     public ResponseEntity<Boolean> checkObjectIdExists(@PathVariable String objectId) {
         boolean exists = objectRepository.existsByObjectId(objectId);
         return ResponseEntity.ok(exists);
-    }
-
-
-    @GetMapping("/object/{objectId}")
-    public ResponseEntity<ObjectResponse> getObjectById(@PathVariable String objectId) {
-        ObjectResponse response = objectDetailService.getObjectById(objectId);
-        return ResponseEntity.ok(response);
-    }
-
-    // 남은 재고 확인
-    @GetMapping("/object/{objectId}/stock")
-    public int getStock(@PathVariable String objectId) {
-        return objectDetailService.getStock(objectId);
     }
 
     // 재고 감소

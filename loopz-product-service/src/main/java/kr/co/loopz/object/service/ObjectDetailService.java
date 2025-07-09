@@ -46,6 +46,11 @@ public class ObjectDetailService {
         return objectConverter.toDetailResponse(entity, imageUrls, liked);
     }
 
+    public List<ObjectResponse> getObjectListByIds(List<String> objectIds) {
+        return objectIds.stream()
+                .map(this::getObjectById)
+                .toList();
+    }
 
     public ObjectResponse getObjectById(String objectId) {
 
