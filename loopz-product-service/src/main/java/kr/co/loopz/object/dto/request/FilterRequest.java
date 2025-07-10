@@ -20,9 +20,13 @@ public class FilterRequest {
     private Boolean excludeSoldOut = false;
     private String sort = "latest";
 
-    @Min(0)
-    private int page = 0;
+    @Min(1)
+    private int page = 1;
 
     @Min(1)
     private int size = 10;
+
+    public int getPage() {
+        return Math.max(page - 1, 0);
+    }
 }
