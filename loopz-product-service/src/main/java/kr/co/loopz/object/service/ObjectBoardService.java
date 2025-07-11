@@ -42,35 +42,50 @@ public class ObjectBoardService {
         Pageable pageable = PageRequest.of(page, size);
 
         List<ObjectEntity> objects = objectRepository.findFilteredObjects(whereClause, pageable, sort, size);
-
+        long totalCount = objectRepository.countFilteredObjects(whereClause);
         boolean hasNext = hasNext(objects, size);
 
+        return getResponseWithLikedAndImage(userId, objects, (int) totalCount, hasNext);
+    }
+
+
+    public BoardResponse getLikedBoardResponse(String userId, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<ObjectEntity> objects = objectRepository.findLikedObjects(userId, pageable);
+        int totalCount = objectRepository.countLikedObjects(userId);
+        boolean hasNext = hasNext(objects, size);
+
+        return getResponseWithLikedAndImage(userId, objects, totalCount, hasNext);
+    }
+
+    /**
+     * 페이지네이션을 위해 다음 페이지가 있는지 확인합니다.
+     * +1개 오브젝트를 조회하고 판단하기 때문에 응답을 만들기 전에 호출해야합니다.
+     * @param list 조회된 오브젝트 목록
+     * @param pageSize 페이지 크기
+     * @return 다음 페이지가 있는지 여부
+     */
+    private <T> boolean hasNext(List<T> list, int pageSize) {
+        boolean hasNext = list.size() > pageSize;
+        if (hasNext) {
+            list.remove(list.size() - 1);
+        }
+        return hasNext;
+    }
+
+    private BoardResponse getResponseWithLikedAndImage(String userId, List<ObjectEntity> objects, int totalCount, boolean hasNext) {
         List<String> objectIds = objects.stream()
                 .map(ObjectEntity::getObjectId)
                 .toList();
 
         Map<String, String> imageMap = objectRepository.fetchThumbnails(objectIds);
         Map<String, Boolean> likeMap = objectRepository.fetchLikeMap(userId, objectIds);
-        long totalCount = objectRepository.countFilteredObjects(whereClause);
+
         List<ObjectResponse> objectResponseList = objectConverter.toObjectResponseList(objects);
 
-        return objectConverter.toBoardResponse((int) totalCount, objectResponseList, imageMap, likeMap, hasNext);
-
-    }
-
-
-    /**
-     * 페이지네이션을 위해 다음 페이지가 있는지 확인합니다.
-     * @param list 조회된 오브젝트 목록
-     * @param pageSize 페이지 크기
-     * @return 다음 페이지가 있는지 여부
-     */
-    public <T> boolean hasNext(List<T> list, int pageSize) {
-        boolean hasNext = list.size() > pageSize;
-        if (hasNext) {
-            list.remove(list.size() - 1);
-        }
-        return hasNext;
+        return objectConverter.toBoardResponse(totalCount, objectResponseList, imageMap, likeMap, hasNext);
     }
 
 }

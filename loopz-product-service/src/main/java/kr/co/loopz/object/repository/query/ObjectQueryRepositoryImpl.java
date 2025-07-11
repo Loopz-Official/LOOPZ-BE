@@ -138,6 +138,45 @@ public class ObjectQueryRepositoryImpl implements ObjectQueryRepository{
         return likeMap;
     }
 
+    @Override
+    public List<ObjectEntity> findLikedObjects(String userId, Pageable pageable) {
+
+        if (userId == null) {
+            return Collections.emptyList();
+        }
+
+        QLikes like = QLikes.likes;
+        QObjectEntity object = QObjectEntity.objectEntity;
+
+        return queryFactory
+                .selectFrom(object)
+                .join(like).on(like.objectId.eq(object.objectId))
+                .where(like.userId.eq(userId))
+                .orderBy(like.createdAt.desc(),
+                         object.createdAt.desc(),
+                         object.objectId.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .fetch();
+    }
+
+    @Override
+    public int countLikedObjects(String userId) {
+        if (userId == null) {
+            return 0;
+        }
+
+        QLikes like = QLikes.likes;
+
+        Long count = queryFactory
+                .select(like.count())
+                .from(like)
+                .where(like.userId.eq(userId))
+                .fetchOne();
+
+        return count != null ? count.intValue() : 0;
+    }
+
     /**
      * 재고가 없는 오브젝트를 뒤로 보내는 정렬 조건을 생성합니다.
      * @param object querydsl 오브젝트 엔티티
