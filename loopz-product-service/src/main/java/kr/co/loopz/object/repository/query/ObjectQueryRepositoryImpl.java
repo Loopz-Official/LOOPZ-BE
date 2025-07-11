@@ -5,7 +5,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.loopz.object.domain.*;
-import kr.co.loopz.object.exception.ObjectException;
+import kr.co.loopz.object.dto.request.enums.SortType;
 import kr.co.loopz.object.repository.LikeRepository;
 import kr.co.loopz.object.repository.ObjectImageRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static kr.co.loopz.object.exception.ObjectErrorCode.INVALID_SORT_TYPE;
 
 
 @Repository
@@ -45,13 +43,13 @@ public class ObjectQueryRepositoryImpl implements ObjectQueryRepository{
     public List<ObjectEntity> findFilteredObjects(
             BooleanBuilder whereClause,
             Pageable pageable,
-            String sortType,
+            SortType sortType,
             int size
     ) {
 
         QObjectEntity object = QObjectEntity.objectEntity;
 
-        if ("popular".equals(sortType)) {
+        if (sortType.equals(SortType.popular)) {
             QLikes like = QLikes.likes;
 
             return queryFactory
@@ -69,18 +67,15 @@ public class ObjectQueryRepositoryImpl implements ObjectQueryRepository{
                     .fetch();
         }
 
-        if ("latest".equals(sortType)) {
-            return queryFactory
-                    .selectFrom(object)
-                    .where(whereClause)
-                    .orderBy(zeroStockToBack(object),
-                             object.createdAt.desc())
-                    .offset(pageable.getOffset())
-                    .limit(size + 1)
-                    .fetch();
-        }
+        return queryFactory
+                .selectFrom(object)
+                .where(whereClause)
+                .orderBy(zeroStockToBack(object),
+                         object.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(size + 1)
+                .fetch();
 
-        throw new ObjectException(INVALID_SORT_TYPE, "popular 또는 latest를 입력해주세요.");
     }
 
     /**

@@ -18,7 +18,7 @@ public class ObjectListService {
 
     public BoardResponse findObjectListByFilter(String userId, FilterRequest filter) {
         BooleanBuilder whereClause = buildWhereClause(filter);
-        return objectBoardService.getBoardResponse(userId, filter, whereClause);
+        return objectBoardService.getBoardResponse(userId, whereClause, filter.page(), filter.size(), filter.sort());
     }
 
 

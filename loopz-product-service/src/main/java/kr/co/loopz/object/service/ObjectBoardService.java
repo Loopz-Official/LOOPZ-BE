@@ -3,8 +3,7 @@ package kr.co.loopz.object.service;
 import com.querydsl.core.BooleanBuilder;
 import kr.co.loopz.object.converter.ObjectConverter;
 import kr.co.loopz.object.domain.ObjectEntity;
-import kr.co.loopz.object.dto.request.FilterRequest;
-import kr.co.loopz.object.dto.request.SearchFilterRequest;
+import kr.co.loopz.object.dto.request.enums.SortType;
 import kr.co.loopz.object.dto.response.BoardResponse;
 import kr.co.loopz.object.dto.response.ObjectResponse;
 import kr.co.loopz.object.repository.ObjectRepository;
@@ -35,23 +34,14 @@ public class ObjectBoardService {
     /**
      * 사용자 ID와 필터를 기반으로 오브젝트 목록을 조회하고, BoardResponse 형태로 반환합니다.
      * @param userId 사용자 UUID
-     * @param filter 검색 필터 요청 객체 FitlerRequest 또는 SearchFilterRequest 오버로드
      * @param whereClause 쿼리 조건을 구성하는 BooleanBuilder 객체
      * @return BoardResponse 오브젝트 목록, 썸네일, 좋아요, 다음 페이지 여부
      */
-    public BoardResponse getBoardResponse(String userId, SearchFilterRequest filter, BooleanBuilder whereClause) {
-        return findFromRepository(filter.page(), filter.size(), whereClause, filter.sort(), userId);
-    }
+    public BoardResponse getBoardResponse(String userId, BooleanBuilder whereClause, int page, int size, SortType sort) {
 
-    public BoardResponse getBoardResponse(String userId, FilterRequest filter, BooleanBuilder whereClause) {
-        return findFromRepository(filter.page(), filter.size(), whereClause, filter.sort(), userId);
-    }
-
-
-    private BoardResponse findFromRepository(int page, int size, BooleanBuilder whereClause, String sortType, String userId) {
         Pageable pageable = PageRequest.of(page, size);
 
-        List<ObjectEntity> objects = objectRepository.findFilteredObjects(whereClause, pageable, sortType, size);
+        List<ObjectEntity> objects = objectRepository.findFilteredObjects(whereClause, pageable, sort, size);
 
         List<String> objectIds = objects.stream()
                 .map(ObjectEntity::getObjectId)
@@ -65,6 +55,7 @@ public class ObjectBoardService {
         boolean hasNext = hasNext(objects, size);
 
         return objectConverter.toBoardResponse((int) totalCount, objectResponseList, imageMap, likeMap, hasNext);
+
     }
 
 
