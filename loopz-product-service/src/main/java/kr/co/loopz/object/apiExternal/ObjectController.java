@@ -42,7 +42,7 @@ public class ObjectController {
             log.debug("비로그인 상태로 접근");
         }
 
-        BoardResponse response = objectListService.getBoard(userId, filter);
+        BoardResponse response = objectListService.findObjectListByFilter(userId, filter);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
