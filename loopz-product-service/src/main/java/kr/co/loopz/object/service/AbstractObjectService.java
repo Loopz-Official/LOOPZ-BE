@@ -128,6 +128,17 @@ public abstract class AbstractObjectService {
 
         return likeMap;
     }
+
+    protected long countFilteredObjects(BooleanBuilder builder) {
+        Long count = queryFactory
+                .select(QObjectEntity.objectEntity.count())
+                .from(QObjectEntity.objectEntity)
+                .where(builder)
+                .fetchOne();
+
+        return count != null ? count : 0L;
+    }
 }
+
 
 

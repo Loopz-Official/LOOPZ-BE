@@ -48,7 +48,7 @@ public class ObjectListService extends AbstractObjectService{
         Map<String, String> imageMap = loadThumbnails(objectIds);
         Map<String, Boolean> likeMap = loadLikeMap(userId, objectIds);
 
-        long filteredCount = countFilteredObjects(filter);
+        long filteredCount = countFilteredObjects(buildFilter(filter, QObjectEntity.objectEntity));
         return objectConverter.toBoardResponse((int) filteredCount, objectResponses, imageMap, likeMap, slice.hasNext());
     }
 
@@ -88,16 +88,5 @@ public class ObjectListService extends AbstractObjectService{
         return builder;
     }
 
-
-    private long countFilteredObjects(FilterRequest filter) {
-        BooleanBuilder builder = buildFilter(filter, QObjectEntity.objectEntity);
-        Long count = queryFactory
-                .select(QObjectEntity.objectEntity.count())
-                .from(QObjectEntity.objectEntity)
-                .where(builder)
-                .fetchOne();
-
-        return count != null ? count : 0L;
-    }
 
 }

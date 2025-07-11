@@ -45,11 +45,11 @@ public class ObjectSearchService extends AbstractObjectService{
         boolean[] hasNextHolder = new boolean[1];
         List<ObjectEntity> objects = fetchFilteredObjects(builder, pageable, filter.sort(), filter.size(), hasNextHolder);
 
-        return buildBoardResponse(userId, objects, hasNextHolder[0], pageable);
+        return buildBoardResponse(userId, objects, hasNextHolder[0], pageable, builder);
     }
 
     // 검색 후 보드 반환
-    private BoardResponse buildBoardResponse(String userId, List<ObjectEntity> entities, boolean hasNext, Pageable pageable) {
+    private BoardResponse buildBoardResponse(String userId, List<ObjectEntity> entities, boolean hasNext, Pageable pageable, BooleanBuilder builder) {
         List<String> objectIds = entities.stream()
                 .map(ObjectEntity::getObjectId)
                 .collect(Collectors.toList());
@@ -58,7 +58,7 @@ public class ObjectSearchService extends AbstractObjectService{
         Map<String, String> imageMap = loadThumbnails(objectIds);
         Map<String, Boolean> likeMap = loadLikeMap(userId, objectIds);
 
-        long totalCount = objectRepository.count();
+        long totalCount = countFilteredObjects(builder);
         return objectConverter.toBoardResponse((int) totalCount, objects, imageMap, likeMap, hasNext);
     }
 
