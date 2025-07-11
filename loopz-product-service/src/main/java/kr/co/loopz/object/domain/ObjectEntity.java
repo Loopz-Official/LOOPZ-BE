@@ -36,9 +36,6 @@ public class ObjectEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private Long objectPrice;
 
-    @Column(nullable = false)
-    private boolean soldOut = false;
-
     // 한줄 소개
     @Column(nullable = false)
     private String intro;

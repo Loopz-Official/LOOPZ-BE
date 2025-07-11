@@ -60,7 +60,7 @@ public class ObjectQueryRepositoryImpl implements ObjectQueryRepository{
                     .where(whereClause)
                     .groupBy(object.id, object.createdAt, object.intro, object.objectId,
                              object.objectName, object.objectPrice, object.objectSize,
-                             object.objectType, object.soldOut, object.updatedAt)
+                             object.objectType, object.updatedAt)
                     .orderBy(zeroStockToBack(object),
                              like.count().desc(),
                              object.createdAt.desc())

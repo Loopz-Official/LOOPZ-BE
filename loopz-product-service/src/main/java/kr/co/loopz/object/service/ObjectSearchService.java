@@ -49,7 +49,7 @@ public class ObjectSearchService{
                     .or(object.intro.likeIgnoreCase(pattern)));
         }
         if (Boolean.TRUE.equals(filter.excludeSoldOut())) {
-            builder.and(object.soldOut.eq(false));
+            builder.and(object.detail.stock.gt(0));
         }
 
         return builder;

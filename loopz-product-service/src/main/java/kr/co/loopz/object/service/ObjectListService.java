@@ -43,7 +43,7 @@ public class ObjectListService {
             builder.and(object.keywords.any().in(filter.keywords()));
         }
         if (Boolean.TRUE.equals(filter.excludeSoldOut())) {
-            builder.and(object.soldOut.isFalse());
+            builder.and(object.detail.stock.gt(0));
         }
         return builder;
     }
