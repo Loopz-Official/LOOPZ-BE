@@ -43,16 +43,16 @@ public class ObjectBoardService {
 
         List<ObjectEntity> objects = objectRepository.findFilteredObjects(whereClause, pageable, sort, size);
 
+        boolean hasNext = hasNext(objects, size);
+
         List<String> objectIds = objects.stream()
                 .map(ObjectEntity::getObjectId)
                 .toList();
 
-        List<ObjectResponse> objectResponseList = objectConverter.toObjectResponseList(objects);
-
         Map<String, String> imageMap = objectRepository.fetchThumbnails(objectIds);
         Map<String, Boolean> likeMap = objectRepository.fetchLikeMap(userId, objectIds);
         long totalCount = objectRepository.countFilteredObjects(whereClause);
-        boolean hasNext = hasNext(objects, size);
+        List<ObjectResponse> objectResponseList = objectConverter.toObjectResponseList(objects);
 
         return objectConverter.toBoardResponse((int) totalCount, objectResponseList, imageMap, likeMap, hasNext);
 
