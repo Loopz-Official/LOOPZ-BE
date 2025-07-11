@@ -29,6 +29,12 @@ public class LikeService {
     private final UserClient userClient;
 
 
+    /**
+     * 사용자가 오브젝트에 좋아요를 토글합니다.
+     * 좋아요가 있으면 삭제, 없으면 추가합니다.
+     * @param userId 사용자 UUID
+     * @param objectId 오브젝트 ID
+     */
     @Transactional
     public void toggleLike(String userId, String objectId) {
 
@@ -49,6 +55,12 @@ public class LikeService {
     }
 
 
+    /**
+     * 사용자가 좋아요한 오브젝트 목록을 조회합니다. BoardResponse 형태로 반환, Board Service에서 처리합니다.
+     * @param userId 사용자 UUID
+     * @param request 페이지 요청 정보 (페이지 번호, 크기)
+     * @return BoardResponse 좋아요한 오브젝트 목록, 썸네일, 좋아요 여부, 다음 페이지 여부
+     */
     public BoardResponse getLikedObjects(String userId, LikedObjectRequest request) {
         checkUserValid(userId);
         return objectBoardService.getLikedBoardResponse(userId, request.page(), request.size());

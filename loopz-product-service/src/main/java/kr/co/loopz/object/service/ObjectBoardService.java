@@ -49,6 +49,13 @@ public class ObjectBoardService {
     }
 
 
+    /**
+     * 사용자가 좋아요한 오브젝트 목록을 조회하고, BoardResponse 형태로 반환합니다.
+     * @param userId 사용자 UUID
+     * @param page 페이지 번호 (0부터 시작)
+     * @param size 페이지 크기
+     * @return BoardResponse 좋아요한 오브젝트 목록, 썸네일, 좋아요 여부, 다음 페이지 여부
+     */
     public BoardResponse getLikedBoardResponse(String userId, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size);

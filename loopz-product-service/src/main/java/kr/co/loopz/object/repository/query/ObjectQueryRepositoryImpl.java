@@ -138,6 +138,12 @@ public class ObjectQueryRepositoryImpl implements ObjectQueryRepository{
         return likeMap;
     }
 
+    /**
+     * 사용자가 좋아요를 누른 오브젝트 목록을 가져옵니다.
+     * @param userId 사용자 UUID
+     * @param pageable 페이징 정보
+     * @return 사용자가 좋아요를 누른 오브젝트 목록
+     */
     @Override
     public List<ObjectEntity> findLikedObjects(String userId, Pageable pageable) {
 
@@ -160,6 +166,11 @@ public class ObjectQueryRepositoryImpl implements ObjectQueryRepository{
                 .fetch();
     }
 
+    /**
+     * 사용자가 좋아요를 누른 오브젝트의 개수를 가져옵니다.
+     * @param userId 사용자 UUID
+     * @return 사용자가 좋아요를 누른 오브젝트의 개수
+     */
     @Override
     public int countLikedObjects(String userId) {
         if (userId == null) {
