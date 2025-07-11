@@ -2,12 +2,14 @@ package kr.co.loopz.object.apiInternal;
 
 import kr.co.loopz.object.dto.request.DeleteCartItemRequest;
 import kr.co.loopz.object.dto.request.SearchFilterRequest;
-import kr.co.loopz.object.dto.response.*;
+import kr.co.loopz.object.dto.response.BoardResponse;
+import kr.co.loopz.object.dto.response.CartWithQuantityResponse;
+import kr.co.loopz.object.dto.response.ObjectNameResponse;
+import kr.co.loopz.object.dto.response.ObjectResponse;
 import kr.co.loopz.object.repository.CartItemRepository;
 import kr.co.loopz.object.repository.ObjectRepository;
 import kr.co.loopz.object.service.CartService;
 import kr.co.loopz.object.service.ObjectDetailService;
-import kr.co.loopz.object.service.ObjectListService;
 import kr.co.loopz.object.service.ObjectSearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,7 +28,6 @@ public class InternalObjectController {
     private final CartItemRepository cartItemRepository;
     private final CartService cartService;
     private final ObjectDetailService objectDetailService;
-    private final ObjectListService objectListService;
     private final ObjectSearchService objectSearchService;
 
     @PostMapping("/objects")
@@ -79,7 +80,7 @@ public class InternalObjectController {
 
     @GetMapping("/object/search")
     public ResponseEntity<List<ObjectNameResponse>> searchObjectsByKeyword(@RequestParam String keyword) {
-        List<ObjectNameResponse> nameResponse = objectSearchService.searchObjectsByKeyword(keyword);
+        List<ObjectNameResponse> nameResponse = objectSearchService.findObjectBySearchFilter(keyword);
         return ResponseEntity.ok(nameResponse);
     }
 
@@ -94,7 +95,7 @@ public class InternalObjectController {
         }
 
 
-        BoardResponse result = objectSearchService.searchObjectsByKeyword(userId, filter);
+        BoardResponse result = objectSearchService.findObjectBySearchFilter(userId, filter);
         return ResponseEntity.ok(result);
     }
 }

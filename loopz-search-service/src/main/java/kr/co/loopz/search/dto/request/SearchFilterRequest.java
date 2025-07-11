@@ -10,4 +10,12 @@ public record SearchFilterRequest(
         Boolean excludeSoldOut,
         int page,
         int size
-) {}
+) {
+    public int page() {
+        return Math.max(page - 1, 0);
+    }
+
+    public int size() {
+        return size > 0 ? size : 10;  // 기본값 10
+    }
+}

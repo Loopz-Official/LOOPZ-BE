@@ -1,7 +1,10 @@
 package kr.co.loopz.object.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public record SearchFilterRequest(
-        String keyword,
+        @JsonProperty("keyword")
+        String searchWord,
         String sort,
         Boolean excludeSoldOut,
         int page,
