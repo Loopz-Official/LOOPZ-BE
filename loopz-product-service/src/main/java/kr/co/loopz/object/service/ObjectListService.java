@@ -91,11 +91,13 @@ public class ObjectListService extends AbstractObjectService{
 
     private long countFilteredObjects(FilterRequest filter) {
         BooleanBuilder builder = buildFilter(filter, QObjectEntity.objectEntity);
-        return queryFactory
+        Long count = queryFactory
                 .select(QObjectEntity.objectEntity.count())
                 .from(QObjectEntity.objectEntity)
                 .where(builder)
                 .fetchOne();
+
+        return count != null ? count : 0L;
     }
 
 }
