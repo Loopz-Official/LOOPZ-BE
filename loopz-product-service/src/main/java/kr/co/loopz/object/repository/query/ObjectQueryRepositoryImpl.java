@@ -61,7 +61,8 @@ public class ObjectQueryRepositoryImpl implements ObjectQueryRepository{
                              object.objectType, object.updatedAt)
                     .orderBy(zeroStockToBack(object),
                              like.count().desc(),
-                             object.createdAt.desc())
+                             object.createdAt.desc(),
+                             object.objectId.asc())
                     .offset(pageable.getOffset())
                     .limit(size + 1)
                     .fetch();
@@ -71,7 +72,8 @@ public class ObjectQueryRepositoryImpl implements ObjectQueryRepository{
                 .selectFrom(object)
                 .where(whereClause)
                 .orderBy(zeroStockToBack(object),
-                         object.createdAt.desc())
+                         object.createdAt.desc(),
+                         object.objectId.asc())
                 .offset(pageable.getOffset())
                 .limit(size + 1)
                 .fetch();
