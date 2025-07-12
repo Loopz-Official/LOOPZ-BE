@@ -5,7 +5,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.loopz.object.domain.*;
-import kr.co.loopz.object.exception.ObjectException;
+import kr.co.loopz.object.dto.request.enums.SortType;
 import kr.co.loopz.object.repository.LikeRepository;
 import kr.co.loopz.object.repository.ObjectImageRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static kr.co.loopz.object.exception.ObjectErrorCode.INVALID_SORT_TYPE;
 
 
 @Repository
@@ -45,13 +43,13 @@ public class ObjectQueryRepositoryImpl implements ObjectQueryRepository{
     public List<ObjectEntity> findFilteredObjects(
             BooleanBuilder whereClause,
             Pageable pageable,
-            String sortType,
+            SortType sortType,
             int size
     ) {
 
         QObjectEntity object = QObjectEntity.objectEntity;
 
-        if ("popular".equals(sortType)) {
+        if (sortType.equals(SortType.popular)) {
             QLikes like = QLikes.likes;
 
             return queryFactory
@@ -63,24 +61,23 @@ public class ObjectQueryRepositoryImpl implements ObjectQueryRepository{
                              object.objectType, object.updatedAt)
                     .orderBy(zeroStockToBack(object),
                              like.count().desc(),
-                             object.createdAt.desc())
+                             object.createdAt.desc(),
+                             object.objectId.asc())
                     .offset(pageable.getOffset())
                     .limit(size + 1)
                     .fetch();
         }
 
-        if ("latest".equals(sortType)) {
-            return queryFactory
-                    .selectFrom(object)
-                    .where(whereClause)
-                    .orderBy(zeroStockToBack(object),
-                             object.createdAt.desc())
-                    .offset(pageable.getOffset())
-                    .limit(size + 1)
-                    .fetch();
-        }
+        return queryFactory
+                .selectFrom(object)
+                .where(whereClause)
+                .orderBy(zeroStockToBack(object),
+                         object.createdAt.desc(),
+                         object.objectId.asc())
+                .offset(pageable.getOffset())
+                .limit(size + 1)
+                .fetch();
 
-        throw new ObjectException(INVALID_SORT_TYPE, "popular 또는 latest를 입력해주세요.");
     }
 
     /**
@@ -139,6 +136,56 @@ public class ObjectQueryRepositoryImpl implements ObjectQueryRepository{
         }
 
         return likeMap;
+    }
+
+    /**
+     * 사용자가 좋아요를 누른 오브젝트 목록을 가져옵니다.
+     * @param userId 사용자 UUID
+     * @param pageable 페이징 정보
+     * @return 사용자가 좋아요를 누른 오브젝트 목록
+     */
+    @Override
+    public List<ObjectEntity> findLikedObjects(String userId, Pageable pageable) {
+
+        if (userId == null) {
+            return Collections.emptyList();
+        }
+
+        QLikes like = QLikes.likes;
+        QObjectEntity object = QObjectEntity.objectEntity;
+
+        return queryFactory
+                .selectFrom(object)
+                .join(like).on(like.objectId.eq(object.objectId))
+                .where(like.userId.eq(userId))
+                .orderBy(like.createdAt.desc(),
+                         object.createdAt.desc(),
+                         object.objectId.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .fetch();
+    }
+
+    /**
+     * 사용자가 좋아요를 누른 오브젝트의 개수를 가져옵니다.
+     * @param userId 사용자 UUID
+     * @return 사용자가 좋아요를 누른 오브젝트의 개수
+     */
+    @Override
+    public int countLikedObjects(String userId) {
+        if (userId == null) {
+            return 0;
+        }
+
+        QLikes like = QLikes.likes;
+
+        Long count = queryFactory
+                .select(like.count())
+                .from(like)
+                .where(like.userId.eq(userId))
+                .fetchOne();
+
+        return count != null ? count.intValue() : 0;
     }
 
     /**

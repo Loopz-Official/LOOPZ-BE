@@ -3,8 +3,7 @@ package kr.co.loopz.object.service;
 import com.querydsl.core.BooleanBuilder;
 import kr.co.loopz.object.converter.ObjectConverter;
 import kr.co.loopz.object.domain.ObjectEntity;
-import kr.co.loopz.object.dto.request.FilterRequest;
-import kr.co.loopz.object.dto.request.SearchFilterRequest;
+import kr.co.loopz.object.dto.request.enums.SortType;
 import kr.co.loopz.object.dto.response.BoardResponse;
 import kr.co.loopz.object.dto.response.ObjectResponse;
 import kr.co.loopz.object.repository.ObjectRepository;
@@ -35,51 +34,65 @@ public class ObjectBoardService {
     /**
      * 사용자 ID와 필터를 기반으로 오브젝트 목록을 조회하고, BoardResponse 형태로 반환합니다.
      * @param userId 사용자 UUID
-     * @param filter 검색 필터 요청 객체 FitlerRequest 또는 SearchFilterRequest 오버로드
      * @param whereClause 쿼리 조건을 구성하는 BooleanBuilder 객체
      * @return BoardResponse 오브젝트 목록, 썸네일, 좋아요, 다음 페이지 여부
      */
-    public BoardResponse getBoardResponse(String userId, SearchFilterRequest filter, BooleanBuilder whereClause) {
-        return findFromRepository(filter.page(), filter.size(), whereClause, filter.sort(), userId);
-    }
+    public BoardResponse getBoardResponse(String userId, BooleanBuilder whereClause, int page, int size, SortType sort) {
 
-    public BoardResponse getBoardResponse(String userId, FilterRequest filter, BooleanBuilder whereClause) {
-        return findFromRepository(filter.page(), filter.size(), whereClause, filter.sort(), userId);
-    }
-
-
-    private BoardResponse findFromRepository(int page, int size, BooleanBuilder whereClause, String sortType, String userId) {
         Pageable pageable = PageRequest.of(page, size);
 
-        List<ObjectEntity> objects = objectRepository.findFilteredObjects(whereClause, pageable, sortType, size);
-
-        List<String> objectIds = objects.stream()
-                .map(ObjectEntity::getObjectId)
-                .toList();
-
-        List<ObjectResponse> objectResponseList = objectConverter.toObjectResponseList(objects);
-
-        Map<String, String> imageMap = objectRepository.fetchThumbnails(objectIds);
-        Map<String, Boolean> likeMap = objectRepository.fetchLikeMap(userId, objectIds);
+        List<ObjectEntity> objects = objectRepository.findFilteredObjects(whereClause, pageable, sort, size);
         long totalCount = objectRepository.countFilteredObjects(whereClause);
         boolean hasNext = hasNext(objects, size);
 
-        return objectConverter.toBoardResponse((int) totalCount, objectResponseList, imageMap, likeMap, hasNext);
+        return getResponseWithLikedAndImage(userId, objects, (int) totalCount, hasNext);
     }
 
 
     /**
+     * 사용자가 좋아요한 오브젝트 목록을 조회하고, BoardResponse 형태로 반환합니다.
+     * @param userId 사용자 UUID
+     * @param page 페이지 번호 (0부터 시작)
+     * @param size 페이지 크기
+     * @return BoardResponse 좋아요한 오브젝트 목록, 썸네일, 좋아요 여부, 다음 페이지 여부
+     */
+    public BoardResponse getLikedBoardResponse(String userId, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<ObjectEntity> objects = objectRepository.findLikedObjects(userId, pageable);
+        int totalCount = objectRepository.countLikedObjects(userId);
+        boolean hasNext = hasNext(objects, size);
+
+        return getResponseWithLikedAndImage(userId, objects, totalCount, hasNext);
+    }
+
+    /**
      * 페이지네이션을 위해 다음 페이지가 있는지 확인합니다.
+     * +1개 오브젝트를 조회하고 판단하기 때문에 응답을 만들기 전에 호출해야합니다.
      * @param list 조회된 오브젝트 목록
      * @param pageSize 페이지 크기
      * @return 다음 페이지가 있는지 여부
      */
-    public <T> boolean hasNext(List<T> list, int pageSize) {
+    private <T> boolean hasNext(List<T> list, int pageSize) {
         boolean hasNext = list.size() > pageSize;
         if (hasNext) {
             list.remove(list.size() - 1);
         }
         return hasNext;
+    }
+
+    private BoardResponse getResponseWithLikedAndImage(String userId, List<ObjectEntity> objects, int totalCount, boolean hasNext) {
+        List<String> objectIds = objects.stream()
+                .map(ObjectEntity::getObjectId)
+                .toList();
+
+        Map<String, String> imageMap = objectRepository.fetchThumbnails(objectIds);
+        Map<String, Boolean> likeMap = objectRepository.fetchLikeMap(userId, objectIds);
+
+        List<ObjectResponse> objectResponseList = objectConverter.toObjectResponseList(objects);
+
+        return objectConverter.toBoardResponse(totalCount, objectResponseList, imageMap, likeMap, hasNext);
     }
 
 }

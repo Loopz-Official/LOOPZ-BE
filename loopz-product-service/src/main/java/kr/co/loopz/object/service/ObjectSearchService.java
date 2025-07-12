@@ -29,7 +29,7 @@ public class ObjectSearchService{
 
     public BoardResponse findObjectBySearchFilter(String userId, SearchFilterRequest filter) {
         BooleanBuilder whereClause = buildWhereClause(filter);
-        return objectBoardService.getBoardResponse(userId, filter, whereClause);
+        return objectBoardService.getBoardResponse(userId, whereClause, filter.page(), filter.size(), filter.sort());
     }
 
     // 실시간 검색: objectName 기준 Top 10
