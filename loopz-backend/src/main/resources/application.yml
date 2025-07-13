@@ -1,6 +1,6 @@
 spring:
   profiles:
-    include: local, jwt, oauth, aws
+    include: local, jwt, oauth, aws, portone
 
   datasource:
     url: jdbc:postgresql://${POSTGRESQL_HOST}:${POSTGRESQL_PORT}/${POSTGRESQL_DATABASE}
@@ -94,3 +94,6 @@ etc:
   payment-service-url: ${PAYMENT_SERVICE_URL}
   search-service-url: ${SEARCH_SERVICE_URL}
 
+portone:
+  api-secret: ${IMP_API_SECRET:testapisecret}
+  webhook-secret: ${IMP_WEBHOOK_SECRET:testwebhooksecret}
