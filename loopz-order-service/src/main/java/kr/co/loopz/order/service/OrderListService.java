@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static kr.co.loopz.order.exception.OrderErrorCode.OBJECT_ID_NOT_FOUND;
 
@@ -50,14 +53,17 @@ public class OrderListService {
 
         List<InternalObjectResponse> currentObjects = getObjectDetailsByOrderItems(orderItems);
 
+        // Map으로 변환
+        Map<String, InternalObjectResponse> objectDetailsMap = currentObjects.stream()
+                .collect(Collectors.toMap(InternalObjectResponse::objectId, Function.identity()));
+
         // MyOrderObjectResponse 리스트 생성
         List<MyOrderObjectResponse> objectResponses = orderItems.stream()
                 .map(item -> {
-                    InternalObjectResponse detail = currentObjects.stream()
-                            .filter(obj -> obj.objectId().equals(item.getObjectId()))
-                            .findFirst()
-                            .orElseThrow(() -> new OrderException(OBJECT_ID_NOT_FOUND, "ObjectId:" + item.getObjectId()));
-
+                    InternalObjectResponse detail = objectDetailsMap.get(item.getObjectId());
+                    if (detail == null) {
+                        throw new OrderException(OBJECT_ID_NOT_FOUND, "ObjectId:" + item.getObjectId());
+                    }
                     return orderConverter.toMyOrderObjectResponse(item, detail);
                 })
                 .toList();
