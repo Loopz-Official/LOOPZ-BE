@@ -3,7 +3,9 @@ package kr.co.loopz.order.apiExternal;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import kr.co.loopz.order.dto.request.OrderRequest;
+import kr.co.loopz.order.dto.response.OrderListResponse;
 import kr.co.loopz.order.dto.response.OrderResponse;
+import kr.co.loopz.order.service.OrderListService;
 import kr.co.loopz.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,10 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -23,11 +24,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController {
 
     private final OrderService orderService;
+    private final OrderListService orderListService;
 
-    // 상품 상세보기에서 주문 (단일 상품)
+    // 상품 주문
     @PostMapping()
-    @Operation(summary = "주문 API - 주문 상태 PENDING")
-    public ResponseEntity<OrderResponse> orderSingle(
+    @Operation(summary = "주문 API")
+    public ResponseEntity<OrderResponse> orderObject(
             @AuthenticationPrincipal User currentUser,
             @RequestBody @Valid OrderRequest request) {
 
@@ -37,5 +39,17 @@ public class OrderController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    // 내 주문목록 조회
+    @GetMapping()
+    public ResponseEntity<List<OrderListResponse>> getOrders(@AuthenticationPrincipal User currentUser) {
+
+        String userId = currentUser.getUsername();
+
+        List<OrderListResponse> response = orderListService.getOrders(userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 
 }
