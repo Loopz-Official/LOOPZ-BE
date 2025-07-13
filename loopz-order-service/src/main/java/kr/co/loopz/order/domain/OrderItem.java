@@ -1,6 +1,7 @@
 package kr.co.loopz.order.domain;
 
 import jakarta.persistence.*;
+import kr.co.loopz.common.domain.BaseTimeEntity;
 import kr.co.loopz.order.domain.enums.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +17,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @AllArgsConstructor
 @Table(name = "order_object_item")
-public class OrderItem {
+public class OrderItem extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
