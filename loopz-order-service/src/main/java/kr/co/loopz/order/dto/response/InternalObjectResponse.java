@@ -1,6 +1,6 @@
-package kr.co.loopz.object.dto.response;
+package kr.co.loopz.order.dto.response;
 
-public record ObjectResponse (
+public record InternalObjectResponse(
         String objectId,
         String objectName,
         String intro,
@@ -8,7 +8,5 @@ public record ObjectResponse (
         Long objectPrice,
         boolean liked,
         int stock
-){
+) {
 }
-
-

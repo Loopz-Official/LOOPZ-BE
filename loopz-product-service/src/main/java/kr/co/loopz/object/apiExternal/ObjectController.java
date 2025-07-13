@@ -3,8 +3,10 @@ package kr.co.loopz.object.apiExternal;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import kr.co.loopz.object.dto.request.FilterRequest;
+import kr.co.loopz.object.dto.request.ObjectInfoRequest;
 import kr.co.loopz.object.dto.response.BoardResponse;
 import kr.co.loopz.object.dto.response.DetailResponse;
+import kr.co.loopz.object.dto.response.OrderObjectInfoResponse;
 import kr.co.loopz.object.service.ObjectDetailService;
 import kr.co.loopz.object.service.ObjectListService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -38,7 +42,7 @@ public class ObjectController {
             log.debug("비로그인 상태로 접근");
         }
 
-        BoardResponse response = objectListService.getBoard(userId, filter);
+        BoardResponse response = objectListService.findObjectListByFilter(userId, filter);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -55,4 +59,17 @@ public class ObjectController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @PostMapping("/info")
+    @Operation(summary= "주문 상품 정보 반환")
+    public ResponseEntity<List<OrderObjectInfoResponse>> getOrderObjectInfo(
+            @RequestBody List<ObjectInfoRequest> objectInfoRequests
+    ){
+        List<OrderObjectInfoResponse> responseList = objectDetailService.getOrderObjectInfo(objectInfoRequests);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseList);
+
+
+    }
+
 }

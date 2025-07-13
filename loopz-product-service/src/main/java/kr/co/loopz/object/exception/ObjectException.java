@@ -1,4 +1,4 @@
-package kr.co.loopz.object.Exception;
+package kr.co.loopz.object.exception;
 
 import kr.co.loopz.common.exception.CustomException;
 import kr.co.loopz.common.exception.ErrorCode;

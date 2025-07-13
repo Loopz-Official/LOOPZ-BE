@@ -1,99 +1,49 @@
 package kr.co.loopz.object.service;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.Tuple;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import kr.co.loopz.object.Exception.ObjectException;
-import kr.co.loopz.object.converter.ObjectConverter;
-import kr.co.loopz.object.domain.Likes;
-import kr.co.loopz.object.domain.ObjectImage;
-import kr.co.loopz.object.domain.ObjectEntity;
-import kr.co.loopz.object.domain.QLikes;
 import kr.co.loopz.object.domain.QObjectEntity;
 import kr.co.loopz.object.dto.request.FilterRequest;
 import kr.co.loopz.object.dto.response.BoardResponse;
-import kr.co.loopz.object.dto.response.ObjectResponse;
-import kr.co.loopz.object.repository.LikeRepository;
-import kr.co.loopz.object.repository.ObjectImageRepository;
-import kr.co.loopz.object.repository.ObjectRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static kr.co.loopz.object.Exception.ObjectErrorCode.*;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
-public class ObjectListService extends AbstractObjectService{
+public class ObjectListService {
 
-    public ObjectListService(
-            ObjectImageRepository objectImageRepository,
-            LikeRepository likeRepository,
-            ObjectRepository objectRepository,
-            ObjectConverter objectConverter,
-            JPAQueryFactory queryFactory
-    ) {
-        super(objectImageRepository, likeRepository, objectRepository, objectConverter, queryFactory);
-    }
+    private final ObjectBoardService objectBoardService;
 
-    // 오브제 보드 조회
-    public BoardResponse getBoard(String userId, FilterRequest filter) {
-        Slice<ObjectEntity> slice = getFilteredObjects(filter);
-        List<ObjectEntity> entities = slice.getContent();
 
-        List<String> objectIds = entities.stream()
-                .map(ObjectEntity::getObjectId)
-                .collect(Collectors.toList());
-        List<ObjectResponse> objectResponses = objectConverter.toObjectResponseList(entities);
-
-        Map<String, String> imageMap = loadThumbnails(objectIds);
-        Map<String, Boolean> likeMap = loadLikeMap(userId, objectIds);
-
-        long totalCount = objectRepository.count();
-        return objectConverter.toBoardResponse((int) totalCount, objectResponses, imageMap, likeMap, slice.hasNext());
+    public BoardResponse findObjectListByFilter(String userId, FilterRequest filter) {
+        BooleanBuilder whereClause = buildWhereClause(filter);
+        return objectBoardService.getBoardResponse(userId, whereClause, filter.page(), filter.size(), filter.sort());
     }
 
 
-    public Slice<ObjectEntity> getFilteredObjects(FilterRequest filter) {
-        Pageable pageable = PageRequest.of(filter.getPage(), filter.getSize());
-        BooleanBuilder builder = buildFilter(filter, QObjectEntity.objectEntity);
-        boolean[] hasNextHolder = new boolean[1];
+    private BooleanBuilder buildWhereClause(FilterRequest filter) {
 
-        List<ObjectEntity> result = fetchFilteredObjects(builder, pageable, filter.getSort(), filter.getSize(), hasNextHolder);
-        return new SliceImpl<>(result, pageable, hasNextHolder[0]);
-    }
-
-
-    // 필터
-    private BooleanBuilder buildFilter(FilterRequest filter, QObjectEntity qObj) {
         BooleanBuilder builder = new BooleanBuilder();
+        QObjectEntity object = QObjectEntity.objectEntity;
 
-        if (filter.getObjectTypes() != null && !filter.getObjectTypes().isEmpty()) {
-            builder.and(qObj.objectType.in(filter.getObjectTypes()));
+        if (filter.objectTypes() != null && !filter.objectTypes().isEmpty()) {
+            builder.and(object.objectType.in(filter.objectTypes()));
         }
-        if (filter.getObjectSizes() != null && !filter.getObjectSizes().isEmpty()) {
-            builder.and(qObj.objectSize.in(filter.getObjectSizes()));
+        if (filter.objectSizes() != null && !filter.objectSizes().isEmpty()) {
+            builder.and(object.objectSize.in(filter.objectSizes()));
         }
-        if (filter.getPriceMin() != null) {
-            builder.and(qObj.objectPrice.goe(filter.getPriceMin()));
+        if (filter.priceMin() != null) {
+            builder.and(object.objectPrice.goe(filter.priceMin()));
         }
-        if (filter.getPriceMax() != null) {
-            builder.and(qObj.objectPrice.loe(filter.getPriceMax()));
+        if (filter.priceMax() != null) {
+            builder.and(object.objectPrice.loe(filter.priceMax()));
         }
-        if (filter.getKeywords() != null && !filter.getKeywords().isEmpty()) {
-            builder.and(qObj.keywords.any().in(filter.getKeywords()));
+        if (filter.keywords() != null && !filter.keywords().isEmpty()) {
+            builder.and(object.keywords.any().in(filter.keywords()));
         }
-        if (Boolean.TRUE.equals(filter.getExcludeSoldOut())) {
-            builder.and(qObj.soldOut.isFalse());
+        if (Boolean.TRUE.equals(filter.excludeSoldOut())) {
+            builder.and(object.detail.stock.gt(0));
         }
         return builder;
     }
