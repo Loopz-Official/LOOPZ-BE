@@ -1,6 +1,7 @@
 package kr.co.loopz.order.domain;
 
 import jakarta.persistence.*;
+import kr.co.loopz.order.domain.enums.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,6 +34,10 @@ public class OrderItem {
     @Column(nullable = false)
     private Long purchasePrice;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrderStatus status;
+
 
     public static OrderItem createOrderItem(String orderId, String objectId, int quantity, Long purchasePrice) {
         return OrderItem.builder()
@@ -40,15 +45,17 @@ public class OrderItem {
                 .objectId(objectId)
                 .quantity(quantity)
                 .purchasePrice(purchasePrice)
+                .status(OrderStatus.PENDING)
                 .build();
     }
 
     @Builder(access = PRIVATE)
-    private OrderItem(String orderId, String objectId, int quantity, Long purchasePrice) {
+    private OrderItem(String orderId, String objectId, int quantity, Long purchasePrice, OrderStatus status) {
         this.orderId = orderId;
         this.objectId = objectId;
         this.quantity = quantity;
         this.purchasePrice = purchasePrice;
+        this.status= status;
     }
 
 }

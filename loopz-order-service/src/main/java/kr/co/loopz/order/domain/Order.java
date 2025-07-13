@@ -37,10 +37,6 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private OrderStatus status;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private PaymentMethod paymentMethod;
 
     @Column(length = 500)
@@ -57,7 +53,6 @@ public class Order {
         return Order.builder()
                 .userId(userId)
                 .addressId(request.addressId())
-                .status(OrderStatus.PENDING)
                 .paymentMethod(request.paymentMethod())
                 .deliveryRequest(request.deliveryRequest())
                 .build();
@@ -67,13 +62,11 @@ public class Order {
     @Builder(access = PRIVATE)
     private Order(String userId,
                  String addressId,
-                 OrderStatus status,
                  PaymentMethod paymentMethod,
                  String deliveryRequest) {
         this.orderId = UUID.randomUUID().toString();
         this.userId = userId;
         this.addressId = addressId;
-        this.status = status;
         this.paymentMethod = paymentMethod;
         this.deliveryRequest = deliveryRequest;
     }
