@@ -4,6 +4,8 @@ import kr.co.loopz.order.domain.Order;
 import kr.co.loopz.order.domain.OrderItem;
 import kr.co.loopz.order.dto.response.InternalObjectResponse;
 import kr.co.loopz.order.dto.response.ObjectResponse;
+import kr.co.loopz.order.dto.response.OrderListResponse;
+import kr.co.loopz.order.dto.response.MyOrderObjectResponse;
 import kr.co.loopz.order.dto.response.OrderResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -43,7 +45,6 @@ public interface OrderConverter {
 
         return new OrderResponse(
                 order.getOrderId(),
-                order.getStatus(),
                 order.getPaymentMethod(),
                 objectResponses,
                 shippingFee,
@@ -55,5 +56,26 @@ public interface OrderConverter {
     @Mapping(source = "internalObjectResponse.objectPrice", target = "purchasePrice")
     ObjectResponse toObjectResponse(InternalObjectResponse internalObjectResponse, int quantity);
 
+
+    default MyOrderObjectResponse toMyOrderObjectResponse(OrderItem item, InternalObjectResponse detail) {
+        return new MyOrderObjectResponse(
+                item.getObjectId(),
+                detail.objectName(),
+                detail.intro(),
+                item.getStatus(),
+                detail.imageUrl(),
+                item.getPurchasePrice()* item.getQuantity(),
+                item.getQuantity(),
+                item.getCreatedAt()
+        );
+    }
+
+    default OrderListResponse toOrderListResponse(Order order, List<MyOrderObjectResponse> objects) {
+        return new OrderListResponse(
+                order.getOrderId(),
+                objects
+        );
+
+    }
 }
 
