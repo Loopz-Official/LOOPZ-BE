@@ -5,12 +5,8 @@ import kr.co.loopz.order.domain.enums.PaymentMethod;
 
 import java.util.List;
 
-public record OrderResponse(
+public record OrderListResponse(
         String orderId,
-        PaymentMethod paymentMethod,
-        List<ObjectResponse> objects,
-        int shippingFee,
-        long totalProductPrice,
-        long totalPayment
+        List<MyOrderObjectResponse> objects
 ) {
 }
