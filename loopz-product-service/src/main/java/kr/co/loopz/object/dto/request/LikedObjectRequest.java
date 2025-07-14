@@ -6,7 +6,8 @@ public record LikedObjectRequest(
         @Min(1)
         int page,
         @Min(1)
-        int size
+        int size,
+        Boolean excludeSoldOut
 ) {
 
         public int page() {

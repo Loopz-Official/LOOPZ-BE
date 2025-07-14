@@ -63,7 +63,8 @@ public class LikeService {
      */
     public BoardResponse getLikedObjects(String userId, LikedObjectRequest request) {
         checkUserValid(userId);
-        return objectBoardService.getLikedBoardResponse(userId, request.page(), request.size());
+        boolean excludeSoldOut = Boolean.TRUE.equals(request.excludeSoldOut());
+        return objectBoardService.getLikedBoardResponse(userId, request.page(), request.size(), excludeSoldOut);
     }
 
 

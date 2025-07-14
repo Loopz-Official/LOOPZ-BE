@@ -13,6 +13,6 @@ public interface ObjectQueryRepository {
     long countFilteredObjects(BooleanBuilder whereClause);
     Map<String, String> fetchThumbnails(List<String> objectIds);
     Map<String, Boolean> fetchLikeMap(String userId, List<String> objectIds);
-    List<ObjectEntity> findLikedObjects(String userId, Pageable pageable);
-    int countLikedObjects(String userId);
+    List<ObjectEntity> findLikedObjects(String userId, Pageable pageable, boolean excludeSoldOut);
+    int countLikedObjects(String userId, boolean excludeSoldOut);
 }
