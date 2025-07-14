@@ -5,6 +5,7 @@ import kr.co.loopz.order.client.UserClient;
 import kr.co.loopz.order.converter.OrderConverter;
 import kr.co.loopz.order.domain.Order;
 import kr.co.loopz.order.domain.OrderItem;
+import kr.co.loopz.order.domain.enums.PaymentMethod;
 import kr.co.loopz.order.dto.response.*;
 import kr.co.loopz.order.dto.response.InternalAddressResponse;
 import kr.co.loopz.order.exception.OrderException;
@@ -43,6 +44,8 @@ public class OrderDetailService {
         // 주소 조회
         InternalAddressResponse address = userClient.getAddressById(order.getUserId(), order.getAddressId());
 
+        PaymentMethod paymentMethod = order.getPaymentMethod();
+
         long productPrice = orderItem.getPurchasePrice() * orderItem.getQuantity();
         long totalPayment = productPrice + SHIPPING_FEE;
 
@@ -53,7 +56,8 @@ public class OrderDetailService {
                 address,
                 SHIPPING_FEE,
                 productPrice,
-                totalPayment
+                totalPayment,
+                paymentMethod
         );
     }
 
