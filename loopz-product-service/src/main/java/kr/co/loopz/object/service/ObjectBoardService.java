@@ -56,12 +56,12 @@ public class ObjectBoardService {
      * @param size 페이지 크기
      * @return BoardResponse 좋아요한 오브젝트 목록, 썸네일, 좋아요 여부, 다음 페이지 여부
      */
-    public BoardResponse getLikedBoardResponse(String userId, int page, int size) {
+    public BoardResponse getLikedBoardResponse(String userId, int page, int size, boolean excludeSoldOut) {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        List<ObjectEntity> objects = objectRepository.findLikedObjects(userId, pageable);
-        int totalCount = objectRepository.countLikedObjects(userId);
+        List<ObjectEntity> objects = objectRepository.findLikedObjects(userId, pageable, excludeSoldOut);
+        int totalCount = objectRepository.countLikedObjects(userId, excludeSoldOut);
         boolean hasNext = hasNext(objects, size);
 
         return getResponseWithLikedAndImage(userId, objects, totalCount, hasNext);
