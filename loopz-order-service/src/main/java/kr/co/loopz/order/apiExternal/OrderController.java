@@ -3,8 +3,10 @@ package kr.co.loopz.order.apiExternal;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import kr.co.loopz.order.dto.request.OrderRequest;
+import kr.co.loopz.order.dto.response.ObjectDetailResponse;
 import kr.co.loopz.order.dto.response.OrderListResponse;
 import kr.co.loopz.order.dto.response.OrderResponse;
+import kr.co.loopz.order.service.OrderDetailService;
 import kr.co.loopz.order.service.OrderListService;
 import kr.co.loopz.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ public class OrderController {
 
     private final OrderService orderService;
     private final OrderListService orderListService;
+    private final OrderDetailService orderDetailService;
 
     // 상품 주문
     @PostMapping()
@@ -47,6 +50,19 @@ public class OrderController {
         String userId = currentUser.getUsername();
 
         List<OrderListResponse> response = orderListService.getOrders(userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    // 주문 상세 조회
+    @GetMapping("/{objectId}")
+    public ResponseEntity<ObjectDetailResponse> getOrderDetail(@AuthenticationPrincipal User currentUser,
+                                                               @RequestParam String orderId,
+                                                               @PathVariable String objectId ) {
+
+        String userId = currentUser.getUsername();
+
+        ObjectDetailResponse response = orderDetailService.getOrderDetail(userId,orderId,objectId);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
