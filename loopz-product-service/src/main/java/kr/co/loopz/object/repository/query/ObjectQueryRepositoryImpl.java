@@ -142,10 +142,11 @@ public class ObjectQueryRepositoryImpl implements ObjectQueryRepository{
      * 사용자가 좋아요를 누른 오브젝트 목록을 가져옵니다.
      * @param userId 사용자 UUID
      * @param pageable 페이징 정보
+     * @param excludeSoldOut 재고가 없는 오브젝트를 제외할지 여부
      * @return 사용자가 좋아요를 누른 오브젝트 목록
      */
     @Override
-    public List<ObjectEntity> findLikedObjects(String userId, Pageable pageable) {
+    public List<ObjectEntity> findLikedObjects(String userId, Pageable pageable, boolean excludeSoldOut) {
 
         if (userId == null) {
             return Collections.emptyList();
@@ -157,7 +158,8 @@ public class ObjectQueryRepositoryImpl implements ObjectQueryRepository{
         return queryFactory
                 .selectFrom(object)
                 .join(like).on(like.objectId.eq(object.objectId))
-                .where(like.userId.eq(userId))
+                .where(like.userId.eq(userId),
+                       excludeSoldOut ? object.detail.stock.gt(0) : null)
                 .orderBy(like.createdAt.desc(),
                          object.createdAt.desc(),
                          object.objectId.asc())
@@ -169,20 +171,24 @@ public class ObjectQueryRepositoryImpl implements ObjectQueryRepository{
     /**
      * 사용자가 좋아요를 누른 오브젝트의 개수를 가져옵니다.
      * @param userId 사용자 UUID
+     * @param excludeSoldOut 품절된 상품(재고가 0인 상품)을 개수에서 제외할지 여부
      * @return 사용자가 좋아요를 누른 오브젝트의 개수
      */
     @Override
-    public int countLikedObjects(String userId) {
+    public int countLikedObjects(String userId, boolean excludeSoldOut) {
         if (userId == null) {
             return 0;
         }
 
         QLikes like = QLikes.likes;
+        QObjectEntity object = QObjectEntity.objectEntity;
 
         Long count = queryFactory
-                .select(like.count())
-                .from(like)
-                .where(like.userId.eq(userId))
+                .select(object.count())
+                .from(object)
+                .join(like).on(like.objectId.eq(object.objectId))
+                .where(like.userId.eq(userId),
+                       excludeSoldOut ? object.detail.stock.gt(0) : null)
                 .fetchOne();
 
         return count != null ? count.intValue() : 0;
