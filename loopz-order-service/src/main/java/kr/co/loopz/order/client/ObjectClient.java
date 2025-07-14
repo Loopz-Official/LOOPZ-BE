@@ -23,6 +23,9 @@ public interface ObjectClient {
     @PostMapping("/internal/objects")
     List<InternalObjectResponse> getObjectListByIds(@RequestBody List<String> requestIds);
 
+    @PostMapping("/internal/object/{objectId}")
+    InternalObjectResponse getObjectById(@PathVariable String objectId);
+
     // 주문 후 재고 감소
     @PostMapping("/internal/object/{objectId}/stock")
     void decreaseStock(@PathVariable String objectId, @RequestParam int quantity);
