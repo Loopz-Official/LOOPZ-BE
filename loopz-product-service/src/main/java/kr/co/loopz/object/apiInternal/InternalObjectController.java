@@ -38,6 +38,14 @@ public class InternalObjectController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @PostMapping("/object/{objectId}")
+    public ResponseEntity<ObjectResponse> getObject(
+            @PathVariable String objectId
+    ) {
+        ObjectResponse response = objectDetailService.getObjectById(objectId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     // objectId 존재 여부 확인 API
     @GetMapping("/objects/{objectId}/exists")
     public ResponseEntity<Boolean> checkObjectIdExists(@PathVariable String objectId) {
