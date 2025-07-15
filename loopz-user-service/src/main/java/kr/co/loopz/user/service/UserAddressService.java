@@ -53,6 +53,11 @@ public class UserAddressService {
         return new AddressListResponse(addressResponses);
     }
 
+    public AddressResponse getAddressResponse(String userId, String addressId) {
+        Address address = getAddress(userId, addressId);
+        return userConverter.toAddressResponse(address);
+    }
+
     // 배송지 수정
     @Transactional
     public AddressResponse updateAddress(String userId, String addressId, AddressUpdateRequest request) {
