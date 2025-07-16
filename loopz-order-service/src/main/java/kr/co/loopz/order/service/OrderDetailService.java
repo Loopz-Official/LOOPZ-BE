@@ -34,7 +34,6 @@ public class OrderDetailService {
 
         // userId + orderId로 주문 확인
         Order order = getOrder(orderId, userId);
-        String orderNumber = order.getOrderNumber();
 
         // 주문의 OrderItem 조회
         OrderItem orderItem = getOrderItem(orderId, objectId);
@@ -45,23 +44,8 @@ public class OrderDetailService {
         // 주소 조회
         InternalAddressResponse address = userClient.getAddressById(order.getUserId(), order.getAddressId());
 
-        PaymentMethod paymentMethod = order.getPaymentMethod();
+        return orderConverter.toObjectDetailResponse(order, orderItem, objectDetail, address, SHIPPING_FEE);
 
-        long productPrice = orderItem.getPurchasePrice() * orderItem.getQuantity();
-        long totalPayment = productPrice + SHIPPING_FEE;
-
-        MyOrderObjectResponse objectResponse = orderConverter.toMyOrderObjectResponse(orderItem, objectDetail);
-
-        return new ObjectDetailResponse(
-                orderNumber,
-                orderId,
-                objectResponse,
-                address,
-                SHIPPING_FEE,
-                productPrice,
-                totalPayment,
-                paymentMethod
-        );
     }
 
     private Order getOrder(String orderId, String userId) {

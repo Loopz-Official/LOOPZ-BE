@@ -2,11 +2,7 @@ package kr.co.loopz.order.converter;
 
 import kr.co.loopz.order.domain.Order;
 import kr.co.loopz.order.domain.OrderItem;
-import kr.co.loopz.order.dto.response.InternalObjectResponse;
-import kr.co.loopz.order.dto.response.ObjectResponse;
-import kr.co.loopz.order.dto.response.OrderListResponse;
-import kr.co.loopz.order.dto.response.MyOrderObjectResponse;
-import kr.co.loopz.order.dto.response.OrderResponse;
+import kr.co.loopz.order.dto.response.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -77,6 +73,31 @@ public interface OrderConverter {
         );
 
     }
+
+    default ObjectDetailResponse toObjectDetailResponse(
+            Order order,
+            OrderItem orderItem,
+            InternalObjectResponse objectDetail,
+            InternalAddressResponse address,
+            int shippingFee
+    ) {
+        long productPrice = orderItem.getPurchasePrice() * orderItem.getQuantity();
+        long totalPayment = productPrice + shippingFee;
+
+        MyOrderObjectResponse objectResponse = toMyOrderObjectResponse(orderItem, objectDetail);
+
+        return new ObjectDetailResponse(
+                order.getOrderNumber(),
+                order.getOrderId(),
+                objectResponse,
+                address,
+                shippingFee,
+                productPrice,
+                totalPayment,
+                order.getPaymentMethod()
+        );
+    }
+
 
 }
 

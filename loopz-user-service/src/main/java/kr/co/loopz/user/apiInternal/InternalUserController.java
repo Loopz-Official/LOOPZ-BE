@@ -23,6 +23,7 @@ public class InternalUserController {
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
     private final UserAddressService userAddressService;
+    private final UserConverter userConverter;
 
     @PostMapping
     public UserInternalRegisterResponse getOrCreateUser(
@@ -50,6 +51,6 @@ public class InternalUserController {
     @GetMapping("/{userId}/addresses/{addressId}")
     public AddressResponse getAddressById(@PathVariable String userId,@PathVariable String addressId) {
         Address address = userAddressService.getAddress(userId, addressId);
-        return UserConverter.INSTANCE.toAddressResponse(address);
+        return userConverter.INSTANCE.toAddressResponse(address);
     }
 }
