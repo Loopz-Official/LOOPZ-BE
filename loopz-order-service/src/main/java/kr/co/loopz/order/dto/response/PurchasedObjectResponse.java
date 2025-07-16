@@ -4,12 +4,13 @@ import kr.co.loopz.order.domain.enums.OrderStatus;
 
 import java.time.LocalDateTime;
 
-public record MyOrderObjectResponse(
+public record PurchasedObjectResponse(
         String objectId,
         String objectName,
         OrderStatus status,
+        String intro,
         String imageUrl,
-        Long totalPrice,
+        Long purchasePrice,
         int quantity,
         LocalDateTime orderDate
 ) {
