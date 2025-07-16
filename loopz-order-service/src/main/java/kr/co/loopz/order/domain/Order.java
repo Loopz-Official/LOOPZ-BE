@@ -31,9 +31,6 @@ public class Order {
     @Column(unique = true, nullable = false)
     private String orderId;
 
-    @Column(unique = true, nullable = false)
-    private String orderNumber;
-
     @Column(nullable = false)
     private String userId;
 
@@ -60,7 +57,6 @@ public class Order {
                 .addressId(request.addressId())
                 .paymentMethod(request.paymentMethod())
                 .deliveryRequest(request.deliveryRequest())
-                .orderNumber(generateOrderNumber())
                 .build();
     }
 
@@ -69,26 +65,15 @@ public class Order {
     private Order(String userId,
                  String addressId,
                  PaymentMethod paymentMethod,
-                 String deliveryRequest,
-                  String orderNumber) {
+                 String deliveryRequest) {
         this.orderId = UUID.randomUUID().toString();
         this.userId = userId;
         this.addressId = addressId;
         this.paymentMethod = paymentMethod;
         this.deliveryRequest = deliveryRequest;
-        this.orderNumber = orderNumber;
     }
 
-    private static final DateTimeFormatter ORDER_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-    private static String generateOrderNumber() {
-        String date = LocalDate.now().format(ORDER_DATE_FORMATTER);
-        String random = UUID.randomUUID().toString()
-                .replaceAll("-", "")
-                .substring(0, 6)
-                .toUpperCase();
-        return date + "-" + random;
-    }
 
 
 

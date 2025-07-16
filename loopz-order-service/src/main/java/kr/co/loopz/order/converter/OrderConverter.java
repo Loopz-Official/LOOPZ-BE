@@ -86,7 +86,6 @@ public interface OrderConverter {
         MyOrderObjectResponse objectResponse = toMyOrderObjectResponse(orderItem, objectDetail);
 
         return new ObjectDetailResponse(
-                order.getOrderNumber(),
                 order.getOrderId(),
                 objectResponse,
                 address,
