@@ -38,7 +38,7 @@ public class InternalObjectController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/object/{objectId}")
+    @GetMapping("/object/{objectId}")
     public ResponseEntity<ObjectResponse> getObject(
             @PathVariable String objectId
     ) {
