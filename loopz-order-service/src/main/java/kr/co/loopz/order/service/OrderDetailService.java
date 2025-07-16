@@ -34,6 +34,7 @@ public class OrderDetailService {
 
         // userId + orderId로 주문 확인
         Order order = getOrder(orderId, userId);
+        String orderNumber = order.getOrderNumber();
 
         // 주문의 OrderItem 조회
         OrderItem orderItem = getOrderItem(orderId, objectId);
@@ -52,6 +53,8 @@ public class OrderDetailService {
         MyOrderObjectResponse objectResponse = orderConverter.toMyOrderObjectResponse(orderItem, objectDetail);
 
         return new ObjectDetailResponse(
+                orderNumber,
+                orderId,
                 objectResponse,
                 address,
                 SHIPPING_FEE,

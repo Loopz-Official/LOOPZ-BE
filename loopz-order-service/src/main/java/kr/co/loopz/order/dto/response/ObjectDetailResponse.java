@@ -5,6 +5,8 @@ import kr.co.loopz.order.domain.enums.PaymentMethod;
 
 public record ObjectDetailResponse(
 
+        String orderNumber,
+        String orderId,
         MyOrderObjectResponse objectResponse,
         InternalAddressResponse address,
         int shippingFee,
