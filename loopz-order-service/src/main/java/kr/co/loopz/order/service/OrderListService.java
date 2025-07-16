@@ -5,7 +5,7 @@ import kr.co.loopz.order.converter.OrderConverter;
 import kr.co.loopz.order.domain.Order;
 import kr.co.loopz.order.domain.OrderItem;
 import kr.co.loopz.order.dto.response.InternalObjectResponse;
-import kr.co.loopz.order.dto.response.MyOrderObjectResponse;
+import kr.co.loopz.order.dto.response.PurchasedObjectResponse;
 import kr.co.loopz.order.dto.response.OrderListResponse;
 import kr.co.loopz.order.exception.OrderException;
 import kr.co.loopz.order.repository.OrderItemRepository;
@@ -38,7 +38,6 @@ public class OrderListService {
      * @param userId 사용자 UUID
      * @return 나의 주문 목록
      */
-
     public List<OrderListResponse> getOrders(String userId) {
 
         List<Order> orders = orderRepository.findAllByUserId(userId);
@@ -70,13 +69,13 @@ public class OrderListService {
                 .collect(Collectors.toMap(InternalObjectResponse::objectId, Function.identity()));
 
         // MyOrderObjectResponse 리스트 생성
-        List<MyOrderObjectResponse> objectResponses = orderItems.stream()
+        List<PurchasedObjectResponse> objectResponses = orderItems.stream()
                 .map(item -> {
                     InternalObjectResponse detail = objectDetailsMap.get(item.getObjectId());
                     if (detail == null) {
                         throw new OrderException(OBJECT_ID_NOT_FOUND, "ObjectId:" + item.getObjectId());
                     }
-                    return orderConverter.toMyOrderObjectResponse(item, detail);
+                    return orderConverter.toPurchasedObjectResponse(item, detail);
                 })
                 .toList();
 
@@ -84,7 +83,7 @@ public class OrderListService {
     }
 
     //  상품 상세 정보 호출 (object 서비스 호출)
-    private List<InternalObjectResponse> getObjectDetailsByOrderItems(List<OrderItem> orderItems) {
+    public List<InternalObjectResponse> getObjectDetailsByOrderItems(List<OrderItem> orderItems) {
         List<String> objectIds = orderItems.stream()
                 .map(OrderItem::getObjectId)
                 .distinct()

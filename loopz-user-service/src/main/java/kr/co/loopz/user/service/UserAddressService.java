@@ -81,6 +81,8 @@ public class UserAddressService {
         addressRepository.delete(address);
     }
 
+
+
     // 기존 기본 배송지 해제
     private void unsetDefaultAddress(String userId) {
         addressRepository.findByUserIdAndDefaultAddressTrue(userId)
@@ -119,7 +121,7 @@ public class UserAddressService {
         }
     }
 
-    private Address getAddress(String userId, String addressId) {
+    public Address getAddress(String userId, String addressId) {
         return addressRepository.findByAddressIdAndUserId(addressId, userId)
                 .orElseThrow(() -> new UserException(ADDRESS_NOT_FOUND, "Address id: " + addressId));
     }

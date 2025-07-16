@@ -3,8 +3,10 @@ package kr.co.loopz.order.apiExternal;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import kr.co.loopz.order.dto.request.OrderRequest;
+import kr.co.loopz.order.dto.response.OrderDetailResponse;
 import kr.co.loopz.order.dto.response.OrderListResponse;
 import kr.co.loopz.order.dto.response.OrderResponse;
+import kr.co.loopz.order.service.OrderDetailService;
 import kr.co.loopz.order.service.OrderListService;
 import kr.co.loopz.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -25,13 +27,15 @@ public class OrderController {
 
     private final OrderService orderService;
     private final OrderListService orderListService;
+    private final OrderDetailService orderDetailService;
 
     // 상품 주문
     @PostMapping()
     @Operation(summary = "주문 API")
     public ResponseEntity<OrderResponse> orderObject(
             @AuthenticationPrincipal User currentUser,
-            @RequestBody @Valid OrderRequest request) {
+            @RequestBody @Valid OrderRequest request
+    ) {
 
         String userId = currentUser.getUsername();
 
@@ -53,15 +57,16 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+
     @GetMapping("/{orderId}")
-    public ResponseEntity<OrderListResponse> getOrder(
+    public ResponseEntity<OrderDetailResponse> getOrder(
             @AuthenticationPrincipal User currentUser,
             @PathVariable String orderId
     ) {
 
         String userId = currentUser.getUsername();
 
-        OrderListResponse response = orderListService.getOrder(userId, orderId);
+        OrderDetailResponse response = orderDetailService.getOrderDetail(userId, orderId);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

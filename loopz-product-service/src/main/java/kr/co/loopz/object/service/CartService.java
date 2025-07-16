@@ -16,10 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -100,7 +97,10 @@ public class CartService {
             return new CartListResponse(Collections.emptyList(),Collections.emptyList());
         }
 
-        List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getCartId());
+        List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getCartId())
+                .stream()
+                .sorted(Comparator.comparing(CartItem::getCreatedAt))
+                .toList();
 
         List<String> objectIds = cartItems.stream()
                 .map(CartItem::getObjectId)

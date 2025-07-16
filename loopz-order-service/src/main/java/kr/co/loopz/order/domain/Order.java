@@ -1,7 +1,6 @@
 package kr.co.loopz.order.domain;
 
 import jakarta.persistence.*;
-import kr.co.loopz.order.domain.enums.OrderStatus;
 import kr.co.loopz.order.domain.enums.PaymentMethod;
 import kr.co.loopz.order.dto.request.OrderRequest;
 import lombok.AllArgsConstructor;
@@ -9,6 +8,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Random;
 import java.util.UUID;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -42,6 +44,8 @@ public class Order {
     @Column(length = 500)
     private String deliveryRequest;
 
+    @Column(unique = true)
+    private String orderNumber;
 
     /**
      * 주문 생성 팩토리 메서드
@@ -65,10 +69,18 @@ public class Order {
                  PaymentMethod paymentMethod,
                  String deliveryRequest) {
         this.orderId = UUID.randomUUID().toString();
+        this.orderNumber = createOrderNumber();
+
         this.userId = userId;
         this.addressId = addressId;
         this.paymentMethod = paymentMethod;
         this.deliveryRequest = deliveryRequest;
+    }
+
+    private String createOrderNumber() {
+        String datePart = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String randomPart = String.format("%07d", new Random().nextInt(10_000_000));
+        return datePart + "-" + randomPart;
     }
 
 
