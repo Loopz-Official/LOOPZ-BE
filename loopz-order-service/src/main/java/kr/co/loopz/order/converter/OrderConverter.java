@@ -53,19 +53,35 @@ public interface OrderConverter {
     ObjectResponse toObjectResponse(InternalObjectResponse internalObjectResponse, int quantity);
 
 
-    default MyOrderObjectResponse toMyOrderObjectResponse(OrderItem item, InternalObjectResponse detail) {
-        return new MyOrderObjectResponse(
+    default PurchasedObjectResponse toPurchasedObjectResponse(OrderItem item, InternalObjectResponse detail) {
+        return new PurchasedObjectResponse(
                 item.getObjectId(),
                 detail.objectName(),
                 item.getStatus(),
+                detail.intro(),
                 detail.imageUrl(),
-                item.getPurchasePrice()* item.getQuantity(),
+                item.getPurchasePrice(),
                 item.getQuantity(),
                 item.getCreatedAt()
         );
     }
 
-    default OrderListResponse toOrderListResponse(Order order, List<MyOrderObjectResponse> objects) {
+    default List<PurchasedObjectResponse> toPurchasedObjectResponseList(
+            List<OrderItem> orderItems,
+            List<InternalObjectResponse> objectDetails
+    ) {
+        return orderItems.stream()
+                .map(item -> {
+                    InternalObjectResponse detail = objectDetails.stream()
+                            .filter(obj -> obj.objectId().equals(item.getObjectId()))
+                            .findFirst()
+                            .orElseThrow(() -> new IllegalArgumentException("Object not found for ID: " + item.getObjectId()));
+                    return toPurchasedObjectResponse(item, detail);
+                })
+                .toList();
+    }
+
+    default OrderListResponse toOrderListResponse(Order order, List<PurchasedObjectResponse> objects) {
         return new OrderListResponse(
                 order.getOrderId(),
                 objects
@@ -73,29 +89,26 @@ public interface OrderConverter {
 
     }
 
-    default ObjectDetailResponse toObjectDetailResponse(
+    default OrderDetailResponse toObjectDetailResponse(
             Order order,
-            OrderItem orderItem,
-            InternalObjectResponse objectDetail,
+            List<OrderItem> orderItems,
+            List<InternalObjectResponse> objectDetails,
             InternalAddressResponse address,
-            int shippingFee
-    ) {
-        long productPrice = orderItem.getPurchasePrice() * orderItem.getQuantity();
-        long totalPayment = productPrice + shippingFee;
-
-        MyOrderObjectResponse objectResponse = toMyOrderObjectResponse(orderItem, objectDetail);
-
-        return new ObjectDetailResponse(
+            int shippingFee,
+            long totalProductPrice,
+            long totalPayment)
+    {
+        return new OrderDetailResponse(
                 order.getOrderId(),
-                objectResponse,
+                order.getOrderNumber(),
+                order.getPaymentMethod(),
+                toPurchasedObjectResponseList(orderItems, objectDetails),
                 address,
                 shippingFee,
-                productPrice,
-                totalPayment,
-                order.getPaymentMethod()
+                totalProductPrice,
+                totalPayment
         );
     }
-
 
 }
 
