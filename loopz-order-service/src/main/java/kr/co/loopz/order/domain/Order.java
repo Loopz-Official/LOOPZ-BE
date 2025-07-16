@@ -79,8 +79,10 @@ public class Order {
         this.orderNumber = orderNumber;
     }
 
+    private static final DateTimeFormatter ORDER_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+
     private static String generateOrderNumber() {
-        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String date = LocalDate.now().format(ORDER_DATE_FORMATTER);
         String random = UUID.randomUUID().toString()
                 .replaceAll("-", "")
                 .substring(0, 6)

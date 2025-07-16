@@ -55,9 +55,9 @@ public class OrderController {
     }
 
     // 주문 상세 조회
-    @GetMapping("/{objectId}")
+    @GetMapping("{orderId}/object/{objectId}")
     public ResponseEntity<ObjectDetailResponse> getOrderDetail(@AuthenticationPrincipal User currentUser,
-                                                               @RequestParam String orderId,
+                                                               @PathVariable String orderId,
                                                                @PathVariable String objectId ) {
 
         String userId = currentUser.getUsername();
