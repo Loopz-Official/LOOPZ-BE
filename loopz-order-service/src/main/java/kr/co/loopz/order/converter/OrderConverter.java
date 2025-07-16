@@ -57,7 +57,6 @@ public interface OrderConverter {
         return new MyOrderObjectResponse(
                 item.getObjectId(),
                 detail.objectName(),
-                detail.intro(),
                 item.getStatus(),
                 detail.imageUrl(),
                 item.getPurchasePrice()* item.getQuantity(),

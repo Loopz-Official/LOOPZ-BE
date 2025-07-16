@@ -45,7 +45,9 @@ public class OrderController {
 
     // 내 주문목록 조회
     @GetMapping()
-    public ResponseEntity<List<OrderListResponse>> getOrders(@AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<List<OrderListResponse>> getOrders(
+            @AuthenticationPrincipal User currentUser
+    ) {
 
         String userId = currentUser.getUsername();
 
@@ -63,6 +65,19 @@ public class OrderController {
         String userId = currentUser.getUsername();
 
         ObjectDetailResponse response = orderDetailService.getOrderDetail(userId,orderId,objectId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderListResponse> getOrder(
+            @AuthenticationPrincipal User currentUser,
+            @PathVariable String orderId
+    ) {
+
+        String userId = currentUser.getUsername();
+
+        OrderListResponse response = orderListService.getOrder(userId, orderId);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

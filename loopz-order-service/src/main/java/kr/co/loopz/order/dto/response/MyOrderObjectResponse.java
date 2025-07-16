@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 public record MyOrderObjectResponse(
         String objectId,
         String objectName,
-        String intro,
         OrderStatus status,
         String imageUrl,
         Long totalPrice,

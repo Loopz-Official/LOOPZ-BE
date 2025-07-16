@@ -44,8 +44,20 @@ public class OrderListService {
         List<Order> orders = orderRepository.findAllByUserId(userId);
 
         return orders.stream()
-                .map(order -> toOrderListResponse(order))
+                .map(this::toOrderListResponse)
                 .toList();
+    }
+
+    public OrderListResponse getOrder(String userId, String orderId) {
+
+        Order order = findOrder(userId, orderId);
+
+        return toOrderListResponse(order);
+    }
+
+    private Order findOrder(String userId, String orderId) {
+        return orderRepository.findByUserIdAndOrderId(userId, orderId)
+                .orElseThrow(() -> new OrderException(OBJECT_ID_NOT_FOUND, "OrderId:" + orderId));
     }
 
     private OrderListResponse toOrderListResponse(Order order) {
