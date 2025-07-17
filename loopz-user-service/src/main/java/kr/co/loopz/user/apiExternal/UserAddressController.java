@@ -74,4 +74,17 @@ public class UserAddressController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+
+    @GetMapping("/{addressId}")
+    public ResponseEntity<AddressResponse> getAddress(
+            @AuthenticationPrincipal User currentUser,
+            @PathVariable String addressId
+    ){
+        String userId = currentUser.getUsername();
+
+        AddressResponse response = userAddressService.getAddressResponse(userId, addressId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 }

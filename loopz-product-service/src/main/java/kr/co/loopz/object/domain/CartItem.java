@@ -1,6 +1,7 @@
 package kr.co.loopz.object.domain;
 
 import jakarta.persistence.*;
+import kr.co.loopz.common.domain.BaseTimeEntity;
 import lombok.*;
 
 @Entity
@@ -8,7 +9,7 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @Table(name = "cart_object_item")
-public class CartItem {
+public class CartItem extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

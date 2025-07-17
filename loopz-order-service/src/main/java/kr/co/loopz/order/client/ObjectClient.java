@@ -1,7 +1,6 @@
 package kr.co.loopz.order.client;
 
 import kr.co.loopz.order.dto.request.DeleteCartItemRequest;
-import kr.co.loopz.order.dto.response.CartWithQuantityResponse;
 import kr.co.loopz.order.dto.response.InternalObjectResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +22,9 @@ public interface ObjectClient {
     @PostMapping("/internal/objects")
     List<InternalObjectResponse> getObjectListByIds(@RequestBody List<String> requestIds);
 
+    @GetMapping("/internal/object/{objectId}")
+    InternalObjectResponse getObjectById(@PathVariable String objectId);
+
     // 주문 후 재고 감소
     @PostMapping("/internal/object/{objectId}/stock")
     void decreaseStock(@PathVariable String objectId, @RequestParam int quantity);
@@ -30,10 +32,6 @@ public interface ObjectClient {
     // 카트 상품 조회
     @GetMapping("/internal/object/cart")
     boolean checkObjectInCart(@RequestParam String cartId, @RequestParam String objectId);
-
-    // 사용자 카트 존재여부 조회
-    @GetMapping("/internal/cart/user/{userId}")
-    CartWithQuantityResponse getCartByUserId(@PathVariable String userId);
 
     //카트 상품 삭제
     @DeleteMapping("/internal/cart")

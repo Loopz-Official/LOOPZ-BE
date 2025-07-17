@@ -1,6 +1,7 @@
 package kr.co.loopz.order.client;
 
 
+import kr.co.loopz.order.dto.response.InternalAddressResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,4 +20,9 @@ public interface UserClient {
             @PathVariable("userId") String userId,
             @PathVariable("addressId") String addressId
     );
+
+    @GetMapping("/internal/user/{userId}/addresses/{addressId}")
+    InternalAddressResponse getAddressById( @PathVariable("userId") String userId,
+                                            @PathVariable("addressId") String addressId);
+
 }

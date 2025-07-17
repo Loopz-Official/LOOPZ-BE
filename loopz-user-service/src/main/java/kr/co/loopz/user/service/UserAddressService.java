@@ -53,6 +53,11 @@ public class UserAddressService {
         return new AddressListResponse(addressResponses);
     }
 
+    public AddressResponse getAddressResponse(String userId, String addressId) {
+        Address address = getAddress(userId, addressId);
+        return userConverter.toAddressResponse(address);
+    }
+
     // 배송지 수정
     @Transactional
     public AddressResponse updateAddress(String userId, String addressId, AddressUpdateRequest request) {
@@ -75,6 +80,8 @@ public class UserAddressService {
         Address address = getAddress(userId, addressId);
         addressRepository.delete(address);
     }
+
+
 
     // 기존 기본 배송지 해제
     private void unsetDefaultAddress(String userId) {
@@ -114,7 +121,7 @@ public class UserAddressService {
         }
     }
 
-    private Address getAddress(String userId, String addressId) {
+    public Address getAddress(String userId, String addressId) {
         return addressRepository.findByAddressIdAndUserId(addressId, userId)
                 .orElseThrow(() -> new UserException(ADDRESS_NOT_FOUND, "Address id: " + addressId));
     }
