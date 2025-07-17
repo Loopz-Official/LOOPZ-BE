@@ -97,3 +97,6 @@ etc:
 portone:
   api-secret: ${IMP_API_SECRET:testapisecret}
   webhook-secret: ${IMP_WEBHOOK_SECRET:testwebhooksecret}
+  api-base: ${IMP_API_BASE:https://api.iamport.kr}
+  store-id: ${IMP_STORE_ID:teststoreid}
+
