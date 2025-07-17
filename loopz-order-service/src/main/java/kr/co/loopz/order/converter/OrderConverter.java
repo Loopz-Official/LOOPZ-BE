@@ -6,6 +6,10 @@ import kr.co.loopz.order.dto.response.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.mapstruct.ReportingPolicy.IGNORE;
@@ -61,8 +65,7 @@ public interface OrderConverter {
                 detail.intro(),
                 detail.imageUrl(),
                 item.getPurchasePrice(),
-                item.getQuantity(),
-                item.getCreatedAt()
+                item.getQuantity()
         );
     }
 
@@ -82,8 +85,14 @@ public interface OrderConverter {
     }
 
     default OrderListResponse toOrderListResponse(Order order, List<PurchasedObjectResponse> objects) {
+
+        ZonedDateTime seoulZoned = order.getCreatedAt().atZone(ZoneId.of("Asia/Seoul"));
+        ZonedDateTime utcZoned = seoulZoned.withZoneSameInstant(ZoneOffset.UTC);
+        OffsetDateTime utcOffsetTime = utcZoned.toOffsetDateTime();
+
         return new OrderListResponse(
                 order.getOrderId(),
+                utcOffsetTime,
                 objects
         );
 
