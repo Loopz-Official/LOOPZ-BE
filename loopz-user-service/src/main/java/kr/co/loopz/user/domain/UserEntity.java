@@ -2,6 +2,9 @@ package kr.co.loopz.user.domain;
 
 import jakarta.persistence.*;
 import kr.co.loopz.common.domain.BaseTimeEntityWithDeletion;
+import kr.co.loopz.user.domain.enums.Gender;
+import kr.co.loopz.user.domain.enums.Role;
+import kr.co.loopz.user.domain.enums.SocialLoginType;
 import kr.co.loopz.user.dto.request.UserInternalRegisterRequest;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,6 +12,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 import static jakarta.persistence.EnumType.STRING;
@@ -60,6 +64,11 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
     @Embedded
     private UserTerms userTerms = new UserTerms();
 
+    @Enumerated(STRING)
+    private Gender gender;
+
+    private LocalDate birthDate;
+
     /**
      * UserEntity 생성 메서드
      * 회원 가입시 사용
@@ -77,6 +86,14 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
 
     public void updateNickName(String nickName) {
         this.nickName = nickName;
+    }
+
+    public void updateGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public void updateBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
     }
 
     /**

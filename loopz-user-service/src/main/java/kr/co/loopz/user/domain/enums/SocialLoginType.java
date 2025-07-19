@@ -1,4 +1,4 @@
-package kr.co.loopz.user.domain;
+package kr.co.loopz.user.domain.enums;
 
 public enum SocialLoginType {
     GOOGLE,

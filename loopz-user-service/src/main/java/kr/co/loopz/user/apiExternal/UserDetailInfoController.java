@@ -1,6 +1,7 @@
 package kr.co.loopz.user.apiExternal;
 
 import jakarta.validation.Valid;
+import kr.co.loopz.user.dto.request.DetailInfoUpdateRequest;
 import kr.co.loopz.user.dto.request.NickNameUpdateRequest;
 import kr.co.loopz.user.dto.response.DetailInfoUpdateResponse;
 import kr.co.loopz.user.dto.response.NickNameAvailableResponse;
@@ -54,16 +55,17 @@ public class UserDetailInfoController {
                 .body(new NickNameAvailableResponse(true));
     }
 
-//    @PatchMapping("/gender")
-//    public ResponseEntity<DetailInfoUpdateResponse> updateGender(
-//            @AuthenticationPrincipal User currentUser,
-//            @RequestBody @Valid GenderUpdateRequest genderUpdateRequest
-//    ) {
-//
-//        String userId = currentUser.getUsername();
-//
-//
-//
-//    }
+    @PatchMapping("/detail")
+    public ResponseEntity<DetailInfoUpdateResponse> updateDetail(
+            @AuthenticationPrincipal User currentUser,
+            @RequestBody @Valid DetailInfoUpdateRequest request
+    ) {
+
+        String userId = currentUser.getUsername();
+
+        DetailInfoUpdateResponse response = userDetailInfoService.updateDetailInfo(userId, request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
 }

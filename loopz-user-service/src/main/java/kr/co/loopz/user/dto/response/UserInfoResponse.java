@@ -1,6 +1,6 @@
 package kr.co.loopz.user.dto.response;
 
-import kr.co.loopz.user.domain.SocialLoginType;
+import kr.co.loopz.user.domain.enums.SocialLoginType;
 
 public record UserInfoResponse(
         String userId,
