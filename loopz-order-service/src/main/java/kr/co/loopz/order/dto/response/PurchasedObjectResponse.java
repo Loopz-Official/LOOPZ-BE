@@ -11,7 +11,6 @@ public record PurchasedObjectResponse(
         String intro,
         String imageUrl,
         Long purchasePrice,
-        int quantity,
-        LocalDateTime orderDate
+        int quantity
 ) {
 }
