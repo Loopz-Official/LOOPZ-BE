@@ -1,6 +1,5 @@
 package kr.co.loopz.order.service;
 
-import kr.co.loopz.order.client.ObjectClient;
 import kr.co.loopz.order.client.UserClient;
 import kr.co.loopz.order.converter.OrderConverter;
 import kr.co.loopz.order.domain.Order;
@@ -30,7 +29,6 @@ public class OrderDetailService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
 
-    private final ObjectClient objectClient;
     private final UserClient userClient;
     private final OrderConverter orderConverter;
 

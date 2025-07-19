@@ -5,8 +5,8 @@ import kr.co.loopz.order.converter.OrderConverter;
 import kr.co.loopz.order.domain.Order;
 import kr.co.loopz.order.domain.OrderItem;
 import kr.co.loopz.order.dto.response.InternalObjectResponse;
-import kr.co.loopz.order.dto.response.PurchasedObjectResponse;
 import kr.co.loopz.order.dto.response.OrderListResponse;
+import kr.co.loopz.order.dto.response.PurchasedObjectResponse;
 import kr.co.loopz.order.exception.OrderException;
 import kr.co.loopz.order.repository.OrderItemRepository;
 import kr.co.loopz.order.repository.OrderRepository;
@@ -47,15 +47,13 @@ public class OrderListService {
                 .toList();
     }
 
-    public OrderListResponse getOrder(String userId, String orderId) {
-
-        Order order = findOrder(userId, orderId);
-
+    public OrderListResponse getOrder(String orderId) {
+        Order order = findOrder(orderId);
         return toOrderListResponse(order);
     }
 
-    private Order findOrder(String userId, String orderId) {
-        return orderRepository.findByUserIdAndOrderId(userId, orderId)
+    private Order findOrder(String orderId) {
+        return orderRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new OrderException(OBJECT_ID_NOT_FOUND, "OrderId:" + orderId));
     }
 

@@ -5,7 +5,10 @@ public enum OrderStatus {
     ORDERED, // 결제 성공 후
     SHIPPING, // 배송중
     DELIVERED, // 배송 완료
-    CANCELED, // 결제 취소
+    PURCHASE_CONFIRMED, // 구매 확정
+
+    CANCEL_REQUESTED, // 결제 취소 요청
+    CANCEL_COMPLETE, // 결제 취소 완료
     REFUND_REQUESTED, // 반품 요청
     REFUND_COMPLETE, // 반품 완료
 }
