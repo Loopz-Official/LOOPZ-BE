@@ -1,4 +1,4 @@
-package kr.co.loopz.order.domain.enums;
+package kr.co.loopz.payment.domain.enums;
 
 /**
  * PENDING, ORDERED는 결제와만 관련 있는 상태
