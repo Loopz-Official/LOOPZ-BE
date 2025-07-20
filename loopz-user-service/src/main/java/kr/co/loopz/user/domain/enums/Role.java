@@ -1,4 +1,4 @@
-package kr.co.loopz.user.domain;
+package kr.co.loopz.user.domain.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
