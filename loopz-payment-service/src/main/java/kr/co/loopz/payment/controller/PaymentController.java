@@ -45,7 +45,7 @@ public class PaymentController {
         String paymentId = paymentCompleteRequest.paymentId();
         log.debug("Payment completion request: paymentId={}, userId={}", paymentId, userId);
 
-        PaymentCompleteResponse response = paymentService.syncPayment(paymentId);
+        PaymentCompleteResponse response = paymentService.syncPayment(paymentId, userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
