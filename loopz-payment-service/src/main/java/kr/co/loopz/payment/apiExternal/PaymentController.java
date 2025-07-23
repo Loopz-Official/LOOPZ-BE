@@ -13,7 +13,6 @@ import kr.co.loopz.payment.exception.PaymentException;
 import kr.co.loopz.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,11 +32,6 @@ public class PaymentController {
 
     private final PaymentService paymentService;
     private final WebhookVerifier webhookVerifier;
-
-
-
-    @Value("${portone.webhook-secret}")
-    private String webhookSecret;
 
 
     /**
@@ -86,6 +80,8 @@ public class PaymentController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
+        log.debug("Received webhook: body={}, webhookId={}, webhookTimestamp={}, webhookSignature={}",
+                  rawBody, webhookId, webhookTimestamp, webhookSignature);
         Webhook verifiedWebhook = verifyWebhook(rawBody, webhookId, webhookTimestamp, webhookSignature);
         log.debug("verified webhook type : {}", verifiedWebhook.getClass().getTypeName());
         WebhookTransaction transaction = getWebhookTransaction(rawBody, webhookId, webhookTimestamp, webhookSignature, verifiedWebhook);
