@@ -25,7 +25,7 @@ public class RedissonLockAspect {
     private final RedissonClient redissonClient;
 
     @Around("@annotation(kr.co.loopz.object.annotation.RedissonLock)")
-    public void redissonLock(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object redissonLock(ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
         RedissonLock annotation = method.getAnnotation(RedissonLock.class);
@@ -37,10 +37,10 @@ public class RedissonLockAspect {
             boolean available = rLock.tryLock(annotation.waitTime(), annotation.leaseTime(), MILLISECONDS);
             if (!available) {
                 log.debug("락 획득 실패: {}", lockKey);
-                return;
+                return false;
             }
             log.debug("락 획득 성공: {}", lockKey);
-            joinPoint.proceed();
+            return joinPoint.proceed();
         } catch (InterruptedException e) {
             throw new InterruptedException("Lock acquisition interrupted for key: " + lockKey);
         } finally {
