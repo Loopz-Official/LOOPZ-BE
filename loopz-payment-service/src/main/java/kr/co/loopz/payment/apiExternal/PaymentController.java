@@ -82,6 +82,8 @@ public class PaymentController {
     private Webhook verifyWebhook(String body, String webhookId, String webhookTimestamp, String webhookSignature) {
         Webhook verifiedWebhook;
         try {
+            long now = System.currentTimeMillis() / 1000;
+            log.debug("Current time in seconds: {}", now);
             verifiedWebhook = webhookVerifier.verify(body, webhookId, webhookTimestamp, webhookSignature);
         } catch (WebhookVerificationException e) {
             log.error("Webhook verification failed", e);
