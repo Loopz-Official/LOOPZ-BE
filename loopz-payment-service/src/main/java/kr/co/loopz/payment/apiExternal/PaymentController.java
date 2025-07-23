@@ -88,17 +88,29 @@ public class PaymentController {
 
     private Webhook verifyWebhook(String body, String webhookId, String webhookTimestamp, String webhookSignature) {
         Webhook verifiedWebhook;
-        try {
-            // 쉼표 대신 공백으로 포맷 수정
-            String cleanedSignature = webhookSignature.replace(",", " ");
 
+        try {
+            String cleanedSignature = webhookSignature.replace(",", " ");
             log.debug("🧪 Final cleaned signature: {}", cleanedSignature);
+            log.debug("📦 Headers - webhookId: {}, webhookTimestamp: {}, webhookSignature: {}", webhookId, webhookTimestamp, webhookSignature);
+            log.debug("📄 Raw body: {}", body);
+
+            long now = System.currentTimeMillis() / 1000;
+            try {
+                long ts = Long.parseLong(webhookTimestamp);
+                log.debug("⏱️ Webhook timestamp: {}", ts);
+                log.debug("⏱️ Server timestamp: {}", now);
+                log.debug("⏱️ Time difference (seconds): {}", Math.abs(now - ts));
+            } catch (NumberFormatException ex) {
+                log.error("❌ Invalid webhookTimestamp: {}", webhookTimestamp, ex);
+            }
 
             verifiedWebhook = webhookVerifier.verify(body, webhookId, webhookTimestamp, cleanedSignature);
         } catch (WebhookVerificationException e) {
             log.error("Webhook verification failed", e);
             throw new PaymentException(WEBHOOK_VERIFICATION_FAILED);
         }
+
         return verifiedWebhook;
     }
 
