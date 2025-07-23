@@ -4,6 +4,7 @@ import io.portone.sdk.server.errors.WebhookVerificationException;
 import io.portone.sdk.server.webhook.Webhook;
 import io.portone.sdk.server.webhook.WebhookTransaction;
 import io.portone.sdk.server.webhook.WebhookVerifier;
+import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import kr.co.loopz.payment.dto.request.PaymentCompleteRequest;
@@ -20,7 +21,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.stream.Collectors;
+import java.nio.charset.StandardCharsets;
 
 import static kr.co.loopz.payment.exception.PaymentErrorCode.WEBHOOK_VERIFICATION_FAILED;
 
@@ -76,14 +77,23 @@ public class PaymentController {
             @RequestHeader("webhook-id") String webhookId,
             @RequestHeader("webhook-timestamp") String webhookTimestamp,
             @RequestHeader("webhook-signature") String webhookSignature
-    ) throws IOException {
-        String body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+    ) {
+
+        String rawBody;
+        try (ServletInputStream inputStream = request.getInputStream()) {
+            rawBody = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            log.error("❌ Failed to read raw body", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        log.debug("📄 Raw body: {}", rawBody);
 
         log.debug("Received webhook: body={}, webhookId={}, webhookTimestamp={}, webhookSignature={}",
-                body, webhookId, webhookTimestamp, webhookSignature);
+                rawBody, webhookId, webhookTimestamp, webhookSignature);
 
-        Webhook verifiedWebhook = verifyWebhook(body, webhookId, webhookTimestamp, webhookSignature);
-        WebhookTransaction transaction = getWebhookTransaction(body, webhookId, webhookTimestamp, webhookSignature, verifiedWebhook);
+        Webhook verifiedWebhook = verifyWebhook(rawBody, webhookId, webhookTimestamp, webhookSignature);
+        WebhookTransaction transaction = getWebhookTransaction(rawBody, webhookId, webhookTimestamp, webhookSignature, verifiedWebhook);
         log.debug("Webhook is a transaction: {}", transaction);
 
         paymentService.syncPaymentAndUpdateStock(transaction.getData().getPaymentId());
