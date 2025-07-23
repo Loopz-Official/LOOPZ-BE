@@ -72,7 +72,7 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/{orderNumber}")
+    @GetMapping("/map/{orderNumber}")
     public ResponseEntity<OrderIdNumberMappingResponse> getOrderByOrderNumber(
             @AuthenticationPrincipal User currentUser,
             @PathVariable String orderNumber
