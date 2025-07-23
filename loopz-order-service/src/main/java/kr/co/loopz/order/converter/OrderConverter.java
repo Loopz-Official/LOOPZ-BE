@@ -136,5 +136,6 @@ public interface OrderConverter {
         );
     }
 
+    OrderIdNumberMappingResponse toOrderIdNumberMappingResponse(Order order);
 }
 

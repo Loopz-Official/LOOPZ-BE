@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import kr.co.loopz.order.dto.request.OrderRequest;
 import kr.co.loopz.order.dto.response.OrderDetailResponse;
+import kr.co.loopz.order.dto.response.OrderIdNumberMappingResponse;
 import kr.co.loopz.order.dto.response.OrderListResponse;
 import kr.co.loopz.order.dto.response.OrderResponse;
 import kr.co.loopz.order.service.OrderDetailService;
@@ -67,6 +68,19 @@ public class OrderController {
         String userId = currentUser.getUsername();
 
         OrderDetailResponse response = orderDetailService.getOrderDetail(userId, orderId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/{orderNumber}")
+    public ResponseEntity<OrderIdNumberMappingResponse> getOrderByOrderNumber(
+            @AuthenticationPrincipal User currentUser,
+            @PathVariable String orderNumber
+    ) {
+
+        String userId = currentUser.getUsername();
+
+        OrderIdNumberMappingResponse response = orderDetailService.getOrderByOrderNumber(userId, orderNumber);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

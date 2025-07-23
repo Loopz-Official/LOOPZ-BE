@@ -7,6 +7,7 @@ import kr.co.loopz.order.domain.OrderItem;
 import kr.co.loopz.order.dto.response.InternalAddressResponse;
 import kr.co.loopz.order.dto.response.InternalObjectResponse;
 import kr.co.loopz.order.dto.response.OrderDetailResponse;
+import kr.co.loopz.order.dto.response.OrderIdNumberMappingResponse;
 import kr.co.loopz.order.exception.OrderException;
 import kr.co.loopz.order.repository.OrderItemRepository;
 import kr.co.loopz.order.repository.OrderRepository;
@@ -35,7 +36,7 @@ public class OrderDetailService {
     public OrderDetailResponse getOrderDetail(String userId, String orderId) {
 
         // userId + orderId로 주문 확인
-        Order order = getOrder(orderId, userId);
+        Order order = findOrder(orderId, userId);
 
         // 주문의 OrderItem 조회
         List<OrderItem> orderItems = orderItemRepository.findAllByOrderId(orderId);
@@ -52,15 +53,24 @@ public class OrderDetailService {
 
     }
 
+    public OrderIdNumberMappingResponse getOrderByOrderNumber(String userId, String orderNumber) {
+        Order order = findOrderByOrderNumber(orderNumber, userId);
+        return orderConverter.toOrderIdNumberMappingResponse(order);
+    }
+
     private long calculateTotalProductPrice(List<OrderItem> orderItems) {
         return orderItems.stream()
                 .mapToLong(item -> item.getPurchasePrice() * item.getQuantity())
                 .sum();
     }
 
-    private Order getOrder(String orderId, String userId) {
+    private Order findOrder(String orderId, String userId) {
         return orderRepository.findByOrderIdAndUserId(orderId, userId)
                 .orElseThrow(() -> new OrderException(ORDER_NOT_FOUND, "orderId: " + orderId));
     }
 
+    private Order findOrderByOrderNumber(String orderNumber, String userId) {
+        return orderRepository.findByOrderNumberAndUserId(orderNumber, userId)
+                .orElseThrow(() -> new OrderException(ORDER_NOT_FOUND, "orderNumber: " + orderNumber));
+    }
 }
