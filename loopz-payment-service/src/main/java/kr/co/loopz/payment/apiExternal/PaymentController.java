@@ -84,7 +84,7 @@ public class PaymentController {
         try {
             verifiedWebhook = webhookVerifier.verify(body, webhookId, webhookTimestamp, webhookSignature);
         } catch (WebhookVerificationException e) {
-            log.error("Webhook verification failed: {}", e.getMessage());
+            log.error("Webhook verification failed", e);
             throw new PaymentException(WEBHOOK_VERIFICATION_FAILED);
         }
         return verifiedWebhook;
