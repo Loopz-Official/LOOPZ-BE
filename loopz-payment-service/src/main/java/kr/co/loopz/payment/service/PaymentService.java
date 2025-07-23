@@ -8,14 +8,17 @@ import io.portone.sdk.server.payment.PaymentClient;
 import kr.co.loopz.payment.client.OrderServiceClient;
 import kr.co.loopz.payment.client.ProductClientAtPayment;
 import kr.co.loopz.payment.converter.PaymentConverter;
+import kr.co.loopz.payment.domain.PaymentEntity;
 import kr.co.loopz.payment.dto.response.InternalOrderResponse;
 import kr.co.loopz.payment.dto.response.PaymentCompleteResponse;
 import kr.co.loopz.payment.dto.response.PortOneCustomData;
 import kr.co.loopz.payment.dto.response.PurchasedObjectResponse;
 import kr.co.loopz.payment.exception.PaymentException;
+import kr.co.loopz.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -28,6 +31,8 @@ import static kr.co.loopz.payment.exception.PaymentErrorCode.*;
 public class PaymentService {
 
     private final PaymentCalculationService calculationService;
+
+    private final PaymentRepository paymentRepository;
 
     private final PaymentClient paymentClient;
 
@@ -57,7 +62,7 @@ public class PaymentService {
 
         log.info("결제 성공 - {}, 주문 정보 : {}", actualPayment, customData);
 
-        return paymentConverter.toPaymentCompleteResponse(customData, orderResponse, paidPayment.getMethod());
+        return paymentConverter.toPaymentCompleteResponse(customData, orderResponse, paidPayment);
     }
 
     /**
@@ -65,12 +70,18 @@ public class PaymentService {
      * 웹훅 수신 후 결제 정보를 주문과 비교해 검증하고 결제 정보를 DB에 기록, 재고 및 장바구니 데이터를 업데이트합니다.
      * @param paymentId 결제 ID
      */
+    @Transactional
     public void syncPaymentAndUpdateStock(String paymentId) {
         PaymentCompleteResponse response = syncPayment(paymentId, null);
         log.info("웹훅 수신 후 결제 정보 동기화 성공, 결제 ID: {} 재고 및 장바구니 데이터 싱크 처리 시작", paymentId);
 
         String userId = response.userId();
+
         requestToProductServiceDecreaseStockDeleteCart(userId, response.objects());
+        requestToOrderServiceChangeOrderStatus(response.orderId());
+
+        PaymentEntity payment = PaymentEntity.createPayment(response);
+        paymentRepository.save(payment);
     }
 
 
@@ -180,6 +191,20 @@ public class PaymentService {
         } catch (Exception e) {
             log.error("상품 서비스 요청 실패. 사용자 ID: {}", userId, e);
             throw new PaymentException(PRODUCT_SERVICE_CLIENT_FAILED, "상품 서비스 요청에 실패했습니다. 사용자 ID: " + userId);
+        }
+    }
+
+
+    /**
+     * order service에 주문 상태를 ORDERED로 변경하는 요청을 보냅니다.
+     * @param orderId 주문 ID
+     */
+    private void requestToOrderServiceChangeOrderStatus(String orderId) {
+        try {
+            orderServiceClient.makeOrderStatusOrdered(orderId);
+        } catch (Exception e) {
+            log.error("주문 서비스 요청 실패. 주문 ID: {}", orderId, e);
+            throw new PaymentException(ORDER_SERVICE_CLIENT_FAILED, "주문 서비스 요청에 실패했습니다. 주문 ID: " + orderId);
         }
     }
 

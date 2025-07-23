@@ -90,4 +90,15 @@ public class OrderListService {
         return objectClient.getObjectListByIds(objectIds);
     }
 
+    /**
+     * 주문에 해당하는 각 아이템 주문 상태를 ORDERED로 변경합니다. Internal API에서 사용
+     * @param orderId 주문 ID
+     */
+    @Transactional
+    public void makeOrderStatusOrdered(String orderId) {
+        List<OrderItem> allByOrderId = orderItemRepository.findAllByOrderId(orderId);
+        for (OrderItem orderItem : allByOrderId) {
+            orderItem.makeStatusToOrdered();
+        }
+    }
 }

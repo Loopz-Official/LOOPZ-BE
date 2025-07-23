@@ -1,6 +1,6 @@
 package kr.co.loopz.payment.converter;
 
-import io.portone.sdk.server.payment.PaymentMethod;
+import io.portone.sdk.server.payment.PaidPayment;
 import kr.co.loopz.payment.domain.enums.OrderStatus;
 import kr.co.loopz.payment.dto.response.InternalOrderResponse;
 import kr.co.loopz.payment.dto.response.PaymentCompleteResponse;
@@ -8,7 +8,7 @@ import kr.co.loopz.payment.dto.response.PortOneCustomData;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-import static org.mapstruct.ReportingPolicy.*;
+import static org.mapstruct.ReportingPolicy.IGNORE;
 
 @Mapper(
         componentModel = "spring",
@@ -22,11 +22,13 @@ public interface PaymentConverter {
     default PaymentCompleteResponse toPaymentCompleteResponse(
             PortOneCustomData customData,
             InternalOrderResponse orderResponse,
-            PaymentMethod method
+            PaidPayment paidPayment
     ) {
         return new PaymentCompleteResponse(
                 customData.userId(),
-                method,
+                customData.orderId(),
+                paidPayment,
+                paidPayment.getMethod(),
                 OrderStatus.ORDERED,
                 orderResponse.objects()
         );
