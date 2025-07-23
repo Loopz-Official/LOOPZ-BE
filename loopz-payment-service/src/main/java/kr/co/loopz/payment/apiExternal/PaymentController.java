@@ -64,7 +64,6 @@ public class PaymentController {
 
     /**
      * 포트원 웹훅을 처리합니다. 포트원쪽 요청을 신뢰하며 재고를 감소하고 주문을 확정합니다. 사용자 장바구니를 조회해 상품을 삭제합니다.
-     * @param body 웹훅 요청 본문
      * @param webhookId 웹훅 ID
      * @param webhookTimestamp 웹훅 타임스탬프
      * @param webhookSignature 웹훅 서명
@@ -83,18 +82,13 @@ public class PaymentController {
         try (ServletInputStream inputStream = request.getInputStream()) {
             rawBody = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            log.error("❌ Failed to read raw body", e);
+            log.error("Failed to read raw body", e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        log.debug("📄 Raw body: {}", rawBody);
-
-        log.debug("Received webhook: body={}, webhookId={}, webhookTimestamp={}, webhookSignature={}",
-                rawBody, webhookId, webhookTimestamp, webhookSignature);
-
         Webhook verifiedWebhook = verifyWebhook(rawBody, webhookId, webhookTimestamp, webhookSignature);
-        WebhookTransaction transaction = (WebhookTransaction) verifiedWebhook;
-//        WebhookTransaction transaction = getWebhookTransaction(rawBody, webhookId, webhookTimestamp, webhookSignature, verifiedWebhook);
+        log.debug("verified webhook type : {}", verifiedWebhook.getClass().getTypeName());
+        WebhookTransaction transaction = getWebhookTransaction(rawBody, webhookId, webhookTimestamp, webhookSignature, verifiedWebhook);
         log.debug("Webhook is a transaction: {}", transaction);
 
         paymentService.syncPaymentAndUpdateStock(transaction.getData().getPaymentId());
