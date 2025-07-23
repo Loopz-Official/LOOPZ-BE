@@ -40,7 +40,7 @@ public class OrderListService {
      */
     public List<OrderListResponse> getOrders(String userId) {
 
-        List<Order> orders = orderRepository.findAllByUserId(userId);
+        List<Order> orders = orderRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
 
         return orders.stream()
                 .map(this::toOrderListResponse)
