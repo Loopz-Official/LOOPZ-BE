@@ -5,10 +5,7 @@ import kr.co.loopz.object.dto.request.SearchFilterRequest;
 import kr.co.loopz.object.dto.response.*;
 import kr.co.loopz.object.repository.CartItemRepository;
 import kr.co.loopz.object.repository.ObjectRepository;
-import kr.co.loopz.object.service.CartService;
-import kr.co.loopz.object.service.ObjectDetailService;
-import kr.co.loopz.object.service.ObjectSearchService;
-import kr.co.loopz.object.service.ObjectStockService;
+import kr.co.loopz.object.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +24,7 @@ public class InternalObjectController {
     private final CartService cartService;
     private final ObjectDetailService objectDetailService;
     private final ObjectSearchService objectSearchService;
-    private final ObjectStockService objectStockService;
+    private final ObjectService objectService;
 
     @PostMapping("/objects")
     public ResponseEntity<List<ObjectResponse>> getObjectList(
@@ -101,7 +98,6 @@ public class InternalObjectController {
             userId = currentUser.getUsername();
         }
 
-
         BoardResponse result = objectSearchService.findObjectBySearchFilter(userId, filter);
         return ResponseEntity.ok(result);
     }
@@ -111,10 +107,7 @@ public class InternalObjectController {
             @RequestHeader String userId,
             @RequestBody List<PurchasedObjectResponse> purchasedObjects
     ) {
-        for (PurchasedObjectResponse purchasedObject : purchasedObjects) {
-            objectStockService.decreaseStock(purchasedObject.objectId(), purchasedObject.quantity());
-        }
-
+        objectService.decreaseStockAndUpdateCart(userId, purchasedObjects);
         return ResponseEntity.noContent().build();
     }
 

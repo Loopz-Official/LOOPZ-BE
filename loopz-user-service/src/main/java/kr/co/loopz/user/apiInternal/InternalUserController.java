@@ -51,6 +51,6 @@ public class InternalUserController {
     @GetMapping("/{userId}/addresses/{addressId}")
     public AddressResponse getAddressById(@PathVariable String userId,@PathVariable String addressId) {
         Address address = userAddressService.getAddress(userId, addressId);
-        return userConverter.INSTANCE.toAddressResponse(address);
+        return userConverter.toAddressResponse(address);
     }
 }

@@ -185,4 +185,19 @@ public class CartService {
 
         return new CartWithQuantityResponse(cart.getCartId(), items);
     }
+
+    @Transactional
+    public void deleteCartItemAllowNull(String userId, String objectId) {
+
+        Optional<Cart> optionalCart = cartRepository.findByUserId(userId);
+        if (optionalCart.isEmpty()) {
+            return;
+        }
+        Cart cart = optionalCart.get();
+
+        // 장바구니 상품 가져오기
+        Optional<CartItem> optionalCartItem = cartItemRepository.findByCartIdAndObjectId(cart.getCartId(), objectId);
+        optionalCartItem.ifPresent(cartItemRepository::delete);
+    }
+
 }
