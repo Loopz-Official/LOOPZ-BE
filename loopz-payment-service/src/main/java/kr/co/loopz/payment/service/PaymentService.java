@@ -6,7 +6,7 @@ import io.portone.sdk.server.payment.PaidPayment;
 import io.portone.sdk.server.payment.Payment;
 import io.portone.sdk.server.payment.PaymentClient;
 import kr.co.loopz.payment.client.OrderServiceClient;
-import kr.co.loopz.payment.client.ProductServiceClient;
+import kr.co.loopz.payment.client.ProductClientAtPayment;
 import kr.co.loopz.payment.converter.PaymentConverter;
 import kr.co.loopz.payment.dto.response.InternalOrderResponse;
 import kr.co.loopz.payment.dto.response.PaymentCompleteResponse;
@@ -32,7 +32,7 @@ public class PaymentService {
     private final PaymentClient paymentClient;
 
     private final OrderServiceClient orderServiceClient;
-    private final ProductServiceClient productServiceClient;
+    private final ProductClientAtPayment productClient;
 
     private final ObjectMapper objectMapper;
     private final PaymentConverter paymentConverter;
@@ -174,7 +174,7 @@ public class PaymentService {
     private void requestToProductServiceDecreaseStockDeleteCart(String userId, List<PurchasedObjectResponse> purchasedObjects) {
         try {
             // 각 상품에 대해 재고 감소 및 장바구니 삭제 처리
-            productServiceClient.decreaseStockAndDeleteCart(userId, purchasedObjects);
+            productClient.decreaseStockAndDeleteCart(userId, purchasedObjects);
 
             log.debug("상품 서비스 요청 성공. 사용자 ID: {}, 상품 개수: {}", userId, purchasedObjects.size());
         } catch (Exception e) {

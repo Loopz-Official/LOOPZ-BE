@@ -1,4 +1,4 @@
-package kr.co.loopz.payment.controller;
+package kr.co.loopz.payment.apiExternal;
 
 import io.portone.sdk.server.errors.WebhookVerificationException;
 import io.portone.sdk.server.webhook.Webhook;
@@ -74,7 +74,7 @@ public class PaymentController {
         log.debug("Webhook is a transaction: {}", transaction);
 
         paymentService.syncPaymentAndUpdateStock(transaction.getData().getPaymentId());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
 

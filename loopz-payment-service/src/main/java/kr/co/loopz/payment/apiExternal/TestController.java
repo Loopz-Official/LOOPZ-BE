@@ -1,4 +1,4 @@
-package kr.co.loopz.payment.controller;
+package kr.co.loopz.payment.apiExternal;
 
 import io.portone.sdk.server.common.Currency;
 import kr.co.loopz.payment.dto.response.PurchasedItem;
