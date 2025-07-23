@@ -4,6 +4,7 @@ import io.portone.sdk.server.errors.WebhookVerificationException;
 import io.portone.sdk.server.webhook.Webhook;
 import io.portone.sdk.server.webhook.WebhookTransaction;
 import io.portone.sdk.server.webhook.WebhookVerifier;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import kr.co.loopz.payment.dto.request.PaymentCompleteRequest;
 import kr.co.loopz.payment.dto.response.PaymentCompleteResponse;
@@ -17,6 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.stream.Collectors;
 
 import static kr.co.loopz.payment.exception.PaymentErrorCode.WEBHOOK_VERIFICATION_FAILED;
 
@@ -67,11 +71,13 @@ public class PaymentController {
      */
     @PostMapping("/webhook")
     public ResponseEntity<Void> handleWebhook(
-            @RequestBody String body,
-            @RequestHeader("Webhook-Id") String webhookId,
-            @RequestHeader("Webhook-Timestamp") String webhookTimestamp,
-            @RequestHeader("Webhook-Signature") String webhookSignature
-    ) {
+//            @RequestBody String body,
+            HttpServletRequest request,
+            @RequestHeader("webhook-id") String webhookId,
+            @RequestHeader("webhook-timestamp") String webhookTimestamp,
+            @RequestHeader("webhook-signature") String webhookSignature
+    ) throws IOException {
+        String body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
 
         log.debug("Received webhook: body={}, webhookId={}, webhookTimestamp={}, webhookSignature={}",
                 body, webhookId, webhookTimestamp, webhookSignature);
@@ -90,22 +96,7 @@ public class PaymentController {
         Webhook verifiedWebhook;
 
         try {
-            String cleanedSignature = webhookSignature.replace(",", " ");
-            log.debug("🧪 Final cleaned signature: {}", cleanedSignature);
-            log.debug("📦 Headers - webhookId: {}, webhookTimestamp: {}, webhookSignature: {}", webhookId, webhookTimestamp, webhookSignature);
-            log.debug("📄 Raw body: {}", body);
-
-            long now = System.currentTimeMillis() / 1000;
-            try {
-                long ts = Long.parseLong(webhookTimestamp);
-                log.debug("⏱️ Webhook timestamp: {}", ts);
-                log.debug("⏱️ Server timestamp: {}", now);
-                log.debug("⏱️ Time difference (seconds): {}", Math.abs(now - ts));
-            } catch (NumberFormatException ex) {
-                log.error("❌ Invalid webhookTimestamp: {}", webhookTimestamp, ex);
-            }
-
-            verifiedWebhook = webhookVerifier.verify(body, webhookId, webhookTimestamp.trim(), cleanedSignature);
+            verifiedWebhook = webhookVerifier.verify(body, webhookId, webhookTimestamp.trim(), webhookSignature);
         } catch (WebhookVerificationException e) {
             log.error("Webhook verification failed", e);
             throw new PaymentException(WEBHOOK_VERIFICATION_FAILED);
