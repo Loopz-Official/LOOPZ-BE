@@ -168,8 +168,8 @@ public class CartService {
         CartItem item = cartItemRepository.findByCartIdAndObjectId(cart.getCartId(), objectId)
                 .orElseThrow(() -> new ObjectException(CART_ITEM_NOT_FOUND, "상품Id: " + objectId));
 
-            cartItemRepository.delete(item);
-        }
+        cartItemRepository.delete(item);
+    }
 
     public CartWithQuantityResponse getCartByUserId(String userId) {
         Cart cart = cartRepository.findByUserId(userId)

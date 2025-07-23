@@ -2,15 +2,13 @@ package kr.co.loopz.object.apiInternal;
 
 import kr.co.loopz.object.dto.request.DeleteCartItemRequest;
 import kr.co.loopz.object.dto.request.SearchFilterRequest;
-import kr.co.loopz.object.dto.response.BoardResponse;
-import kr.co.loopz.object.dto.response.CartWithQuantityResponse;
-import kr.co.loopz.object.dto.response.ObjectNameResponse;
-import kr.co.loopz.object.dto.response.ObjectResponse;
+import kr.co.loopz.object.dto.response.*;
 import kr.co.loopz.object.repository.CartItemRepository;
 import kr.co.loopz.object.repository.ObjectRepository;
 import kr.co.loopz.object.service.CartService;
 import kr.co.loopz.object.service.ObjectDetailService;
 import kr.co.loopz.object.service.ObjectSearchService;
+import kr.co.loopz.object.service.ObjectStockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +27,7 @@ public class InternalObjectController {
     private final CartService cartService;
     private final ObjectDetailService objectDetailService;
     private final ObjectSearchService objectSearchService;
+    private final ObjectStockService objectStockService;
 
     @PostMapping("/objects")
     public ResponseEntity<List<ObjectResponse>> getObjectList(
@@ -106,4 +105,17 @@ public class InternalObjectController {
         BoardResponse result = objectSearchService.findObjectBySearchFilter(userId, filter);
         return ResponseEntity.ok(result);
     }
+
+    @PostMapping("/object/stock")
+    public ResponseEntity<Void> decreaseStockAndDeleteCart(
+            @RequestHeader String userId,
+            @RequestBody List<PurchasedObjectResponse> purchasedObjects
+    ) {
+        for (PurchasedObjectResponse purchasedObject : purchasedObjects) {
+            objectStockService.decreaseStock(purchasedObject.objectId(), purchasedObject.quantity());
+        }
+
+        return ResponseEntity.noContent().build();
+    }
+
 }
