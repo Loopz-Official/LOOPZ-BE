@@ -11,11 +11,17 @@ import kr.co.loopz.payment.exception.PaymentException;
 import kr.co.loopz.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 import static kr.co.loopz.payment.exception.PaymentErrorCode.WEBHOOK_VERIFICATION_FAILED;
 
@@ -27,6 +33,12 @@ public class PaymentController {
 
     private final PaymentService paymentService;
     private final WebhookVerifier webhookVerifier;
+
+
+
+    @Value("${portone.webhook-secret}")
+    private String webhookSecret;
+
 
     /**
      * 클라이언트 결제 완료 요청을 처리합니다. 결제 완료 상태인지 확인하고 응답합니다.
@@ -82,10 +94,36 @@ public class PaymentController {
     private Webhook verifyWebhook(String body, String webhookId, String webhookTimestamp, String webhookSignature) {
         Webhook verifiedWebhook;
         try {
-            long now = System.currentTimeMillis() / 1000;
-            log.debug("Current time in seconds: {}", now);
             verifiedWebhook = webhookVerifier.verify(body, webhookId, webhookTimestamp, webhookSignature);
         } catch (WebhookVerificationException e) {
+
+
+
+            try {
+                // ✅ 수동으로 Signature 계산해서 비교
+                String signatureBase = webhookId + "." + webhookTimestamp + "." + body;
+                log.debug("Raw signature base string: {}", signatureBase);
+
+                String secret = webhookSecret; // 예: 환경 변수에서 가져오거나 설정한 값
+                if (secret.startsWith("whsec_")) {
+                    secret = secret.substring("whsec_".length());
+                }
+
+                byte[] decodedSecret = Base64.getDecoder().decode(secret);
+                SecretKeySpec keySpec = new SecretKeySpec(decodedSecret, "HmacSHA256");
+                Mac mac = Mac.getInstance("HmacSHA256");
+                mac.init(keySpec);
+                byte[] expectedSignature = mac.doFinal(signatureBase.getBytes(StandardCharsets.UTF_8));
+                String expectedBase64 = Base64.getEncoder().encodeToString(expectedSignature);
+
+                log.debug("🧪 Calculated Signature (base64): {}", expectedBase64);
+
+            } catch (Exception ex) {
+                log.error("‼️ Error while manually verifying signature", ex);
+            }
+
+
+
             log.error("Webhook verification failed", e);
             throw new PaymentException(WEBHOOK_VERIFICATION_FAILED);
         }
