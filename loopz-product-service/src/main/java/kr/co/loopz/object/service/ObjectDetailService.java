@@ -1,14 +1,12 @@
 package kr.co.loopz.object.service;
 
-import kr.co.loopz.common.domain.Image;
-import kr.co.loopz.object.dto.request.ObjectInfoRequest;
-import kr.co.loopz.object.dto.response.OrderObjectInfoResponse;
-
 import kr.co.loopz.object.converter.ObjectConverter;
 import kr.co.loopz.object.domain.ObjectEntity;
 import kr.co.loopz.object.domain.ObjectImage;
+import kr.co.loopz.object.dto.request.ObjectInfoRequest;
 import kr.co.loopz.object.dto.response.DetailResponse;
 import kr.co.loopz.object.dto.response.ObjectResponse;
+import kr.co.loopz.object.dto.response.OrderObjectInfoResponse;
 import kr.co.loopz.object.exception.ObjectException;
 import kr.co.loopz.object.repository.LikeRepository;
 import kr.co.loopz.object.repository.ObjectImageRepository;
@@ -21,7 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static kr.co.loopz.object.exception.ObjectErrorCode.*;
+import static kr.co.loopz.object.exception.ObjectErrorCode.INSUFFICIENT_STOCK;
+import static kr.co.loopz.object.exception.ObjectErrorCode.OBJECT_ID_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -96,7 +95,7 @@ public class ObjectDetailService {
                 .toList();
     }
 
-    private ObjectEntity findObjectEntity(String objectId) {
+    public ObjectEntity findObjectEntity(String objectId) {
         return objectRepository.findByObjectId(objectId)
                 .orElseThrow(() -> new ObjectException(OBJECT_ID_NOT_FOUND, "Object not found: " + objectId));
     }

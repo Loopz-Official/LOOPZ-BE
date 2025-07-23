@@ -50,6 +50,10 @@ public class OrderItem extends BaseTimeEntity {
                 .build();
     }
 
+    public void makeStatusToOrdered() {
+        this.status = OrderStatus.ORDERED;
+    }
+
     @Builder(access = PRIVATE)
     private OrderItem(String orderId, String objectId, int quantity, Long purchasePrice, OrderStatus status) {
         this.orderId = orderId;

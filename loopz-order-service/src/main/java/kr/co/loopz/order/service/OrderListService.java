@@ -5,8 +5,8 @@ import kr.co.loopz.order.converter.OrderConverter;
 import kr.co.loopz.order.domain.Order;
 import kr.co.loopz.order.domain.OrderItem;
 import kr.co.loopz.order.dto.response.InternalObjectResponse;
-import kr.co.loopz.order.dto.response.PurchasedObjectResponse;
 import kr.co.loopz.order.dto.response.OrderListResponse;
+import kr.co.loopz.order.dto.response.PurchasedObjectResponse;
 import kr.co.loopz.order.exception.OrderException;
 import kr.co.loopz.order.repository.OrderItemRepository;
 import kr.co.loopz.order.repository.OrderRepository;
@@ -40,22 +40,20 @@ public class OrderListService {
      */
     public List<OrderListResponse> getOrders(String userId) {
 
-        List<Order> orders = orderRepository.findAllByUserId(userId);
+        List<Order> orders = orderRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
 
         return orders.stream()
                 .map(this::toOrderListResponse)
                 .toList();
     }
 
-    public OrderListResponse getOrder(String userId, String orderId) {
-
-        Order order = findOrder(userId, orderId);
-
+    public OrderListResponse getOrder(String orderId) {
+        Order order = findOrder(orderId);
         return toOrderListResponse(order);
     }
 
-    private Order findOrder(String userId, String orderId) {
-        return orderRepository.findByUserIdAndOrderId(userId, orderId)
+    private Order findOrder(String orderId) {
+        return orderRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new OrderException(OBJECT_ID_NOT_FOUND, "OrderId:" + orderId));
     }
 
@@ -92,4 +90,15 @@ public class OrderListService {
         return objectClient.getObjectListByIds(objectIds);
     }
 
+    /**
+     * 주문에 해당하는 각 아이템 주문 상태를 ORDERED로 변경합니다. Internal API에서 사용
+     * @param orderId 주문 ID
+     */
+    @Transactional
+    public void makeOrderStatusOrdered(String orderId) {
+        List<OrderItem> allByOrderId = orderItemRepository.findAllByOrderId(orderId);
+        for (OrderItem orderItem : allByOrderId) {
+            orderItem.makeStatusToOrdered();
+        }
+    }
 }

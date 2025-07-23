@@ -55,7 +55,7 @@ public class ObjectEntity extends BaseTimeEntity {
     private Set<Keyword> keywords = new HashSet<>();
 
     @Embedded
-    private ObjectDetail detail;
+    private ObjectDetail detail = new ObjectDetail();
 
 
     @Builder(access = AccessLevel.PRIVATE)
@@ -72,6 +72,10 @@ public class ObjectEntity extends BaseTimeEntity {
 
     public int getStock() {
         return detail != null ? detail.getStock() : 0;
+    }
+
+    public void decreaseStock(int quantity) {
+        detail.decreaseStock(quantity);
     }
 
 }

@@ -3,6 +3,7 @@ package kr.co.loopz.order.converter;
 import kr.co.loopz.order.domain.Order;
 import kr.co.loopz.order.domain.OrderItem;
 import kr.co.loopz.order.dto.response.*;
+import kr.co.loopz.order.util.MaskingUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -107,17 +108,34 @@ public interface OrderConverter {
             long totalProductPrice,
             long totalPayment)
     {
+
+        InternalAddressResponse maskedAddress = toMaskedAddress(address);
+
         return new OrderDetailResponse(
                 order.getOrderId(),
                 order.getOrderNumber(),
                 order.getPaymentMethod(),
                 toPurchasedObjectResponseList(orderItems, objectDetails),
-                address,
+                maskedAddress,
                 shippingFee,
                 totalProductPrice,
                 totalPayment
         );
     }
 
+    default InternalAddressResponse toMaskedAddress(InternalAddressResponse address){
+        return new InternalAddressResponse(
+                address.addressId(),
+                address.userId(),
+                MaskingUtil.maskName(address.recipientName()),
+                MaskingUtil.maskPhoneNumber(address.phoneNumber()),
+                address.zoneCode(),
+                address.address(),
+                address.addressDetail(),
+                address.defaultAddress()
+        );
+    }
+
+    OrderIdNumberMappingResponse toOrderIdNumberMappingResponse(Order order);
 }
 
