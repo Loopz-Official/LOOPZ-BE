@@ -18,11 +18,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-
 import static kr.co.loopz.payment.exception.PaymentErrorCode.WEBHOOK_VERIFICATION_FAILED;
 
 @RestController
@@ -94,36 +89,13 @@ public class PaymentController {
     private Webhook verifyWebhook(String body, String webhookId, String webhookTimestamp, String webhookSignature) {
         Webhook verifiedWebhook;
         try {
-            verifiedWebhook = webhookVerifier.verify(body, webhookId, webhookTimestamp, webhookSignature);
+            // 쉼표 대신 공백으로 포맷 수정
+            String cleanedSignature = webhookSignature.replace(",", " ");
+
+            log.debug("🧪 Final cleaned signature: {}", cleanedSignature);
+
+            verifiedWebhook = webhookVerifier.verify(body, webhookId, webhookTimestamp, cleanedSignature);
         } catch (WebhookVerificationException e) {
-
-
-
-            try {
-                // ✅ 수동으로 Signature 계산해서 비교
-                String signatureBase = webhookId + "." + webhookTimestamp + "." + body;
-                log.debug("Raw signature base string: {}", signatureBase);
-
-                String secret = webhookSecret; // 예: 환경 변수에서 가져오거나 설정한 값
-                if (secret.startsWith("whsec_")) {
-                    secret = secret.substring("whsec_".length());
-                }
-
-                byte[] decodedSecret = Base64.getDecoder().decode(secret);
-                SecretKeySpec keySpec = new SecretKeySpec(decodedSecret, "HmacSHA256");
-                Mac mac = Mac.getInstance("HmacSHA256");
-                mac.init(keySpec);
-                byte[] expectedSignature = mac.doFinal(signatureBase.getBytes(StandardCharsets.UTF_8));
-                String expectedBase64 = Base64.getEncoder().encodeToString(expectedSignature);
-
-                log.debug("🧪 Calculated Signature (base64): {}", expectedBase64);
-
-            } catch (Exception ex) {
-                log.error("‼️ Error while manually verifying signature", ex);
-            }
-
-
-
             log.error("Webhook verification failed", e);
             throw new PaymentException(WEBHOOK_VERIFICATION_FAILED);
         }
