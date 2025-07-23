@@ -24,7 +24,7 @@ public class InternalObjectController {
     private final CartService cartService;
     private final ObjectDetailService objectDetailService;
     private final ObjectSearchService objectSearchService;
-    private final ObjectService objectService;
+    private final ObjectStockService objectStockService;
 
     @PostMapping("/objects")
     public ResponseEntity<List<ObjectResponse>> getObjectList(
@@ -107,7 +107,7 @@ public class InternalObjectController {
             @RequestHeader String userId,
             @RequestBody List<PurchasedObjectResponse> purchasedObjects
     ) {
-        objectService.decreaseStockAndUpdateCart(userId, purchasedObjects);
+        objectStockService.decreaseStockAndUpdateCart(userId, purchasedObjects);
         return ResponseEntity.noContent().build();
     }
 
