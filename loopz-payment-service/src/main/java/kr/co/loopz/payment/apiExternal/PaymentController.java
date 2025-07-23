@@ -93,7 +93,8 @@ public class PaymentController {
                 rawBody, webhookId, webhookTimestamp, webhookSignature);
 
         Webhook verifiedWebhook = verifyWebhook(rawBody, webhookId, webhookTimestamp, webhookSignature);
-        WebhookTransaction transaction = getWebhookTransaction(rawBody, webhookId, webhookTimestamp, webhookSignature, verifiedWebhook);
+        WebhookTransaction transaction = (WebhookTransaction) verifiedWebhook;
+//        WebhookTransaction transaction = getWebhookTransaction(rawBody, webhookId, webhookTimestamp, webhookSignature, verifiedWebhook);
         log.debug("Webhook is a transaction: {}", transaction);
 
         paymentService.syncPaymentAndUpdateStock(transaction.getData().getPaymentId());
@@ -106,7 +107,7 @@ public class PaymentController {
         Webhook verifiedWebhook;
 
         try {
-            verifiedWebhook = webhookVerifier.verify(body, webhookId, webhookSignature ,webhookTimestamp.trim());
+            verifiedWebhook = webhookVerifier.verify(body, webhookId, webhookSignature ,webhookTimestamp);
         } catch (WebhookVerificationException e) {
             log.error("Webhook verification failed", e);
             throw new PaymentException(WEBHOOK_VERIFICATION_FAILED);
