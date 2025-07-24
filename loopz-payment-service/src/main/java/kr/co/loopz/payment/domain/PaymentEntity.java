@@ -50,7 +50,7 @@ public class PaymentEntity extends BaseTimeEntity {
     public static PaymentEntity createPayment(PaymentCompleteResponse response) {
 
         String method = response.paidPayment().getMethod() != null
-                ? response.paidPayment().getMethod().toString()
+                ? response.paidPayment().getMethod().getClass().getSimpleName()
                 : null;
 
         return PaymentEntity.builder()
