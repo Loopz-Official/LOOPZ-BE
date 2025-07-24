@@ -34,11 +34,14 @@ public class PaymentEntity extends BaseTimeEntity {
 
     private String paymentMethod;
 
+    @Column(columnDefinition = "text")
     private String transactionId;
     private String orderName;
     private Long paymentAmount;
     private String currency;
+    @Column(columnDefinition = "text")
     private String pgTxId;
+    @Column(columnDefinition = "text")
     private String receiptUrl;
 
     private LocalDateTime canceledAt;

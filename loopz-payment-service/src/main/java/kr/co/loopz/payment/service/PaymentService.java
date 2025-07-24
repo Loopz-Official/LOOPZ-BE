@@ -77,11 +77,11 @@ public class PaymentService {
 
         String userId = response.userId();
 
-        requestToProductServiceDecreaseStockDeleteCart(userId, response.objects());
-        requestToOrderServiceChangeOrderStatus(response.orderId());
-
         PaymentEntity payment = PaymentEntity.createPayment(response);
         paymentRepository.save(payment);
+
+        requestToProductServiceDecreaseStockDeleteCart(userId, response.objects());
+        requestToOrderServiceChangeOrderStatus(response.orderId());
     }
 
 

@@ -65,7 +65,6 @@ public class PaymentController {
      */
     @PostMapping("/webhook")
     public ResponseEntity<Void> handleWebhook(
-//            @RequestBody String body,
             HttpServletRequest request,
             @RequestHeader("webhook-id") String webhookId,
             @RequestHeader("webhook-timestamp") String webhookTimestamp,
