@@ -64,7 +64,7 @@ public class PaymentController {
      * @return void
      */
     @PostMapping("/webhook")
-    public ResponseEntity<Void> handleWebhook(
+    public ResponseEntity<String> handleWebhook(
             HttpServletRequest request,
             @RequestHeader("webhook-id") String webhookId,
             @RequestHeader("webhook-timestamp") String webhookTimestamp,
@@ -87,7 +87,7 @@ public class PaymentController {
         log.debug("Webhook is a transaction: {}", transaction);
 
         paymentService.syncPaymentAndUpdateStock(transaction.getData().getPaymentId());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.OK).body("Webhook processed successfully");
     }
 
 
