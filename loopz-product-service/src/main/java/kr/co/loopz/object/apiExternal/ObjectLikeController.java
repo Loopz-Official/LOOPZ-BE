@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import kr.co.loopz.object.dto.request.LikedObjectRequest;
 import kr.co.loopz.object.dto.response.BoardResponse;
+import kr.co.loopz.object.dto.response.ObjectLikedResponse;
 import kr.co.loopz.object.service.LikeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,14 +25,15 @@ public class ObjectLikeController {
 
     @PatchMapping("/{objectId}")
     @Operation(summary="좋아요 추가/삭제")
-    public ResponseEntity<Void> toggleLike(
+    public ResponseEntity<ObjectLikedResponse> toggleLike(
             @AuthenticationPrincipal User currentUser,
-            @PathVariable String objectId){
+            @PathVariable String objectId
+    ){
 
         String userId = currentUser.getUsername();
-        likeService.toggleLike(userId, objectId);
+        ObjectLikedResponse response = likeService.toggleLike(userId, objectId);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
     }
 
     @GetMapping()

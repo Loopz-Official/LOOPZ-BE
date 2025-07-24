@@ -1,9 +1,11 @@
 package kr.co.loopz.object.service;
 
 import kr.co.loopz.object.client.UserClient;
+import kr.co.loopz.object.converter.ObjectConverter;
 import kr.co.loopz.object.domain.Likes;
 import kr.co.loopz.object.dto.request.LikedObjectRequest;
 import kr.co.loopz.object.dto.response.BoardResponse;
+import kr.co.loopz.object.dto.response.ObjectLikedResponse;
 import kr.co.loopz.object.exception.ObjectException;
 import kr.co.loopz.object.repository.LikeRepository;
 import kr.co.loopz.object.repository.ObjectRepository;
@@ -28,6 +30,8 @@ public class LikeService {
 
     private final UserClient userClient;
 
+    private final ObjectConverter objectConverter;
+
 
     /**
      * 사용자가 오브젝트에 좋아요를 토글합니다.
@@ -36,7 +40,7 @@ public class LikeService {
      * @param objectId 오브젝트 ID
      */
     @Transactional
-    public void toggleLike(String userId, String objectId) {
+    public ObjectLikedResponse toggleLike(String userId, String objectId) {
 
         checkUserValid(userId);
         checkObjectValid(objectId);
@@ -46,12 +50,14 @@ public class LikeService {
         if (like.isPresent()) {
             // 좋아요가 이미 있으면 삭제 (좋아요 취소)
             likeRepository.delete(like.get());
-
-        } else {
-            // 좋아요가 없으면 새로 추가
-            Likes newLike = Likes.from(userId, objectId);
-            likeRepository.save(newLike);
+            return objectConverter.toLikedResponse(objectId, false);
         }
+
+        // 좋아요가 없으면 새로 추가
+        Likes newLike = Likes.from(userId, objectId);
+        likeRepository.save(newLike);
+        return objectConverter.toLikedResponse(objectId, true);
+
     }
 
 

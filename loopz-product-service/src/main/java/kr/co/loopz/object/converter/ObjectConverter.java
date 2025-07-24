@@ -73,4 +73,8 @@ public interface ObjectConverter {
         );
     }
 
+    default ObjectLikedResponse toLikedResponse(String objectId, boolean liked) {
+        return new ObjectLikedResponse(objectId, liked);
+    }
+
 }
