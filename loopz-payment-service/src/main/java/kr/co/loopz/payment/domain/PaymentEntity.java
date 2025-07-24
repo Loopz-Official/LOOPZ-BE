@@ -39,7 +39,6 @@ public class PaymentEntity extends BaseTimeEntity {
     private Long paymentAmount;
     private String currency;
     private String pgTxId;
-    private String pgResponse;
     private String receiptUrl;
 
     private LocalDateTime canceledAt;
@@ -60,7 +59,6 @@ public class PaymentEntity extends BaseTimeEntity {
                 .paymentAmount(response.paidPayment().getAmount().getTotal())
                 .currency(response.paidPayment().getCurrency().getValue())
                 .pgTxId(response.paidPayment().getPgTxId())
-                .pgResponse(response.paidPayment().getPgResponse())
                 .receiptUrl(response.paidPayment().getReceiptUrl())
                 .build();
     }
@@ -75,7 +73,6 @@ public class PaymentEntity extends BaseTimeEntity {
             Long paymentAmount,
             String currency,
             String pgTxId,
-            String pgResponse,
             String receiptUrl
     ) {
         this.paymentId = UUID.randomUUID().toString();
@@ -88,7 +85,6 @@ public class PaymentEntity extends BaseTimeEntity {
         this.paymentAmount = paymentAmount;
         this.currency = currency;
         this.pgTxId = pgTxId;
-        this.pgResponse = pgResponse;
         this.receiptUrl = receiptUrl;
     }
 
