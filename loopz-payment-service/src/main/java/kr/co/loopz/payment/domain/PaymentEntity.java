@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PRIVATE;
@@ -23,6 +22,7 @@ public class PaymentEntity extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
+    // 정합성을 맞추기 위해 내부 UUID가 아닌 포트원에서 제공한 paymentId를 사용
     @Column(unique = true, nullable = false)
     private String paymentId;
 
@@ -44,9 +44,16 @@ public class PaymentEntity extends BaseTimeEntity {
     @Column(columnDefinition = "text")
     private String receiptUrl;
 
+    private boolean webhookVerified;
+
     private LocalDateTime canceledAt;
     private String cancelReason;
 
+    /**
+     * 결제 성공 웹훅을 수신하고 기록할때 사용하는 팩토리 메서드입니다.
+     * @param response 결제 성공 후 검증 성공 응답
+     * @return PaymentEntity
+     */
     public static PaymentEntity createPayment(PaymentCompleteResponse response) {
 
         String method = response.paidPayment().getMethod() != null
@@ -54,6 +61,7 @@ public class PaymentEntity extends BaseTimeEntity {
                 : null;
 
         return PaymentEntity.builder()
+                .paymentId(response.paidPayment().getId())
                 .orderId(response.orderId())
                 .userId(response.userId())
                 .paymentMethod(method)
@@ -68,6 +76,7 @@ public class PaymentEntity extends BaseTimeEntity {
 
     @Builder(access = PRIVATE)
     private PaymentEntity(
+            String paymentId,
             String orderId,
             String userId,
             String paymentMethod,
@@ -78,8 +87,7 @@ public class PaymentEntity extends BaseTimeEntity {
             String pgTxId,
             String receiptUrl
     ) {
-        this.paymentId = UUID.randomUUID().toString();
-
+        this.paymentId = paymentId;
         this.orderId = orderId;
         this.userId = userId;
         this.paymentMethod = paymentMethod;
@@ -91,5 +99,9 @@ public class PaymentEntity extends BaseTimeEntity {
         this.receiptUrl = receiptUrl;
     }
 
+
+    public void makeWebhookVerified() {
+        this.webhookVerified = true;
+    }
 
 }

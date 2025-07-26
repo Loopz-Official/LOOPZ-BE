@@ -82,6 +82,8 @@ public class PaymentService {
 
         requestToProductServiceDecreaseStockDeleteCart(userId, response.objects());
         requestToOrderServiceChangeOrderStatus(response.orderId());
+
+        payment.makeWebhookVerified();
     }
 
 
