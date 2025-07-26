@@ -72,6 +72,12 @@ public class PaymentService {
      */
     @Transactional
     public void syncPaymentAndUpdateStock(String paymentId) {
+
+        if (paymentRepository.existsByPaymentId(paymentId)) {
+            log.info("이미 처리된 결제 웹훅입니다. 중복 처리를 방지합니다. 결제 ID: {}", paymentId);
+            return;
+        }
+
         PaymentCompleteResponse response = syncPayment(paymentId, null);
         log.info("웹훅 수신 후 결제 정보 동기화 성공, 결제 ID: {} 재고 및 장바구니 데이터 싱크 처리 시작", paymentId);
 
@@ -82,6 +88,8 @@ public class PaymentService {
 
         requestToProductServiceDecreaseStockDeleteCart(userId, response.objects());
         requestToOrderServiceChangeOrderStatus(response.orderId());
+
+        payment.makeWebhookVerified();
     }
 
 
