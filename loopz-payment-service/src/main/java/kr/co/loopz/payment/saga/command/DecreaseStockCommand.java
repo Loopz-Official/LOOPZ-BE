@@ -1,7 +1,6 @@
-package kr.co.loopz.object.saga;
+package kr.co.loopz.payment.saga.command;
 
-
-import kr.co.loopz.object.dto.response.PurchasedObjectResponse;
+import kr.co.loopz.payment.dto.response.PurchasedObjectResponse;
 
 import java.util.List;
 
