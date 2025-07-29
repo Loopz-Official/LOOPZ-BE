@@ -2,6 +2,7 @@ package kr.co.loopz.payment.converter;
 
 import io.portone.sdk.server.payment.PaidPayment;
 import kr.co.loopz.payment.domain.enums.OrderStatus;
+import kr.co.loopz.payment.saga.event.PaymentCompleteEvent;
 import kr.co.loopz.payment.dto.response.InternalOrderResponse;
 import kr.co.loopz.payment.dto.response.PaymentCompleteResponse;
 import kr.co.loopz.payment.dto.response.PortOneCustomData;
@@ -34,4 +35,12 @@ public interface PaymentConverter {
         );
     }
 
+    default PaymentCompleteEvent toPaymentCompleteEvent(PaymentCompleteResponse response){
+        return new PaymentCompleteEvent(
+                response.paidPayment().getId(),
+                response.userId(),
+                response.orderId(),
+                response.objects()
+        );
+    }
 }

@@ -92,7 +92,7 @@ public class PaymentController {
 
 
 
-    private Webhook verifyWebhook(String body, String webhookId, String webhookTimestamp, String webhookSignature) {
+    public Webhook verifyWebhook(String body, String webhookId, String webhookTimestamp, String webhookSignature) {
         Webhook verifiedWebhook;
 
         try {
@@ -107,7 +107,7 @@ public class PaymentController {
 
 
 
-    private WebhookTransaction getWebhookTransaction(String body, String webhookId, String webhookTimestamp, String webhookSignature, Webhook verifiedWebhook) {
+    public WebhookTransaction getWebhookTransaction(String body, String webhookId, String webhookTimestamp, String webhookSignature, Webhook verifiedWebhook) {
 
         if (!(verifiedWebhook instanceof WebhookTransaction transaction)) {
             log.error("Webhook is not a transaction: body={}, webhookId={}, webhookTimestamp={}, webhookSignature={}",
