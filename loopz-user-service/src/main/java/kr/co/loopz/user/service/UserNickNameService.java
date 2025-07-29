@@ -79,14 +79,18 @@ public class UserNickNameService {
         if (badWordFiltering.check(nickname) || badWordFiltering.blankCheck(nickname)) {
             throw new UserException(NICKNAME_INVALID, "닉네임에 부적절한 단어가 포함되어 있습니다.");
         }
-        if (RESERVED_NICKNAMES.contains(nickname.toLowerCase())) {
-            throw new UserException(NICKNAME_INVALID, "사용할 수 없는 닉네임입니다.");
+
+        String lowerNickname = nickname.toLowerCase();
+        for (String reserved : RESERVED_NICKNAMES) {
+            if (lowerNickname.contains(reserved.toLowerCase())) {
+                throw new UserException(NICKNAME_INVALID, "사용할 수 없는 단어가 닉네임에 포함되어 있습니다.");
+            }
         }
     }
 
     // 예약어 추가
     private static final Set<String> RESERVED_NICKNAMES = Set.of(
-            "admin", "manager", "system", "root", "운영자", "관리자", "null"
+            "admin", "manager", "system", "root", "운영자", "관리자", "null","loopz"
     );
 
 
