@@ -5,3 +5,4 @@ application-oauth.yml
 application-dev.yml
 application-aws.yml
 application-portone.yml
+application-kafka.yml
