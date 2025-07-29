@@ -4,6 +4,17 @@ dependencies {
     implementation project(':loopz-common')
     implementation project(':loopz-authorization')
 
+    // Test
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testCompileOnly 'org.projectlombok:lombok:1.18.28'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
+
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+
+    //h2 데이터베이스
+    runtimeOnly 'com.h2database:h2'
 
 }
 

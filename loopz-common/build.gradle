@@ -31,7 +31,8 @@ dependencies {
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'
 
     // AOP
-    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    api 'org.springframework.boot:spring-boot-starter-aop'
+    api 'org.springframework.retry:spring-retry'
 
 }
 
