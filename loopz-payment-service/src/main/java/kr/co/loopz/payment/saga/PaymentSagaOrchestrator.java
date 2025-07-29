@@ -23,6 +23,7 @@ public class PaymentSagaOrchestrator {
         log.info("결제 완료 이벤트 수신. 재고 감소 커맨드를 발행합니다. OrderId: {}", event.orderId());
 
         DecreaseStockCommand command = new DecreaseStockCommand(
+                event.orderId(),
                 event.userId(),
                 event.objects()
         );

@@ -1,4 +1,4 @@
-package kr.co.loopz.payment.config;
+package kr.co.loopz.object.config;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -14,19 +14,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class PaymentKafkaConsumerConfig {
+public class ProductKafkaConsumerConfig {
 
     @Value("${spring.kafka.producer.bootstrap-servers}")
     private String bootstrapServers;
 
+
     @Bean
-    public ConsumerFactory<String, Object> paymentSagaConsumerFactory() {
+    public ConsumerFactory<String, Object> productCommandConsumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        // 이 컨슈머 그룹은 오직 결제 사가 처리만을 위한 그룹
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "payment-saga-orchestrator-group");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "product-command-handler-group");
 
-        // JsonDeserializer 설정
         JsonDeserializer<Object> deserializer = new JsonDeserializer<>(Object.class);
         deserializer.setRemoveTypeHeaders(false);
         deserializer.addTrustedPackages("*");
@@ -35,10 +34,10 @@ public class PaymentKafkaConsumerConfig {
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
     }
 
-    @Bean(name = "paymentSagaKafkaListenerContainerFactory")
-    public ConcurrentKafkaListenerContainerFactory<String, Object> paymentSagaKafkaListenerContainerFactory() {
+    @Bean(name = "productCommandKafkaListenerContainerFactory")
+    public ConcurrentKafkaListenerContainerFactory<String, Object> productCommandKafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(paymentSagaConsumerFactory());
+        factory.setConsumerFactory(productCommandConsumerFactory());
         return factory;
     }
 
