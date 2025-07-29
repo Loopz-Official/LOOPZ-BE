@@ -1,7 +1,7 @@
 package kr.co.loopz.object.service;
 
 import kr.co.loopz.object.exception.ObjectException;
-import kr.co.loopz.object.saga.DecreaseStockCommand;
+import kr.co.loopz.object.saga.command.DecreaseStockCommand;
 import kr.co.loopz.object.saga.event.StockDecreaseFailedEvent;
 import kr.co.loopz.object.saga.event.StockDecreasedEvent;
 import lombok.RequiredArgsConstructor;
