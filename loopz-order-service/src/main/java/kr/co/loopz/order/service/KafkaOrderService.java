@@ -38,7 +38,7 @@ public class KafkaOrderService {
             orderItems = orderListService.makeOrderStatusOrdered(command.orderId());
 
             // 사가 흐름의 최종 성공을 알리는 '주문 완료' 이벤트를 발행
-            log.info("주문 완료 이벤트 수신. 사가 트랜잭션을 성공적으로 종료합니다. OrderId: {}", command.orderId());
+            log.info("주문 상태 변경 성공. 사가 트랜잭션을 성공적으로 종료합니다. OrderId: {}", command.orderId());
 
         } catch (Exception e) {
             log.error("주문 상태 변경 실패. OrderId: {}", command.orderId(), e);
