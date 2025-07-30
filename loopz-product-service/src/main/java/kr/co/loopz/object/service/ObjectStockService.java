@@ -32,4 +32,10 @@ public class ObjectStockService {
         object.decreaseStock(quantity);
     }
 
+    @RedissonLock(key = "#objectId")
+    public void increaseStock(String objectId, int quantity) {
+        ObjectEntity object = objectDetailService.findObjectEntity(objectId);
+        object.increaseStock(quantity);
+    }
+
 }

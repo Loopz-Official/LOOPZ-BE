@@ -1,7 +1,9 @@
 package kr.co.loopz.object.service;
 
+import kr.co.loopz.object.dto.response.ItemIdAndQuantity;
 import kr.co.loopz.object.exception.ObjectException;
 import kr.co.loopz.object.saga.command.DecreaseStockCommand;
+import kr.co.loopz.object.saga.command.IncreaseStockCommand;
 import kr.co.loopz.object.saga.event.StockDecreaseFailedEvent;
 import kr.co.loopz.object.saga.event.StockDecreasedEvent;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +53,25 @@ public class ObjectStockServiceV2 {
                     "재고 부족: " + e.getMessage()
             );
             kafkaTemplate.send("stock-decrease-failed-topic", event);
+        }
+    }
+
+    @KafkaListener(
+            topics = "increase-stock-command-topic",
+            containerFactory = "productCommandKafkaListenerContainerFactory"
+    )
+    @Transactional
+    public void handleIncreaseStockCommand(IncreaseStockCommand command) {
+        log.info("재고 원복 커맨드 수신. OrderId: {}", command.orderId());
+        try {
+            // 커맨드에 포함된 상품 목록을 순회하며 재고 원복
+            for (ItemIdAndQuantity item : command.items()) {
+                objectStockService.increaseStock(item.objectId(), item.quantity());
+            }
+            log.info("재고 원복 성공. OrderId: {}", command.orderId());
+            // 보상 트랜잭션 성공 시 별도의 이벤트를 발행할 수도 있습니다.
+        } catch (Exception e) {
+            log.error("재고 원복 처리 중 심각한 오류 발생. OrderId: {}", command.orderId(), e);
         }
     }
 
