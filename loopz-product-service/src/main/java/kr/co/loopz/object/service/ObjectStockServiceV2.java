@@ -53,6 +53,13 @@ public class ObjectStockServiceV2 {
                     "재고 부족: " + e.getMessage()
             );
             kafkaTemplate.send("stock-decrease-failed-topic", event);
+        } catch (Exception e) {
+            log.error("재고 감소 처리 중 알수없는 오류 발생. OrderId: {}", command.orderId(), e);
+            StockDecreaseFailedEvent event = new StockDecreaseFailedEvent(
+                    command.orderId(),
+                    "시스템 오류: " + e.getMessage()
+            );
+            kafkaTemplate.send("stock-decrease-failed-topic", event);
         }
     }
 
