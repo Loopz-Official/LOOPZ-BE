@@ -29,7 +29,7 @@ public class ObjectStockServiceV2 {
             containerFactory = "productCommandKafkaListenerContainerFactory"
     )
     @Transactional
-    public void decreaseStockAndUpdateCartV2(DecreaseStockCommand command) {
+    public void decreaseStockAndUpdateCartByTopic(DecreaseStockCommand command) {
 
         try {
             log.info("재고 감소 커맨드 수신. 재고를 감소시키고 카트에서 삭제후 이벤트를 발행합니다.");
