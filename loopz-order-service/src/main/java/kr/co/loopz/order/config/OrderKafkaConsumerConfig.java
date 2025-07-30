@@ -26,7 +26,7 @@ public class OrderKafkaConsumerConfig {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "order-command-handler-group");
 
         JsonDeserializer<Object> deserializer = new JsonDeserializer<>(Object.class, false);
-        deserializer.addTrustedPackages("*");
+        deserializer.addTrustedPackages("kr.co.loopz.order.saga.command", "kr.co.loopz.order.saga.event");
 
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
     }

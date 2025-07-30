@@ -28,7 +28,7 @@ public class ProductKafkaConsumerConfig {
 
         JsonDeserializer<Object> deserializer = new JsonDeserializer<>(Object.class);
         deserializer.setRemoveTypeHeaders(false);
-        deserializer.addTrustedPackages("*");
+        deserializer.addTrustedPackages("kr.co.loopz.object.saga.command", "kr.co.loopz.object.saga.event");
         deserializer.setUseTypeMapperForKey(true);
 
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);

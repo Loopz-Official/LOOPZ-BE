@@ -29,7 +29,7 @@ public class PaymentKafkaConsumerConfig {
         // JsonDeserializer 설정
         JsonDeserializer<Object> deserializer = new JsonDeserializer<>(Object.class);
         deserializer.setRemoveTypeHeaders(false);
-        deserializer.addTrustedPackages("*");
+        deserializer.addTrustedPackages("kr.co.loopz.payment.saga.command", "kr.co.loopz.payment.saga.event");
         deserializer.setUseTypeMapperForKey(true);
 
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
