@@ -19,4 +19,8 @@ public record SearchFilterRequest(
     public int size() {
         return size > 0 ? size : 10;  // 기본값 10
     }
+
+     public SortType sort() {
+        return sort != null ? sort : SortType.latest;
+    }
 }
