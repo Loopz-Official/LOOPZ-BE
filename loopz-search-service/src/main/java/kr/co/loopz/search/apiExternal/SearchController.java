@@ -1,5 +1,6 @@
 package kr.co.loopz.search.apiExternal;
 
+import jakarta.validation.Valid;
 import kr.co.loopz.search.dto.request.SearchFilterRequest;
 import kr.co.loopz.search.dto.response.BoardResponse;
 import kr.co.loopz.search.dto.response.SearchHistoryResponse;
@@ -45,10 +46,10 @@ public class SearchController {
     }
 
     // 검색 후 상품 목록 반환
-    @PostMapping("/objects")
+    @GetMapping("/objects")
     public ResponseEntity<BoardResponse> search(
             @AuthenticationPrincipal User currentUser,
-            @RequestBody SearchFilterRequest filter
+            @ModelAttribute @Valid SearchFilterRequest filter
     ) {
 
         String userId = currentUser != null ? currentUser.getUsername() : null;
