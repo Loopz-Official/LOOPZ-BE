@@ -1,12 +1,13 @@
 package kr.co.loopz.search.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import kr.co.loopz.search.dto.request.enums.SortType;
 
 import java.util.List;
 
 public record SearchFilterRequest(
         @NotBlank String keyword,
-        String sort,
+        SortType sort,
         Boolean excludeSoldOut,
         int page,
         int size
