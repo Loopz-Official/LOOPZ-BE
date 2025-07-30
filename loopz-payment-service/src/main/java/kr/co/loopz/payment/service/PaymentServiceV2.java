@@ -28,6 +28,7 @@ public class PaymentServiceV2 {
     /**
      * 최종적인 결제 성공 처리를 위해 사용됩니다.
      * 웹훅 수신 후 결제 정보를 주문과 비교해 검증하고 결제 정보를 DB에 기록, 재고 및 장바구니 데이터를 업데이트합니다.
+     * V2 버전에서는 결제 완료 이벤트를 발행하고, 이후 SAGA Orchestrator가 재고 감소 및 주문 상태 변경을 처리합니다.
      * @param paymentId 결제 ID
      */
     @Transactional

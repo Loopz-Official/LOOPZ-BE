@@ -95,10 +95,11 @@ public class OrderListService {
      * @param orderId 주문 ID
      */
     @Transactional
-    public void makeOrderStatusOrdered(String orderId) {
+    public List<OrderItem> makeOrderStatusOrdered(String orderId) {
         List<OrderItem> allByOrderId = orderItemRepository.findAllByOrderId(orderId);
         for (OrderItem orderItem : allByOrderId) {
             orderItem.makeStatusToOrdered();
         }
+        return allByOrderId;
     }
 }

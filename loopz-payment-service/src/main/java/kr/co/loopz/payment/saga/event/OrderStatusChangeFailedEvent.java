@@ -1,6 +1,6 @@
-package kr.co.loopz.order.saga.event;
+package kr.co.loopz.payment.saga.event;
 
-import kr.co.loopz.order.dto.response.ItemIdAndQuantity;
+import kr.co.loopz.payment.dto.response.ItemIdAndQuantity;
 
 import java.util.List;
 
