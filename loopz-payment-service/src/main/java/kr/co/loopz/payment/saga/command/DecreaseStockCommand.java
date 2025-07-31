@@ -1,12 +1,12 @@
 package kr.co.loopz.payment.saga.command;
 
-import kr.co.loopz.payment.dto.response.PurchasedObjectResponse;
+import kr.co.loopz.payment.saga.event.KafkaPurchasedObject;
 
 import java.util.List;
 
 public record DecreaseStockCommand(
         String orderId,
         String userId,
-        List<PurchasedObjectResponse> purchasedObjects
+        List<KafkaPurchasedObject> purchasedObjects
 ) {
 }

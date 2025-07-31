@@ -39,6 +39,7 @@ public class AuthorizationSecurityConfig {
             "/search/v1",
             "/search/v1/objects",
             "/payment/v1/webhook",
+            "/payment/v2/webhook",
     };
 
     @Bean
