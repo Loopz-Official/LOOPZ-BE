@@ -26,14 +26,14 @@ public class S3Service {
     private String bucketName;
 
     public String generatePresignedUrl(String fileName) {
-        String uuidFileName =  UUID.randomUUID() + "_" + fileName;
+        String folder = "images/object/";
+        String uuidFileName = folder+ UUID.randomUUID() + "_" + fileName;
 
         Date expiration = new Date(System.currentTimeMillis() + 1000 * 60 * 5);
 
         GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, uuidFileName)
                 .withMethod(HttpMethod.PUT)
                 .withExpiration(expiration);
-        request.addRequestParameter("Content-Type", "image/jpeg");
 
         URL url = amazonS3Client.generatePresignedUrl(request);
 

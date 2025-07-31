@@ -31,12 +31,6 @@ public class ObjectUploadService {
     private final ObjectConverter objectConverter;
     private final UserClient userClient;
 
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucketName;
-
-    @Value("${cloud.aws.region.static}")
-    private String region;
-
     @Transactional
     public InternalUploadResponse uploadObject(String userId, InternalUploadRequest request) {
 
