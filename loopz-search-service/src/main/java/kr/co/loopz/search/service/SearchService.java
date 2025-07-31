@@ -81,7 +81,7 @@ public class SearchService {
     }
 
     @Transactional
-    public ResponseEntity<Void> deleteHistory(String userId, String searchId) {
+    public void deleteHistory(String userId, String searchId) {
 
         Search search = searchRepository.findBySearchIdAndDeletedAtIsNull(searchId)
                 .orElseThrow(() -> new SearchException(SEARCH_ID_NOT_FOUND, "SearchId:"+searchId));
@@ -90,9 +90,7 @@ public class SearchService {
             throw new SearchException(USER_ID_NOT_MATCH);
         }
 
-        searchRepository.delete(search); // soft delete 자동 실행
-
-        return ResponseEntity.noContent().build();
+        searchRepository.delete(search);
 
     }
 }
