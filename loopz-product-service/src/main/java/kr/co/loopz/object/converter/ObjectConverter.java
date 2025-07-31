@@ -3,6 +3,7 @@ package kr.co.loopz.object.converter;
 import kr.co.loopz.object.domain.ObjectDetail;
 import kr.co.loopz.object.domain.ObjectEntity;
 import kr.co.loopz.object.dto.response.*;
+import kr.co.loopz.object.saga.event.KafkaPurchasedObject;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -76,5 +77,9 @@ public interface ObjectConverter {
     default ObjectLikedResponse toLikedResponse(String objectId, boolean liked) {
         return new ObjectLikedResponse(objectId, liked);
     }
+
+
+    PurchasedObjectResponse toPurchasedObjectResponse(KafkaPurchasedObject object);
+    List<PurchasedObjectResponse> toPurchasedObjectResponseList(List<KafkaPurchasedObject> objects);
 
 }

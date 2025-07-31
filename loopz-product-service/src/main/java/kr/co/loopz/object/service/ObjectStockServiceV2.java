@@ -1,6 +1,8 @@
 package kr.co.loopz.object.service;
 
+import kr.co.loopz.object.converter.ObjectConverter;
 import kr.co.loopz.object.dto.response.ItemIdAndQuantity;
+import kr.co.loopz.object.dto.response.PurchasedObjectResponse;
 import kr.co.loopz.object.exception.ObjectException;
 import kr.co.loopz.object.saga.command.DecreaseStockCommand;
 import kr.co.loopz.object.saga.command.IncreaseStockCommand;
@@ -13,6 +15,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -22,6 +26,7 @@ public class ObjectStockServiceV2 {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
+    private final ObjectConverter objectConverter;
 
 
     @KafkaListener(
@@ -34,7 +39,8 @@ public class ObjectStockServiceV2 {
         try {
             log.info("재고 감소 커맨드 수신. 재고를 감소시키고 카트에서 삭제후 이벤트를 발행합니다.");
 
-            objectStockService.decreaseStockAndUpdateCart(command.userId(), command.purchasedObjects());
+            List<PurchasedObjectResponse> purchasedObjectResponseList = objectConverter.toPurchasedObjectResponseList(command.purchasedObjects());
+            objectStockService.decreaseStockAndUpdateCart(command.userId(), purchasedObjectResponseList);
 
             // 성공 시 '재고 감소 성공' 이벤트를 발행하여 오케스트레이터에게 알림
             StockDecreasedEvent event = new StockDecreasedEvent(
