@@ -18,6 +18,8 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
+      ssl:
+        enabled: ${REDIS_SSL_ENABLED:false}
 
   security:
     oauth2:
