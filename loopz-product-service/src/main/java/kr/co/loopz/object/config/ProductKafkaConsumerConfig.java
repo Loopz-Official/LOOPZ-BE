@@ -26,7 +26,7 @@ public class ProductKafkaConsumerConfig {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "product-command-handler-group");
 
-        JsonDeserializer<Object> deserializer = new JsonDeserializer<>(Object.class);
+        JsonDeserializer<Object> deserializer = new JsonDeserializer<>();
         deserializer.setRemoveTypeHeaders(false);
         deserializer.addTrustedPackages("kr.co.loopz.object.saga.command", "kr.co.loopz.object.saga.event");
         deserializer.setUseTypeMapperForKey(true);

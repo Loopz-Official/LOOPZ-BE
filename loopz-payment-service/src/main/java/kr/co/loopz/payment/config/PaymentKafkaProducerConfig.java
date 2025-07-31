@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.support.converter.StringJsonMessageConverter;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.util.HashMap;
@@ -31,7 +32,10 @@ public class PaymentKafkaProducerConfig {
 
     @Bean
     public KafkaTemplate<String, Object> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
+        KafkaTemplate<String, Object> kafkaTemplate = new KafkaTemplate<>(producerFactory());
+        kafkaTemplate.setMessageConverter(new StringJsonMessageConverter());
+
+        return kafkaTemplate;
     }
 
 
