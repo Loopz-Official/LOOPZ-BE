@@ -12,13 +12,11 @@ import kr.co.loopz.object.repository.ObjectImageRepository;
 import kr.co.loopz.object.repository.ObjectRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 
-import static kr.co.loopz.object.exception.ObjectErrorCode.DUPLICATE_OBJECT_NAME;
 import static kr.co.loopz.object.exception.ObjectErrorCode.USER_ID_NOT_FOUND;
 
 @Service
@@ -34,23 +32,36 @@ public class ObjectUploadService {
     @Transactional
     public InternalUploadResponse uploadObject(String userId, InternalUploadRequest request) {
 
+        validateUserExists(userId);
+
+        // 상세 정보 생성
+        ObjectDetail detail = createObjectDetail(request);
+
+        // 객체 엔티티 생성
+        ObjectEntity objectEntity = createObjectEntity(request,detail);
+
+        // 이미지 URL 생성
+        ObjectImage objectImage = createAndSaveObjectImage(objectEntity.getObjectId(), request.imageKey());
+
+        return objectConverter.toInternalUploadResponse(objectEntity, objectImage.getImageUrl());
+    }
+
+    private void validateUserExists(String userId) {
         if (!userClient.existsByUserId(userId)) {
             throw new ObjectException(USER_ID_NOT_FOUND, "User with ID not found: " + userId);
         }
+    }
 
-        if (objectRepository.existsByObjectName(request.objectName())) {
-            throw new ObjectException(DUPLICATE_OBJECT_NAME, "Object name: " + request.objectName());
-        }
-
-        // 상세 정보 생성
-        ObjectDetail detail = ObjectDetail.upload(
+    private ObjectDetail createObjectDetail(InternalUploadRequest request) {
+        return ObjectDetail.upload(
                 request.size(),
                 request.descriptionUrl(),
                 request.stock()
         );
+    }
 
-        // 객체 엔티티 생성
-        ObjectEntity objectEntity = ObjectEntity.upload(
+    private ObjectEntity createObjectEntity(InternalUploadRequest request, ObjectDetail detail) {
+        ObjectEntity entity = ObjectEntity.upload(
                 request.objectName(),
                 request.objectPrice(),
                 request.intro(),
@@ -59,21 +70,17 @@ public class ObjectUploadService {
                 new HashSet<>(request.keywords()),
                 detail
         );
+        return objectRepository.save(entity);
+    }
 
-        objectRepository.save(objectEntity);
-
-        // 이미지 URL 생성
+    private ObjectImage createAndSaveObjectImage(String objectId, String imageKey) {
         String cdnDomain = "https://static.loopz.co.kr/";
-        String imageKey = request.imageKey();
         String imageUrl = cdnDomain + imageKey;
 
-        ObjectImage objectImage = ObjectImage.builder()
-                .objectId(objectEntity.getObjectId())
+        ObjectImage image = ObjectImage.builder()
+                .objectId(objectId)
                 .imageUrl(imageUrl)
                 .build();
-        objectImageRepository.save(objectImage);
-
-        InternalUploadResponse response = objectConverter.toInternalUploadResponse(objectEntity, imageUrl);
-        return response;
+        return objectImageRepository.save(image);
     }
 }
