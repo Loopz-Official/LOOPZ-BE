@@ -4,5 +4,7 @@ dependencies {
     implementation project(':loopz-common')
     implementation project(':loopz-authorization')
 
+    implementation 'org.springframework.kafka:spring-kafka'
+
 }
 

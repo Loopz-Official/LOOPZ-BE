@@ -42,6 +42,7 @@ application-prod.yml
 application-oauth.yml
 application-aws.yml
 application-portone.yml
+application-kafka.yml
 
 .env
 .env.staging

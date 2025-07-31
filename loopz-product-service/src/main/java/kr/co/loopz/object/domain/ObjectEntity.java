@@ -78,4 +78,7 @@ public class ObjectEntity extends BaseTimeEntity {
         detail.decreaseStock(quantity);
     }
 
+    public void increaseStock(int quantity) {
+        detail.increaseStock(quantity);
+    }
 }
