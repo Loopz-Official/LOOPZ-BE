@@ -2,9 +2,11 @@ package kr.co.loopz.object.converter;
 
 import kr.co.loopz.object.domain.ObjectDetail;
 import kr.co.loopz.object.domain.ObjectEntity;
+import kr.co.loopz.object.domain.enums.Keyword;
 import kr.co.loopz.object.dto.response.*;
 import org.mapstruct.Mapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -77,4 +79,21 @@ public interface ObjectConverter {
         return new ObjectLikedResponse(objectId, liked);
     }
 
+    default InternalUploadResponse toInternalUploadResponse(ObjectEntity entity, String imageUrl) {
+        ObjectDetail detail = entity.getDetail();
+
+        return new InternalUploadResponse(
+                entity.getObjectName(),
+                entity.getObjectPrice(),
+                entity.getIntro(),
+                entity.getObjectType(),
+                entity.getObjectSize(),
+                new ArrayList<>(entity.getKeywords()),
+                detail.getSize(),
+                detail.getDescriptionUrl(),
+                imageUrl,
+                detail.getStock()
+        );
+
+    }
 }

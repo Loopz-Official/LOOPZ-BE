@@ -20,6 +20,7 @@ public enum ObjectErrorCode implements ErrorCode {
     CART_LIMIT_EXCEEDS(HttpStatus.BAD_REQUEST, "장바구니에는 100개의 상품만 추가 가능합니다."),
     CART_ITEM_NOT_FOUND(HttpStatus.BAD_REQUEST, "장바구니에 존재하지 않는 상품입니다."),
     INSUFFICIENT_STOCK(HttpStatus.BAD_REQUEST, "재고가 부족합니다."),
+    DUPLICATE_OBJECT_NAME(HttpStatus.BAD_REQUEST, "이미 존재하는 상품입니다.")
     ;
 
     private final HttpStatus httpStatus;
