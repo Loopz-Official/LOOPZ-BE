@@ -94,4 +94,17 @@ public class SearchService {
 
         return "OK";
     }
+
+    @Transactional
+    public String deleteAllHistory(String userId) {
+
+        List<Search> searches = searchRepository.findAllByUserIdAndDeletedAtIsNull(userId);
+
+        if (searches.isEmpty()) {
+            throw new SearchException(SEARCH_HISTORY_NOT_FOUND, "userId: " + userId);
+        }
+
+        searchRepository.deleteAll(searches);
+        return "전체 삭제 성공";
+    }
 }

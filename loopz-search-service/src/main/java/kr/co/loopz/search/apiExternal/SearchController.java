@@ -69,4 +69,15 @@ public class SearchController {
 
         return ResponseEntity.ok(result);
     }
+
+    //검색어 전체 삭제
+    @DeleteMapping("")
+    public ResponseEntity<String> deleteAllHistory(@AuthenticationPrincipal User currentUser) {
+
+        String userId = currentUser.getUsername();
+
+        String result = searchService.deleteAllHistory(userId);
+
+        return ResponseEntity.ok(result);
+    }
 }

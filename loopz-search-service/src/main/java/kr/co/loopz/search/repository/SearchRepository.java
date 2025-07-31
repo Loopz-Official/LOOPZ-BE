@@ -12,5 +12,7 @@ public interface SearchRepository extends JpaRepository<Search, Long> {
 
     Optional<Search> findBySearchIdAndDeletedAtIsNull(String searchId);
 
+    List<Search> findAllByUserIdAndDeletedAtIsNull(String userId);
+
 
 }
