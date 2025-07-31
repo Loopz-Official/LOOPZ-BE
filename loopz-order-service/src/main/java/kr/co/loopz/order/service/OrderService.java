@@ -1,5 +1,6 @@
 package kr.co.loopz.order.service;
 
+import kr.co.loopz.order.aop.RetryOrder;
 import kr.co.loopz.order.client.ObjectClient;
 import kr.co.loopz.order.client.UserClient;
 import kr.co.loopz.order.converter.OrderConverter;
@@ -44,6 +45,7 @@ public class OrderService {
      * @return 생성된 주문 정보
      */
     @Transactional
+    @RetryOrder(maxAttempts = 5)
     public OrderResponse createOrder(String userId, OrderRequest request) {
 
         // 주소 확인
