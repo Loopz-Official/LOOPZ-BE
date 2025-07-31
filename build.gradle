@@ -48,10 +48,14 @@ subprojects {
 
         // test
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
 
         // lombok
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'
+        testCompileOnly 'org.projectlombok:lombok:1.18.28'
+        testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
+
 
         // querydsl
         implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
@@ -65,6 +69,10 @@ subprojects {
 
         // monitoring
         implementation 'io.micrometer:micrometer-registry-prometheus'
+
+        //h2 database
+        testImplementation 'com.h2database:h2'
+
 
     }
 
