@@ -27,7 +27,7 @@ public class PaymentKafkaConsumerConfig {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "payment-saga-orchestrator-group");
 
         // JsonDeserializer 설정
-        JsonDeserializer<Object> deserializer = new JsonDeserializer<>();
+        JsonDeserializer<Object> deserializer = new JsonDeserializer<>(Object.class);
         deserializer.setRemoveTypeHeaders(false);
         deserializer.addTrustedPackages("kr.co.loopz.payment.saga.command", "kr.co.loopz.payment.saga.event");
         deserializer.setUseTypeMapperForKey(true);
