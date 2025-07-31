@@ -4,6 +4,7 @@ import kr.co.loopz.object.domain.ObjectDetail;
 import kr.co.loopz.object.domain.ObjectEntity;
 import kr.co.loopz.object.domain.enums.Keyword;
 import kr.co.loopz.object.dto.response.*;
+import kr.co.loopz.object.saga.event.KafkaPurchasedObject;
 import org.mapstruct.Mapper;
 
 import java.util.ArrayList;
@@ -96,4 +97,8 @@ public interface ObjectConverter {
         );
 
     }
+
+    PurchasedObjectResponse toPurchasedObjectResponse(KafkaPurchasedObject object);
+    List<PurchasedObjectResponse> toPurchasedObjectResponseList(List<KafkaPurchasedObject> objects);
+
 }

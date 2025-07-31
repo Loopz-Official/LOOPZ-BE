@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.kafka.support.converter.StringJsonMessageConverter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,25 +20,30 @@ public class PaymentKafkaConsumerConfig {
     private String bootstrapServers;
 
     @Bean
-    public ConsumerFactory<String, Object> paymentSagaConsumerFactory() {
+    public ConsumerFactory<String, String> paymentSagaConsumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        // 이 컨슈머 그룹은 오직 결제 사가 처리만을 위한 그룹
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "payment-saga-orchestrator-group");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        return new DefaultKafkaConsumerFactory<>(props);
+    }
 
-        // JsonDeserializer 설정
-        JsonDeserializer<Object> deserializer = new JsonDeserializer<>(Object.class);
-        deserializer.setRemoveTypeHeaders(false);
-        deserializer.addTrustedPackages("kr.co.loopz.payment.saga.command", "kr.co.loopz.payment.saga.event");
-        deserializer.setUseTypeMapperForKey(true);
-
-        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
+    @Bean
+    public StringJsonMessageConverter stringJsonMessageConverter() {
+        return new StringJsonMessageConverter();
     }
 
     @Bean(name = "paymentSagaKafkaListenerContainerFactory")
-    public ConcurrentKafkaListenerContainerFactory<String, Object> paymentSagaKafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(paymentSagaConsumerFactory());
+    public ConcurrentKafkaListenerContainerFactory<String, String> paymentSagaKafkaListenerContainerFactory(
+            ConsumerFactory<String, String> paymentSagaConsumerFactory,
+            StringJsonMessageConverter stringJsonMessageConverter) {
+
+        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(paymentSagaConsumerFactory);
+
+        factory.setRecordMessageConverter(stringJsonMessageConverter);
+
         return factory;
     }
 
