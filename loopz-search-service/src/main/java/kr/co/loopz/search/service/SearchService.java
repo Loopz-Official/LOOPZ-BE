@@ -81,10 +81,10 @@ public class SearchService {
     }
 
     @Transactional
-    public void deleteHistory(String userId, String searchId) {
+    public String deleteHistory(String userId, String searchId) {
 
         Search search = searchRepository.findBySearchIdAndDeletedAtIsNull(searchId)
-                .orElseThrow(() -> new SearchException(SEARCH_ID_NOT_FOUND, "SearchId:"+searchId));
+                .orElseThrow(() -> new SearchException(SEARCH_ID_NOT_FOUND, "SearchId:" + searchId));
 
         if (!search.getUserId().equals(userId)) {
             throw new SearchException(USER_ID_NOT_MATCH);
@@ -92,5 +92,19 @@ public class SearchService {
 
         searchRepository.delete(search);
 
+        return "OK";
+    }
+
+    @Transactional
+    public String deleteAllHistory(String userId) {
+
+        List<Search> searches = searchRepository.findAllByUserIdAndDeletedAtIsNull(userId);
+
+        if (searches.isEmpty()) {
+            throw new SearchException(SEARCH_HISTORY_NOT_FOUND, "userId: " + userId);
+        }
+
+        searchRepository.deleteAll(searches);
+        return "전체 삭제 성공";
     }
 }
