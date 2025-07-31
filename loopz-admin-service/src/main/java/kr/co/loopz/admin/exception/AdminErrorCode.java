@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum AdminErrorCode implements ErrorCode {
 
-    INVALID_ADDRESS(HttpStatus.BAD_REQUEST, "주소가 존재하지 않습니다.");
+    DUPLICATE_OBJECT_NAME(HttpStatus.BAD_REQUEST, "상품이 존재합니다.");
 
 
     private final HttpStatus httpStatus;
