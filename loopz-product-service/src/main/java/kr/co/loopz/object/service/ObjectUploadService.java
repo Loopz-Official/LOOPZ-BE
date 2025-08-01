@@ -18,8 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.Optional;
 
-import static kr.co.loopz.object.exception.ObjectErrorCode.OBJECT_NOT_FOUND;
-import static kr.co.loopz.object.exception.ObjectErrorCode.USER_ID_NOT_FOUND;
+import static kr.co.loopz.object.exception.ObjectErrorCode.*;
 
 @Service
 @Slf4j
@@ -47,7 +46,7 @@ public class ObjectUploadService {
         ObjectDetail detail = createObjectDetail(request);
 
         // 객체 엔티티 생성
-        ObjectEntity objectEntity = createObjectEntity(request,detail);
+        ObjectEntity objectEntity = createObjectEntity(request, detail);
 
         // 이미지 URL 생성
         ObjectImage objectImage = createAndSaveObjectImage(objectEntity.getObjectId(), request.imageKey());
@@ -73,11 +72,35 @@ public class ObjectUploadService {
         return objectConverter.toInternalUploadResponse(objectEntity, objectImage.getImageUrl());
     }
 
+    /**
+     * 기존 객체 수정 처리
+     * - 사용자 존재 검증
+     * - 상품 존재 검증
+     * - 이미지 함꼐 삭제
+     */
+    @Transactional
+    public void deleteObject(String userId, String objectId) {
+
+        validateUserExists(userId);
+
+        ObjectEntity objectEntity = validateObjectExists(objectId);
+
+        objectImageRepository.findByObjectId(objectId)
+                .ifPresent(objectImageRepository::delete);
+
+        objectRepository.delete(objectEntity);
+    }
+
 
     private void validateUserExists(String userId) {
         if (!userClient.existsByUserId(userId)) {
             throw new ObjectException(USER_ID_NOT_FOUND, "User with ID not found: " + userId);
         }
+    }
+
+    private ObjectEntity validateObjectExists(String objectId) {
+        return objectRepository.findByObjectId(objectId)
+                .orElseThrow(() -> new ObjectException(OBJECT_NOT_FOUND, "Object not found: " + objectId));
     }
 
     private ObjectDetail createObjectDetail(InternalUploadRequest request) {

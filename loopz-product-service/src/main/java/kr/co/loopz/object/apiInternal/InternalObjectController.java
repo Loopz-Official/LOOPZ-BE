@@ -134,4 +134,14 @@ public class InternalObjectController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/admin/{objectId}")
+    public ResponseEntity<String> deleteObject(
+            @RequestHeader String userId,
+            @PathVariable String objectId
+    ){
+
+        objectUploadService.deleteObject(userId,objectId);
+        return ResponseEntity.noContent().build();
+    }
+
 }
