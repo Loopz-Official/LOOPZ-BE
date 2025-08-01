@@ -29,4 +29,9 @@ public class ObjectImage extends Image {
         this.imageUrl = imageUrl;
         this.objectId = objectId;
     }
+
+    public ObjectImage replaceImage(String imageUrl) {
+        this.imageUrl = imageUrl;
+        return this;
+    }
 }

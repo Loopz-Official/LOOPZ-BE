@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import kr.co.loopz.common.dto.ResponseError;
 import kr.co.loopz.common.exception.CustomException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -69,6 +70,18 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseError);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ResponseError> handleDataIntegrityViolationException(DataIntegrityViolationException e,
+                                                                               HttpServletRequest request) {
+        ResponseError responseError = ResponseError.builder()
+                .messageDetail("중복된 값이 존재합니다. (unique constraint violation)")
+                .errorDetail(e.getRootCause() != null ? e.getRootCause().getMessage() : e.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(responseError);
     }
 
 }

@@ -68,6 +68,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private void setAuthentication(String accessToken) {
         Authentication authentication = jwtValidator.getAuthentication(accessToken);
+        log.debug("Authentication authorities: {}", authentication.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 

@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
+import kr.co.loopz.authentication.client.UserServiceClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Slf4j
 @RequiredArgsConstructor
 public class JwtProvider {
+
+    private final UserServiceClient userClient;
 
     @Value("${jwt.secret}")
     private String secret;
@@ -56,6 +59,7 @@ public class JwtProvider {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
+
         return Jwts.builder()
                 .subject(userId)
                 .claim("category", category)
@@ -68,7 +72,13 @@ public class JwtProvider {
 
 
     public Authentication getAuthenticationFromUserId(String userId) {
-        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+
+        List<String> roles = userClient.getUserRoles(userId);
+
+        List<GrantedAuthority> authorities = roles.stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                .collect(Collectors.toList());
+
         User principal = new User(userId, "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, null, authorities);
     }
