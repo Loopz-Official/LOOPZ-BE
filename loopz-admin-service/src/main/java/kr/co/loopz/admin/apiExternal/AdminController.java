@@ -37,5 +37,21 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    // 상품 정보 수정
+    @PutMapping("/modify/{objectId}")
+    @Operation(summary = "상품 수정 API")
+    public ResponseEntity<UploadResponse> modifyObject(
+            @AuthenticationPrincipal User currentUser,
+            @PathVariable String objectId,
+            @RequestBody @Valid UploadRequest request
+    ) {
+
+        String userId = currentUser.getUsername();
+
+        UploadResponse response = adminService.modifyObject(userId,objectId, request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 
 }

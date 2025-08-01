@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import static kr.co.loopz.admin.exception.AdminErrorCode.DUPLICATE_OBJECT_NAME;
+import java.util.function.Supplier;
+
+import static kr.co.loopz.admin.exception.AdminErrorCode.*;
 
 
 @Service
@@ -20,13 +22,31 @@ public class AdminService {
     private final ProductClient productClient;
 
     public UploadResponse uploadObject(String userId, UploadRequest request) {
+
+        return handleFeignCall(() -> productClient.uploadObject(userId, request), request.objectName(),false);
+
+    }
+
+    public UploadResponse modifyObject(String userId, String objectId, UploadRequest request) {
+
+        return handleFeignCall(() -> productClient.modifyObject(userId, objectId, request), request.objectName(),true);
+
+    }
+
+
+    private <T> T handleFeignCall(Supplier<T> feignCall, String objectName, boolean isModify) {
         try {
-            return productClient.uploadObject(userId, request);
+            return feignCall.get();
+        } catch (FeignException.Conflict e) {
+            throw new AdminException(DUPLICATE_OBJECT_NAME, "objectName:" + objectName);
         } catch (FeignException.BadRequest e) {
+            log.error("Feign 요청 중 BadRequest 발생: {}", e.contentUTF8(), e);
 
-            log.error("상품 업로드 중 에러 발생: {}", e.contentUTF8(), e);
+            if (isModify) {
+                throw new AdminException(CANNOT_FIND_OBJECT, "objectId 없음");
+            }
 
-            throw new AdminException(DUPLICATE_OBJECT_NAME, "objectName:"+request.objectName());
+            throw new AdminException(INVALID_REQUEST, "Invalid request");
         }
     }
 
