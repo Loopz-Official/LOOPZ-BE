@@ -123,4 +123,15 @@ public class InternalObjectController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/admin/modify/{objectId}")
+    public ResponseEntity<InternalUploadResponse> ModifyObject(
+            @RequestHeader String userId,
+            @PathVariable String objectId,
+            @RequestBody InternalUploadRequest uploadRequest
+    ){
+
+        InternalUploadResponse response=objectUploadService.modifyObject(userId, objectId, uploadRequest);
+        return ResponseEntity.ok(response);
+    }
+
 }

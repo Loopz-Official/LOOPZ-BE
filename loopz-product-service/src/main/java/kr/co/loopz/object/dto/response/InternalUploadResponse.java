@@ -8,6 +8,7 @@ import kr.co.loopz.object.domain.enums.ObjectType;
 import java.util.List;
 
 public record InternalUploadResponse(
+        String objectId,
         String objectName,
         Long objectPrice,
         String intro,

@@ -84,6 +84,7 @@ public interface ObjectConverter {
         ObjectDetail detail = entity.getDetail();
 
         return new InternalUploadResponse(
+                entity.getObjectId(),
                 entity.getObjectName(),
                 entity.getObjectPrice(),
                 entity.getIntro(),
