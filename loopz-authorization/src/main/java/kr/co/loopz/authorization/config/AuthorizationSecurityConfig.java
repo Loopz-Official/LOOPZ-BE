@@ -3,6 +3,7 @@ package kr.co.loopz.authorization.config;
 import kr.co.loopz.authorization.filter.JwtAuthorizationFilter;
 import kr.co.loopz.authorization.filter.JwtExceptionFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity()
 @RequiredArgsConstructor
+@EnableMethodSecurity(prePostEnabled = true)
 public class AuthorizationSecurityConfig {
 
     private final CorsConfig corsConfig;
@@ -58,6 +60,7 @@ public class AuthorizationSecurityConfig {
                 // 경로별 인가 - internal 보안 추가 필요
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITE_LIST).permitAll()
+                        .requestMatchers("/admin/v1/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
 
