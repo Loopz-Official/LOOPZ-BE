@@ -12,8 +12,6 @@ public interface ObjectRepository extends JpaRepository<ObjectEntity, Long>, Obj
 
     boolean existsByObjectId(String objectId);
 
-    boolean existsByObjectName(String objectName);
-
     Optional<ObjectEntity> findByObjectId(String objectId);
 
     List<ObjectEntity> findAllByObjectIdIn(List<String> objectIds);

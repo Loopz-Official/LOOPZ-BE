@@ -16,7 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.Optional;
 
+import static kr.co.loopz.object.exception.ObjectErrorCode.OBJECT_NOT_FOUND;
 import static kr.co.loopz.object.exception.ObjectErrorCode.USER_ID_NOT_FOUND;
 
 @Service
@@ -29,6 +31,13 @@ public class ObjectUploadService {
     private final ObjectConverter objectConverter;
     private final UserClient userClient;
 
+    /**
+     * 신규 객체 업로드 처리
+     * - 사용자 존재 검증
+     * - 상세 정보 생성
+     * - 객체 엔티티 생성 및 저장
+     * - 이미지 URL 생성 및 저장
+     */
     @Transactional
     public InternalUploadResponse uploadObject(String userId, InternalUploadRequest request) {
 
@@ -45,6 +54,25 @@ public class ObjectUploadService {
 
         return objectConverter.toInternalUploadResponse(objectEntity, objectImage.getImageUrl());
     }
+
+    /**
+     * 기존 객체 수정 처리
+     * - 사용자 존재 검증
+     * - 객체 조회 및 수정
+     * - 이미지 URL 수정 및 저장
+     */
+    @Transactional
+    public InternalUploadResponse modifyObject(String userId, String objectId, InternalUploadRequest request) {
+
+        validateUserExists(userId);
+
+        ObjectEntity objectEntity = findAndModifyObject(objectId, request);
+
+        ObjectImage objectImage = createAndSaveObjectImage(objectEntity.getObjectId(), request.imageKey());
+
+        return objectConverter.toInternalUploadResponse(objectEntity, objectImage.getImageUrl());
+    }
+
 
     private void validateUserExists(String userId) {
         if (!userClient.existsByUserId(userId)) {
@@ -77,10 +105,34 @@ public class ObjectUploadService {
         String cdnDomain = "https://static.loopz.co.kr/";
         String imageUrl = cdnDomain + imageKey;
 
-        ObjectImage image = ObjectImage.builder()
-                .objectId(objectId)
-                .imageUrl(imageUrl)
-                .build();
+        Optional<ObjectImage> exists = objectImageRepository.findByObjectId(objectId);
+        ObjectImage image = exists
+                .map(img -> img.replaceImage(imageUrl))
+                .orElseGet(() -> ObjectImage.builder()
+                        .objectId(objectId)
+                        .imageUrl(imageUrl)
+                        .build());
         return objectImageRepository.save(image);
     }
+
+    private ObjectEntity findAndModifyObject(String objectId, InternalUploadRequest request) {
+
+        ObjectEntity objectEntity = objectRepository.findByObjectId(objectId)
+                .orElseThrow(() -> new ObjectException(OBJECT_NOT_FOUND, "Object not found: " + objectId));
+
+        ObjectDetail detail = createObjectDetail(request);
+
+        objectEntity.modify(
+                request.objectName(),
+                request.objectPrice(),
+                request.intro(),
+                request.objectType(),
+                request.objectSize(),
+                new HashSet<>(request.keywords()),
+                detail
+        );
+
+        return objectEntity;
+    }
+
 }
