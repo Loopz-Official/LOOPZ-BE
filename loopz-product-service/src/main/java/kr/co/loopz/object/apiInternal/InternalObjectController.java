@@ -114,7 +114,7 @@ public class InternalObjectController {
     }
 
     @PostMapping("/admin/upload")
-    public ResponseEntity<InternalUploadResponse> UploadObject(
+    public ResponseEntity<InternalUploadResponse> uploadObject(
             @RequestHeader String userId,
             @RequestBody InternalUploadRequest uploadRequest
     ){
@@ -124,7 +124,7 @@ public class InternalObjectController {
     }
 
     @PutMapping("/admin/modify/{objectId}")
-    public ResponseEntity<InternalUploadResponse> ModifyObject(
+    public ResponseEntity<InternalUploadResponse> modifyObject(
             @RequestHeader String userId,
             @PathVariable String objectId,
             @RequestBody InternalUploadRequest uploadRequest
