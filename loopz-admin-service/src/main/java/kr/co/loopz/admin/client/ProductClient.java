@@ -3,9 +3,7 @@ package kr.co.loopz.admin.client;
 import kr.co.loopz.admin.dto.request.UploadRequest;
 import kr.co.loopz.admin.dto.response.UploadResponse;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
@@ -19,6 +17,7 @@ public interface ProductClient {
     @PostMapping("/internal/admin/upload")
     UploadResponse uploadObject(@RequestHeader("userId") String userId, @RequestBody UploadRequest request);
 
-
+    @PutMapping("/internal/admin/modify/{objectId}")
+    UploadResponse modifyObject(@RequestHeader("userId") String userId, @PathVariable String objectId, @RequestBody UploadRequest request);
 
 }

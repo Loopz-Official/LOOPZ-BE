@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public record UploadResponse(
+        String objectId,
         String objectName,
         Long objectPrice,
         String intro,
