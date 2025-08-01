@@ -53,5 +53,20 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    // 상품 삭제
+    @DeleteMapping("/{objectId}")
+    @Operation(summary = "상품 삭제 API")
+    public ResponseEntity<String> deleteObject(
+            @AuthenticationPrincipal User currentUser,
+            @PathVariable String objectId
+    ) {
+
+        String userId = currentUser.getUsername();
+
+        adminService.deleteObject(userId, objectId);
+
+        return ResponseEntity.ok("삭제 완료");
+    }
+
 
 }

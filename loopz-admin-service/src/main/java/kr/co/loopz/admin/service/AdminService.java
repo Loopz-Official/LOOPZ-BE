@@ -33,6 +33,14 @@ public class AdminService {
 
     }
 
+    public String deleteObject(String userId, String objectId) {
+        handleFeignCall(() -> {
+            productClient.deleteObject(userId, objectId);
+            return null;},null, true);
+
+        return "삭제 완료";
+    }
+
 
     private <T> T handleFeignCall(Supplier<T> feignCall, String objectName, boolean isModify) {
         try {

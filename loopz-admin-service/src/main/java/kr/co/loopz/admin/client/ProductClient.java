@@ -20,4 +20,7 @@ public interface ProductClient {
     @PutMapping("/internal/admin/modify/{objectId}")
     UploadResponse modifyObject(@RequestHeader("userId") String userId, @PathVariable String objectId, @RequestBody UploadRequest request);
 
+    @DeleteMapping("/internal/admin/{objectId}")
+    String deleteObject(@RequestHeader("userId") String userId, @PathVariable String objectId);
+
 }
