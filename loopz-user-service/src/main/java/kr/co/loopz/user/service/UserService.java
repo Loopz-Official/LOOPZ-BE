@@ -29,9 +29,9 @@ public class UserService {
      * @param userId context에서 가져온 사용자 String id
      */
     @Transactional
-    public void softDeleteUser(String userId) {
+    public void softDeleteUser(String userId, String reason) {
         UserEntity user = findByUserId(userId);
-        userRepository.delete(user);
+        user.processWithdrawal(reason);
     }
 
     /**

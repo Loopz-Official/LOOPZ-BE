@@ -69,6 +69,8 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
 
     private LocalDate birthDate;
 
+    private String withdrawalReason;
+
     /**
      * UserEntity 생성 메서드
      * 회원 가입시 사용
@@ -94,6 +96,12 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
 
     public void updateBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
+    }
+
+    public void processWithdrawal(String reason) {
+        this.withdrawalReason = reason;
+        this.enabled = false;
+        super.processDeletion();
     }
 
     /**

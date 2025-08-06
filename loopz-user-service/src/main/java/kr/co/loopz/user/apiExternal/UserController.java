@@ -1,5 +1,6 @@
 package kr.co.loopz.user.apiExternal;
 
+import kr.co.loopz.user.dto.request.UserWithdrawalRequest;
 import kr.co.loopz.user.dto.response.UserInfoResponse;
 import kr.co.loopz.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -8,10 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,13 +33,14 @@ public class UserController {
 
     @DeleteMapping()
     public ResponseEntity<Void> deleteUser(
-            @AuthenticationPrincipal User currentUser
+            @AuthenticationPrincipal User currentUser,
+            @RequestBody UserWithdrawalRequest withdrawalRequest
             ) {
 
         log.debug("Received request to delete user with ID: {}", currentUser.getUsername());
 
         String userId = currentUser.getUsername();
-        userService.softDeleteUser(userId);
+        userService.softDeleteUser(userId, withdrawalRequest.reason());
 
         return ResponseEntity.noContent().build();
     }
