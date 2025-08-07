@@ -1,5 +1,6 @@
 package kr.co.loopz.user.apiExternal;
 
+import jakarta.validation.Valid;
 import kr.co.loopz.user.dto.request.UserWithdrawalRequest;
 import kr.co.loopz.user.dto.response.UserInfoResponse;
 import kr.co.loopz.user.service.UserService;
@@ -34,7 +35,7 @@ public class UserController {
     @DeleteMapping()
     public ResponseEntity<Void> deleteUser(
             @AuthenticationPrincipal User currentUser,
-            @RequestBody UserWithdrawalRequest withdrawalRequest
+            @Valid @RequestBody UserWithdrawalRequest withdrawalRequest
             ) {
 
         log.debug("Received request to delete user with ID: {}", currentUser.getUsername());
