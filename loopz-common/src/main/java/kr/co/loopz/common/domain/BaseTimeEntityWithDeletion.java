@@ -8,5 +8,10 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @Getter
 public class BaseTimeEntityWithDeletion extends BaseTimeEntity {
+
     private LocalDateTime deletedAt;
+
+    protected void processDeletion() {
+        this.deletedAt = LocalDateTime.now();
+    }
 }

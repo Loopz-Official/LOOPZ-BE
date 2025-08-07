@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.loopz.common.dto.CommonResponse;
 import org.springframework.core.MethodParameter;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -27,6 +28,11 @@ public class ResponseInterceptor implements ResponseBodyAdvice {
         }
 
         int status = ((ServletServerHttpResponse) response).getServletResponse().getStatus();
+
+        // 204인 경우 예외 처리
+        if (status == HttpStatus.NO_CONTENT.value()) {
+            return body;
+        }
 
         // swagger 제외
         String path = request.getURI().getPath();
