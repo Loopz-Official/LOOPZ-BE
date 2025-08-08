@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/internal/user")
@@ -52,5 +54,10 @@ public class InternalUserController {
     public AddressResponse getAddressById(@PathVariable String userId,@PathVariable String addressId) {
         Address address = userAddressService.getAddress(userId, addressId);
         return userConverter.toAddressResponse(address);
+    }
+
+    @GetMapping("/{userId}/roles")
+    public List<String> getRolesByUserId(@PathVariable String userId) {
+        return userService.getRolesByUserId(userId);
     }
 }
