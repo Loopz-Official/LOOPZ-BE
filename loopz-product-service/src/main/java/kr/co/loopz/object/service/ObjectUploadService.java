@@ -27,7 +27,7 @@ import static kr.co.loopz.object.exception.ObjectErrorCode.*;
 @RequiredArgsConstructor
 public class ObjectUploadService {
 
-    @Value("${cdn.domain}")
+    @Value("${cdn-domain}")
     private String cdnDomain;
 
     private final ObjectRepository objectRepository;
