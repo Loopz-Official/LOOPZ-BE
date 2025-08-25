@@ -24,10 +24,13 @@ public class ObjectImage extends Image {
     @Column(name = "object_id", nullable = false)
     private String objectId;
 
+    private String s3Key;
+
     @Builder
-    public ObjectImage(String imageUrl, String objectId) {
+    public ObjectImage(String imageUrl, String objectId, String s3Key) {
         this.imageUrl = imageUrl;
         this.objectId = objectId;
+        this.s3Key = s3Key;
     }
 
     public ObjectImage replaceImage(String imageUrl) {
