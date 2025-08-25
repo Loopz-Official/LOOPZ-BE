@@ -7,6 +7,7 @@ import kr.co.loopz.admin.dto.response.UploadResponse;
 import kr.co.loopz.admin.exception.AdminException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.function.Supplier;
@@ -22,22 +23,21 @@ public class AdminService {
     private final ProductClient productClient;
 
     public UploadResponse uploadObject(String userId, UploadRequest request) {
-
-        return handleFeignCall(() -> productClient.uploadObject(userId, request), request.objectName(),false);
-
+        return handleFeignCall(() -> productClient.uploadObject(getJwtToken(), request),
+                request.objectName(), false);
     }
 
+
     public UploadResponse modifyObject(String userId, String objectId, UploadRequest request) {
-
-        return handleFeignCall(() -> productClient.modifyObject(userId, objectId, request), request.objectName(),true);
-
+        return handleFeignCall(() -> productClient.modifyObject(getJwtToken(), objectId, request),
+                request.objectName(), true);
     }
 
     public String deleteObject(String userId, String objectId) {
         handleFeignCall(() -> {
-            productClient.deleteObject(userId, objectId);
-            return null;},null, true);
-
+            productClient.deleteObject(getJwtToken(), objectId);
+            return null;
+        }, null, true);
         return "삭제 완료";
     }
 
@@ -56,6 +56,10 @@ public class AdminService {
 
             throw new AdminException(INVALID_REQUEST, "Invalid request");
         }
+    }
+
+    private String getJwtToken() {
+        return "Bearer " + SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
     }
 
 }

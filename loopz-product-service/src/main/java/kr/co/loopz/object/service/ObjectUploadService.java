@@ -1,5 +1,6 @@
 package kr.co.loopz.object.service;
 
+import kr.co.loopz.object.client.S3Client;
 import kr.co.loopz.object.client.UserClient;
 import kr.co.loopz.object.converter.ObjectConverter;
 import kr.co.loopz.object.domain.ObjectDetail;
@@ -29,6 +30,7 @@ public class ObjectUploadService {
     private final ObjectImageRepository objectImageRepository;
     private final ObjectConverter objectConverter;
     private final UserClient userClient;
+    private final S3Client s3Client;
 
     /**
      * 신규 객체 업로드 처리
@@ -86,8 +88,21 @@ public class ObjectUploadService {
         ObjectEntity objectEntity = validateObjectExists(objectId);
 
         objectImageRepository.findByObjectId(objectId)
-                .ifPresent(objectImageRepository::delete);
+                .ifPresent(image -> {
+                    try {
 
+                        String s3Key = image.getS3Key();
+
+                        log.info("Deleting S3 key: {}", s3Key);
+                        // S3 삭제
+                        s3Client.deleteFile(s3Key);
+                        // DB 삭제
+                        objectImageRepository.delete(image);
+
+                    } catch (Exception e) {
+                        throw new RuntimeException("S3 이미지 삭제 실패: " , e);
+                    }
+                });
         objectRepository.delete(objectEntity);
     }
 
@@ -125,8 +140,9 @@ public class ObjectUploadService {
     }
 
     private ObjectImage createAndSaveObjectImage(String objectId, String imageKey) {
-        String cdnDomain = "https://static.loopz.co.kr/";
+        String cdnDomain = "https://static.loopz.co.kr";
         String imageUrl = cdnDomain + imageKey;
+        String s3Key = imageKey.startsWith("/") ? imageKey.substring(1) : imageKey;
 
         Optional<ObjectImage> exists = objectImageRepository.findByObjectId(objectId);
         ObjectImage image = exists
@@ -134,6 +150,7 @@ public class ObjectUploadService {
                 .orElseGet(() -> ObjectImage.builder()
                         .objectId(objectId)
                         .imageUrl(imageUrl)
+                        .s3Key(s3Key)
                         .build());
         return objectImageRepository.save(image);
     }

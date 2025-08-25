@@ -27,7 +27,7 @@ public class S3Service {
 
     public String generatePresignedUrl(String fileName) {
         String folder = "images/object/";
-        String uuidFileName = folder+ UUID.randomUUID() + "_" + fileName;
+        String uuidFileName = folder + UUID.randomUUID() + "_" + fileName;
 
         Date expiration = new Date(System.currentTimeMillis() + 1000 * 60 * 5);
 
@@ -38,5 +38,23 @@ public class S3Service {
         URL url = amazonS3Client.generatePresignedUrl(request);
 
         return url.toString();
+    }
+
+    public void deleteFile(String key) {
+        log.info("Attempting to delete from S3. Bucket: {}, Key: {}", bucketName, key);
+
+        try {
+            boolean exists = amazonS3Client.doesObjectExist(bucketName, key);
+            log.info("doesObjectExist returned: {}", exists);
+
+            if (exists) {
+                amazonS3Client.deleteObject(bucketName, key);
+                log.info("S3 객체 삭제 완료: {}", key);
+            } else {
+                log.info("S3 객체가 존재하지 않음: {}", key);
+            }
+        } catch (Exception e) {
+            log.error("S3 접근 중 예외 발생", e);
+        }
     }
 }
