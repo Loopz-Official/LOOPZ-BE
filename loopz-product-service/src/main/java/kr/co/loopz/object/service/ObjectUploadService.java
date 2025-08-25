@@ -13,6 +13,7 @@ import kr.co.loopz.object.repository.ObjectImageRepository;
 import kr.co.loopz.object.repository.ObjectRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,9 @@ import static kr.co.loopz.object.exception.ObjectErrorCode.*;
 @Slf4j
 @RequiredArgsConstructor
 public class ObjectUploadService {
+
+    @Value("${cdn.domain}")
+    private String cdnDomain;
 
     private final ObjectRepository objectRepository;
     private final ObjectImageRepository objectImageRepository;
@@ -140,7 +144,6 @@ public class ObjectUploadService {
     }
 
     private ObjectImage createAndSaveObjectImage(String objectId, String imageKey) {
-        String cdnDomain = "https://static.loopz.co.kr";
         String imageUrl = cdnDomain + imageKey;
         String s3Key = imageKey.startsWith("/") ? imageKey.substring(1) : imageKey;
 
