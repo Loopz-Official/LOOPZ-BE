@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static kr.co.loopz.object.exception.ObjectErrorCode.INSUFFICIENT_STOCK;
@@ -56,8 +57,8 @@ public class ObjectDetailService {
 
         ObjectEntity entity = findObjectEntity(objectId);
 
-        List<ObjectImage> images = objectImageRepository.findByObjectId(objectId);
-        String firstImageUrl = images.isEmpty() ? "" : images.get(0).getImageUrl();
+        Optional<ObjectImage> imageOpt = objectImageRepository.findByObjectId(objectId);
+        String firstImageUrl = imageOpt.map(ObjectImage::getImageUrl).orElse("");
 
         return objectConverter.toObjectResponse(entity, firstImageUrl);
     }

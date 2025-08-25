@@ -89,6 +89,7 @@ cloud:
 etc:
   base-url: ${BASE_URL}
   #  front-url: ${FRONT_URL}
+  cdn-domain: ${CDN_DOMAIN}
   google-profile-url: https://www.googleapis.com/userinfo/v2/me
   kakao-profile-url: https://kapi.kakao.com/v2/user/me
   kakao-token-url: https://kauth.kakao.com/oauth/token

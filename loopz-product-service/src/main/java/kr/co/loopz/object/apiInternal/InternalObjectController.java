@@ -2,6 +2,7 @@ package kr.co.loopz.object.apiInternal;
 
 import kr.co.loopz.object.dto.request.DeleteCartItemRequest;
 import kr.co.loopz.object.dto.request.SearchFilterRequest;
+import kr.co.loopz.object.dto.request.InternalUploadRequest;
 import kr.co.loopz.object.dto.response.*;
 import kr.co.loopz.object.repository.CartItemRepository;
 import kr.co.loopz.object.repository.ObjectRepository;
@@ -25,6 +26,7 @@ public class InternalObjectController {
     private final ObjectDetailService objectDetailService;
     private final ObjectSearchService objectSearchService;
     private final ObjectStockService objectStockService;
+    private final ObjectUploadService objectUploadService;
 
     @PostMapping("/objects")
     public ResponseEntity<List<ObjectResponse>> getObjectList(
@@ -108,6 +110,37 @@ public class InternalObjectController {
             @RequestBody List<PurchasedObjectResponse> purchasedObjects
     ) {
         objectStockService.decreaseStockAndUpdateCart(userId, purchasedObjects);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/admin/upload")
+    public ResponseEntity<InternalUploadResponse> uploadObject(
+            @AuthenticationPrincipal(expression = "username") String userId,
+            @RequestBody InternalUploadRequest uploadRequest
+    ){
+
+        InternalUploadResponse response=objectUploadService.uploadObject(userId, uploadRequest);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/admin/modify/{objectId}")
+    public ResponseEntity<InternalUploadResponse> modifyObject(
+            @AuthenticationPrincipal(expression = "username") String userId,
+            @PathVariable String objectId,
+            @RequestBody InternalUploadRequest uploadRequest
+    ){
+
+        InternalUploadResponse response=objectUploadService.modifyObject(userId,  objectId, uploadRequest);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/admin/{objectId}")
+    public ResponseEntity<String> deleteObject(
+            @AuthenticationPrincipal(expression = "username") String userId,
+            @PathVariable String objectId
+    ){
+
+        objectUploadService.deleteObject(userId,objectId);
         return ResponseEntity.noContent().build();
     }
 

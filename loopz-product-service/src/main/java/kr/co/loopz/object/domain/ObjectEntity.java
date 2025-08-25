@@ -70,6 +70,32 @@ public class ObjectEntity extends BaseTimeEntity {
         this.detail = detail;
     }
 
+    public static ObjectEntity upload(
+            String objectName, Long objectPrice, String intro, ObjectType objectType,
+            ObjectSize objectSize, Set<Keyword> keywords, ObjectDetail detail) {
+        return ObjectEntity.builder()
+                .objectName(objectName)
+                .objectPrice(objectPrice)
+                .intro(intro)
+                .objectType(objectType)
+                .objectSize(objectSize)
+                .keywords(keywords)
+                .detail(detail)
+                .build();
+    }
+
+    public void modify(String objectName,Long objectPrice, String intro, ObjectType objectType,
+                       ObjectSize objectSize, Set<Keyword> keywords, ObjectDetail detail) {
+        this.objectName=objectName;
+        this.objectPrice = objectPrice;
+        this.intro = intro;
+        this.objectType = objectType;
+        this.objectSize = objectSize;
+        this.keywords = keywords;
+        this.detail = detail;
+    }
+
+
     public int getStock() {
         return detail != null ? detail.getStock() : 0;
     }

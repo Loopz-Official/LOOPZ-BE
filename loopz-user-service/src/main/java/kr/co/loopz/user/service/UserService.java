@@ -9,8 +9,11 @@ import kr.co.loopz.user.exception.UserException;
 import kr.co.loopz.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static kr.co.loopz.user.exception.UserErrorCode.USER_NOT_FOUND;
 
@@ -63,6 +66,12 @@ public class UserService {
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND, String.format("User with ID %s not found", userId)));
     }
 
+    public List<String> getRolesByUserId(String userId) {
+
+        UserEntity user = findByUserId(userId);
+
+        return List.of(user.getRole().name());
+    }
 
     private UserEntity getOrSave(UserInternalRegisterRequest registerRequest) {
         UserEntity userEntity = userRepository.findByEmail(registerRequest.email())
