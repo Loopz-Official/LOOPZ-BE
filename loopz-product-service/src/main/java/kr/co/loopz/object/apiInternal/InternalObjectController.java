@@ -115,7 +115,7 @@ public class InternalObjectController {
 
     @PostMapping("/admin/upload")
     public ResponseEntity<InternalUploadResponse> uploadObject(
-            @RequestHeader String userId,
+            @AuthenticationPrincipal(expression = "username") String userId,
             @RequestBody InternalUploadRequest uploadRequest
     ){
 
@@ -125,18 +125,18 @@ public class InternalObjectController {
 
     @PutMapping("/admin/modify/{objectId}")
     public ResponseEntity<InternalUploadResponse> modifyObject(
-            @RequestHeader String userId,
+            @AuthenticationPrincipal(expression = "username") String userId,
             @PathVariable String objectId,
             @RequestBody InternalUploadRequest uploadRequest
     ){
 
-        InternalUploadResponse response=objectUploadService.modifyObject(userId, objectId, uploadRequest);
+        InternalUploadResponse response=objectUploadService.modifyObject(userId,  objectId, uploadRequest);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/admin/{objectId}")
     public ResponseEntity<String> deleteObject(
-            @RequestHeader String userId,
+            @AuthenticationPrincipal(expression = "username") String userId,
             @PathVariable String objectId
     ){
 

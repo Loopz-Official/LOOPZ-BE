@@ -15,12 +15,12 @@ import java.util.List;
 public interface ProductClient {
 
     @PostMapping("/internal/admin/upload")
-    UploadResponse uploadObject(@RequestHeader("userId") String userId, @RequestBody UploadRequest request);
+    UploadResponse uploadObject(@RequestHeader("Authorization") String jwtToken, @RequestBody UploadRequest request);
 
     @PutMapping("/internal/admin/modify/{objectId}")
-    UploadResponse modifyObject(@RequestHeader("userId") String userId, @PathVariable String objectId, @RequestBody UploadRequest request);
+    UploadResponse modifyObject(@RequestHeader("Authorization") String jwtToken,  @PathVariable String objectId, @RequestBody UploadRequest request);
 
     @DeleteMapping("/internal/admin/{objectId}")
-    String deleteObject(@RequestHeader("userId") String userId, @PathVariable String objectId);
+    String deleteObject(@RequestHeader("Authorization") String jwtToken,  @PathVariable String objectId);
 
 }
